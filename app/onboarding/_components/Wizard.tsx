@@ -99,151 +99,130 @@ export default function Wizard() {
 
   return (
     <div className="w-full">
-      <Stepper current={step} />
+      <div className="mb-6">
+        <Stepper current={step} />
+      </div>
 
       {error ? (
-        <div className="rounded-md bg-red-50 text-red-700 border border-red-200 p-3 mb-4 text-sm">
-          {error}
-        </div>
+        <Alert tone="error" message={error} />
       ) : null}
       {successMessage ? (
-        <div className="rounded-md bg-green-50 text-green-700 border border-green-200 p-3 mb-4 text-sm">
-          {successMessage}
-        </div>
+        <Alert tone="success" message={successMessage} />
       ) : null}
 
       {step === 1 && (
-        <section className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Company name</label>
-            <input
-              value={orgName}
-              onChange={(e) => setOrgName(e.target.value)}
-              className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-              placeholder="Robotice"
-            />
+        <Card>
+          <div className="text-center mb-6">
+            <h2 className="text-2xl font-semibold mb-2">Let's Get Started</h2>
+            <p className="text-sm text-black/60 dark:text-white/70">
+              Enter your email and company details to begin the Gmail API setup process.
+            </p>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Contact email</label>
-            <input
-              type="email"
-              value={contactEmail}
-              onChange={(e) => setContactEmail(e.target.value)}
-              className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-              placeholder="you@company.com"
-            />
+          <div className="space-y-4">
+            <Field label="Email Address">
+              <input
+                type="email"
+                value={contactEmail}
+                onChange={(e) => setContactEmail(e.target.value)}
+                className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
+                placeholder="john@example.com"
+              />
+            </Field>
+            <Field label="Company/Brand Name">
+              <input
+                value={orgName}
+                onChange={(e) => setOrgName(e.target.value)}
+                className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
+                placeholder="Acme Corporation"
+              />
+            </Field>
+            <Field label="Industry (Optional)">
+              <input
+                value={videoUrl}
+                onChange={(e) => setVideoUrl(e.target.value)}
+                className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
+                placeholder="Select your industry"
+              />
+            </Field>
           </div>
-          <div className="flex items-center gap-3 pt-2">
-            <button
-              className="h-10 px-4 rounded-md bg-black text-white dark:bg-white dark:text-black"
-              onClick={() => setStep(2)}
-            >
-              Continue
-            </button>
+          <div className="flex justify-end pt-6">
+            <Button onClick={() => setStep(2)}>Continue to Tutorial</Button>
           </div>
-        </section>
+        </Card>
       )}
 
       {step === 2 && (
-        <section className="space-y-4">
-          <p className="text-sm text-black/70 dark:text-white/70">
-            In your Google Cloud Console:
+        <Card>
+          <h2 className="text-xl font-semibold mb-2 text-center">Gmail API Setup Tutorial</h2>
+          <p className="text-sm text-black/60 dark:text-white/70 text-center mb-6">
+            Follow this step-by-step video to enable Gmail API access for your account.
           </p>
-          <ol className="list-decimal ml-6 text-sm space-y-1">
-            <li>Enable Gmail API</li>
-            <li>OAuth consent: Internal (Workspace)</li>
-            <li>Credentials → OAuth client ID (Web)</li>
-            <li>
-              Authorized redirect URI:
-              <span className="ml-2 font-mono text-xs break-all">{redirectUri}</span>
-            </li>
-          </ol>
-          <div>
-            <label className="block text-sm font-medium mb-1">Help video (optional)</label>
-            <input
-              value={videoUrl}
-              onChange={(e) => setVideoUrl(e.target.value)}
-              className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-              placeholder="https://youtu.be/..."
+          <div className="aspect-video w-full rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-black/5">
+            <iframe
+              className="w-full h-full"
+              src="https://www.youtube.com/embed/dQw4w9WgXcQ"
+              title="Gmail API Setup Tutorial"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
             />
           </div>
-          <div className="flex items-center gap-3 pt-2">
-            <button
-              className="h-10 px-4 rounded-md border border-black/10 dark:border-white/15"
-              onClick={() => setStep(1)}
-            >
-              Back
-            </button>
-            <button
-              className="h-10 px-4 rounded-md bg-black text-white dark:bg-white dark:text-black"
-              onClick={() => setStep(3)}
-            >
-              Continue
-            </button>
+          <div className="mt-6">
+            <div className="text-sm font-medium mb-2">Tutorial Checklist:</div>
+            <ul className="text-sm space-y-2">
+              <li className="flex items-center gap-2"><Check /> Enable Gmail API in Google Cloud Console</li>
+              <li className="flex items-center gap-2"><Check /> Create OAuth 2.0 credentials</li>
+              <li className="flex items-center gap-2"><Check /> Configure authorized redirect URIs</li>
+              <li className="flex items-center gap-2"><Check /> Download credentials JSON file</li>
+            </ul>
           </div>
-        </section>
+          <div className="flex items-center justify-between pt-6">
+            <Button variant="secondary" onClick={() => setStep(1)}>Back</Button>
+            <Button onClick={() => setStep(3)}>I've Completed Setup →</Button>
+          </div>
+        </Card>
       )}
 
       {step === 3 && (
-        <section className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium mb-1">Google Client ID</label>
-            <input
-              value={googleClientId}
-              onChange={(e) => setGoogleClientId(e.target.value)}
-              className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-              placeholder="xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com"
-            />
+        <Card>
+          <div className="grid gap-4">
+            <Field label="Google Client ID">
+              <input
+                value={googleClientId}
+                onChange={(e) => setGoogleClientId(e.target.value)}
+                className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
+                placeholder="xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com"
+              />
+            </Field>
+            <Field label="Google Client Secret">
+              <input
+                value={googleClientSecret}
+                onChange={(e) => setGoogleClientSecret(e.target.value)}
+                className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
+                placeholder="GOCSPX-..."
+              />
+            </Field>
+            <Field label="From email">
+              <input
+                type="email"
+                value={fromEmail}
+                onChange={(e) => setFromEmail(e.target.value)}
+                className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
+                placeholder="noreply@company.com"
+              />
+            </Field>
+            <Field label="Redirect URI">
+              <div className="font-mono text-xs break-all p-2 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20">
+                {redirectUri}
+              </div>
+            </Field>
           </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Google Client Secret</label>
-            <input
-              value={googleClientSecret}
-              onChange={(e) => setGoogleClientSecret(e.target.value)}
-              className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-              placeholder="GOCSPX-..."
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">From email</label>
-            <input
-              type="email"
-              value={fromEmail}
-              onChange={(e) => setFromEmail(e.target.value)}
-              className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-              placeholder="noreply@company.com"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium mb-1">Redirect URI</label>
-            <div className="font-mono text-xs break-all p-2 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20">
-              {redirectUri}
-            </div>
-          </div>
-          <div className="flex items-center gap-3 pt-2">
-            <button
-              className="h-10 px-4 rounded-md border border-black/10 dark:border-white/15"
-              onClick={() => setStep(2)}
-            >
-              Back
-            </button>
-            <button
-              className="h-10 px-4 rounded-md bg-black text-white dark:bg-white dark:text-black disabled:opacity-60"
-              onClick={handleSave}
-              disabled={saving}
-            >
-              {saving ? "Saving..." : integrationId ? "Save again" : "Save"}
-            </button>
-            <button
-              className="h-10 px-4 rounded-md border border-black/10 dark:border-white/15 disabled:opacity-60"
-              onClick={handleConnectGoogle}
-              disabled={!integrationId}
-            >
-              Connect with Google
-            </button>
+          <div className="flex flex-wrap items-center gap-3 pt-6">
+            <Button variant="secondary" onClick={() => setStep(2)}>Back</Button>
+            <Button onClick={handleSave} disabled={saving}>{saving ? "Saving..." : integrationId ? "Save again" : "Save"}</Button>
+            <Button variant="outline" onClick={handleConnectGoogle} disabled={!integrationId}>Connect with Google</Button>
           </div>
           <div className="mt-6 space-y-2">
-            <label className="block text-sm font-medium">Send test email</label>
+            <div className="text-sm font-medium">Send test email</div>
             <div className="flex gap-2 items-center">
               <input
                 type="email"
@@ -252,9 +231,7 @@ export default function Wizard() {
                 className="flex-1 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
                 placeholder="your.email@company.com"
               />
-              <button
-                className="h-10 px-4 rounded-md border border-black/10 dark:border-white/15 disabled:opacity-60"
-                disabled={!integrationId || !testRecipient || testSendLoading}
+              <Button variant="outline" disabled={!integrationId || !testRecipient || testSendLoading}
                 onClick={async () => {
                   setError("");
                   setSuccessMessage("");
@@ -273,12 +250,10 @@ export default function Wizard() {
                     setTestSendLoading(false);
                   }
                 }}
-              >
-                {testSendLoading ? "Sending..." : "Send"}
-              </button>
+              >{testSendLoading ? "Sending..." : "Send"}</Button>
             </div>
           </div>
-        </section>
+        </Card>
       )}
     </div>
   );
@@ -287,7 +262,7 @@ export default function Wizard() {
 function Stepper({ current }: { current: number }) {
   const steps = ["Company", "Guide", "Connect"];
   return (
-    <div className="flex items-center gap-3 mb-6">
+    <div className="flex items-center justify-center gap-6">
       {steps.map((label, idx) => {
         const number = idx + 1;
         const active = number === current;
@@ -296,11 +271,11 @@ function Stepper({ current }: { current: number }) {
           <div key={label} className="flex items-center gap-2">
             <div
               className={
-                "w-7 h-7 rounded-full grid place-items-center text-xs " +
+                "w-9 h-9 rounded-full grid place-items-center text-xs " +
                 (completed
-                  ? "bg-black text-white dark:bg-white dark:text-black"
+                  ? "bg-blue-600 text-white"
                   : active
-                  ? "border border-black/40 dark:border-white/40"
+                  ? "border-2 border-blue-600 text-blue-600"
                   : "border border-black/20 dark:border-white/20 text-black/50 dark:text-white/50")
               }
             >
@@ -308,13 +283,57 @@ function Stepper({ current }: { current: number }) {
             </div>
             <span className={"text-sm " + (active ? "font-medium" : "text-black/60 dark:text-white/60")}>{label}</span>
             {idx < steps.length - 1 && (
-              <div className="w-8 h-px bg-black/10 dark:bg-white/10 mx-2" />
+              <div className="w-10 h-px bg-black/10 dark:bg-white/10 mx-2" />
             )}
           </div>
         );
       })}
     </div>
   );
+}
+
+function Card({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="bg-white/90 dark:bg-black/30 backdrop-blur rounded-xl shadow-sm border border-black/5 dark:border-white/10 p-6 sm:p-8">
+      {children}
+    </div>
+  );
+}
+
+function Field({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="block text-sm font-medium mb-1">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+function Button({ children, onClick, disabled, variant }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean; variant?: "primary" | "secondary" | "outline" }) {
+  const cls =
+    variant === "secondary"
+      ? "h-10 px-4 rounded-md border border-black/10 dark:border-white/15"
+      : variant === "outline"
+      ? "h-10 px-4 rounded-md border border-blue-600 text-blue-600"
+      : "h-10 px-4 rounded-md bg-blue-600 text-white";
+  return (
+    <button className={cls + (disabled ? " opacity-60 cursor-not-allowed" : "")} onClick={onClick} disabled={disabled}>
+      {children}
+    </button>
+  );
+}
+
+function Check() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" className="text-blue-600">
+      <path d="M20 6L9 17l-5-5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  );
+}
+
+function Alert({ tone, message }: { tone: "error" | "success"; message: string }) {
+  const styles = tone === "error" ? "bg-red-50 text-red-700 border-red-200" : "bg-green-50 text-green-700 border-green-200";
+  return <div className={`rounded-md border p-3 mb-4 text-sm ${styles}`}>{message}</div>;
 }
 
 
