@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 
 type RegisterPayload = {
   googleClientId: string;
@@ -15,6 +16,7 @@ type RegisterResponse = {
 };
 
 export default function Wizard() {
+  const { t } = useI18n();
   const [step, setStep] = useState<number>(1);
   const [orgName, setOrgName] = useState<string>("");
   const [contactEmail, setContactEmail] = useState<string>("");
@@ -42,14 +44,14 @@ export default function Wizard() {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     if (params.get("success") === "1") {
-      setSuccessMessage("Google connected successfully. Refresh token stored.");
+      setSuccessMessage(t("googleConnected"));
       setStep(3);
     }
     if (params.get("error")) {
       setError(params.get("error") || "");
       setStep(3);
     }
-  }, []);
+  }, [t]);
 
   // Run once on mount
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -75,13 +77,13 @@ export default function Wizard() {
       });
       if (!res.ok) {
         const text = await res.text();
-        throw new Error(text || "Failed to save integration");
+        throw new Error(text || t("unknownError"));
       }
       const data = (await res.json()) as RegisterResponse;
       setIntegrationId(data.integrationId);
-      setSuccessMessage("Saved. Now connect your Google account.");
+      setSuccessMessage(t("savedNowConnect"));
     } catch (e: unknown) {
-      setError(e instanceof Error ? e.message : "Unknown error");
+      setError(e instanceof Error ? e.message : t("unknownError"));
     } finally {
       setSaving(false);
     }
@@ -89,7 +91,7 @@ export default function Wizard() {
 
   const handleConnectGoogle = () => {
     if (!integrationId) {
-      setError("Please save first to get an integration ID.");
+      setError(t("pleaseSaveFirst"));
       return;
     }
     window.location.href = `/api/oauth/google/start?integrationId=${encodeURIComponent(
@@ -113,49 +115,49 @@ export default function Wizard() {
       {step === 1 && (
         <Card>
           <div className="text-center mb-6">
-            <h2 className="text-2xl font-semibold mb-2">Let's Get Started</h2>
+            <h2 className="text-2xl font-semibold mb-2">{t("letsGetStarted")}</h2>
             <p className="text-sm text-black/60 dark:text-white/70">
-              Enter your email and company details to begin the Gmail API setup process.
+              {t("enterEmailAndCompany")}
             </p>
           </div>
           <div className="space-y-4">
-            <Field label="Email Address">
+            <Field label={t("emailAddress")}>
               <input
                 type="email"
                 value={contactEmail}
                 onChange={(e) => setContactEmail(e.target.value)}
                 className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-                placeholder="john@example.com"
+                placeholder={t("yourEmailPlaceholder")}
               />
             </Field>
-            <Field label="Company/Brand Name">
+            <Field label={t("companyName")}>
               <input
                 value={orgName}
                 onChange={(e) => setOrgName(e.target.value)}
                 className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-                placeholder="Acme Corporation"
+                placeholder={t("companyPlaceholder")}
               />
             </Field>
-            <Field label="Industry (Optional)">
+            <Field label={t("industryOptional")}>
               <input
                 value={videoUrl}
                 onChange={(e) => setVideoUrl(e.target.value)}
                 className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-                placeholder="Select your industry"
+                placeholder={t("industryPlaceholder")}
               />
             </Field>
           </div>
           <div className="flex justify-end pt-6">
-            <Button onClick={() => setStep(2)}>Continue to Tutorial</Button>
+            <Button onClick={() => setStep(2)}>{t("continueToTutorial")}</Button>
           </div>
         </Card>
       )}
 
       {step === 2 && (
         <Card>
-          <h2 className="text-xl font-semibold mb-2 text-center">Gmail API Setup Tutorial</h2>
+          <h2 className="text-xl font-semibold mb-2 text-center">{t("tutorialTitle")}</h2>
           <p className="text-sm text-black/60 dark:text-white/70 text-center mb-6">
-            Follow this step-by-step video to enable Gmail API access for your account.
+            {t("tutorialSubtitle")}
           </p>
           <div className="aspect-video w-full rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-black/5">
             <iframe
@@ -167,17 +169,17 @@ export default function Wizard() {
             />
           </div>
           <div className="mt-6">
-            <div className="text-sm font-medium mb-2">Tutorial Checklist:</div>
+            <div className="text-sm font-medium mb-2">{t("tutorialChecklist")}</div>
             <ul className="text-sm space-y-2">
-              <li className="flex items-center gap-2"><Check /> Enable Gmail API in Google Cloud Console</li>
-              <li className="flex items-center gap-2"><Check /> Create OAuth 2.0 credentials</li>
-              <li className="flex items-center gap-2"><Check /> Configure authorized redirect URIs</li>
-              <li className="flex items-center gap-2"><Check /> Download credentials JSON file</li>
+              <li className="flex items-center gap-2"><Check /> {t("checkEnableApi")}</li>
+              <li className="flex items-center gap-2"><Check /> {t("checkCreateOAuth")}</li>
+              <li className="flex items-center gap-2"><Check /> {t("checkRedirectUris")}</li>
+              <li className="flex items-center gap-2"><Check /> {t("checkDownloadJson")}</li>
             </ul>
           </div>
           <div className="flex items-center justify-between pt-6">
-            <Button variant="secondary" onClick={() => setStep(1)}>Back</Button>
-            <Button onClick={() => setStep(3)}>I've Completed Setup →</Button>
+            <Button variant="secondary" onClick={() => setStep(1)}>{t("back")}</Button>
+            <Button onClick={() => setStep(3)}>{t("completedSetup")}</Button>
           </div>
         </Card>
       )}
@@ -185,7 +187,7 @@ export default function Wizard() {
       {step === 3 && (
         <Card>
           <div className="grid gap-4">
-            <Field label="Google Client ID">
+            <Field label={t("googleClientId")}>
               <input
                 value={googleClientId}
                 onChange={(e) => setGoogleClientId(e.target.value)}
@@ -193,7 +195,7 @@ export default function Wizard() {
                 placeholder="xxxxxxxxxxxx-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx.apps.googleusercontent.com"
               />
             </Field>
-            <Field label="Google Client Secret">
+            <Field label={t("googleClientSecret")}>
               <input
                 value={googleClientSecret}
                 onChange={(e) => setGoogleClientSecret(e.target.value)}
@@ -201,7 +203,7 @@ export default function Wizard() {
                 placeholder="GOCSPX-..."
               />
             </Field>
-            <Field label="From email">
+            <Field label={t("fromEmail")}>
               <input
                 type="email"
                 value={fromEmail}
@@ -210,26 +212,26 @@ export default function Wizard() {
                 placeholder="noreply@company.com"
               />
             </Field>
-            <Field label="Redirect URI">
+            <Field label={t("redirectUri")}>
               <div className="font-mono text-xs break-all p-2 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20">
                 {redirectUri}
               </div>
             </Field>
           </div>
           <div className="flex flex-wrap items-center gap-3 pt-6">
-            <Button variant="secondary" onClick={() => setStep(2)}>Back</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? "Saving..." : integrationId ? "Save again" : "Save"}</Button>
-            <Button variant="outline" onClick={handleConnectGoogle} disabled={!integrationId}>Connect with Google</Button>
+            <Button variant="secondary" onClick={() => setStep(2)}>{t("back")}</Button>
+            <Button onClick={handleSave} disabled={saving}>{saving ? t("saving") + "..." : integrationId ? t("saveAgain") : t("save")}</Button>
+            <Button variant="outline" onClick={handleConnectGoogle} disabled={!integrationId}>{t("connectWithGoogle")}</Button>
           </div>
           <div className="mt-6 space-y-2">
-            <div className="text-sm font-medium">Send test email</div>
+            <div className="text-sm font-medium">{t("sendTestEmail")}</div>
             <div className="flex gap-2 items-center">
               <input
                 type="email"
                 value={testRecipient}
                 onChange={(e) => setTestRecipient(e.target.value)}
                 className="flex-1 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-                placeholder="your.email@company.com"
+                placeholder={t("yourEmailPlaceholder")}
               />
               <Button variant="outline" disabled={!integrationId || !testRecipient || testSendLoading}
                 onClick={async () => {
@@ -243,14 +245,14 @@ export default function Wizard() {
                       body: JSON.stringify({ integrationId, to: testRecipient }),
                     });
                     if (!res.ok) throw new Error(await res.text());
-                    setSuccessMessage("Test email sent. Check your inbox.");
+                    setSuccessMessage(t("testEmailSent"));
                   } catch (e: unknown) {
-                    setError(e instanceof Error ? e.message : "Failed to send test email");
+                    setError(e instanceof Error ? e.message : t("failedToSendTest"));
                   } finally {
                     setTestSendLoading(false);
                   }
                 }}
-              >{testSendLoading ? "Sending..." : "Send"}</Button>
+              >{testSendLoading ? t("sending") + "..." : t("send")}</Button>
             </div>
           </div>
         </Card>
@@ -260,7 +262,8 @@ export default function Wizard() {
 }
 
 function Stepper({ current }: { current: number }) {
-  const steps = ["Company", "Guide", "Connect"];
+  const { t } = useI18n();
+  const steps = [t("stepCompany"), t("stepGuide"), t("stepConnect")];
   return (
     <div className="flex items-center justify-center gap-6">
       {steps.map((label, idx) => {
