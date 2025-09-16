@@ -46,6 +46,8 @@ const ES: Dictionary = {
   pleaseSaveFirst: "Guarda primero para obtener un ID de integración.",
   unknownError: "Error desconocido",
   failedToSendTest: "Error al enviar el correo de prueba",
+  clickToCopy: "Clic para copiar",
+  copied: "¡Copiado!",
 
   yourEmailPlaceholder: "tu.email@empresa.com",
   companyPlaceholder: "Nombre de tu empresa",
@@ -93,6 +95,8 @@ const EN: Dictionary = {
   pleaseSaveFirst: "Please save first to get an integration ID.",
   unknownError: "Unknown error",
   failedToSendTest: "Failed to send test email",
+  clickToCopy: "Click to copy",
+  copied: "Copied!",
 
   yourEmailPlaceholder: "your.email@company.com",
   companyPlaceholder: "Your company name",

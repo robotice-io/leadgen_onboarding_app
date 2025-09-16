@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useMemo, useState } from "react";
+import { ArrowLeft } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 
 type RegisterPayload = {
@@ -30,6 +31,8 @@ export default function Wizard() {
   const [successMessage, setSuccessMessage] = useState<string>("");
   const [testSendLoading, setTestSendLoading] = useState<boolean>(false);
   const [testRecipient, setTestRecipient] = useState<string>("");
+  const [checklist, setChecklist] = useState<boolean[]>([false, false, false, false]);
+  const [copied, setCopied] = useState<boolean>(false);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const envBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -155,11 +158,11 @@ export default function Wizard() {
 
       {step === 2 && (
         <Card>
-          <h2 className="text-xl font-semibold mb-2 text-center">{t("tutorialTitle")}</h2>
-          <p className="text-sm text-black/60 dark:text-white/70 text-center mb-6">
+          <h2 className="text-2xl font-semibold mb-3 text-center">{t("tutorialTitle")}</h2>
+          <p className="text-sm text-black/70 dark:text-white/70 text-center mb-8">
             {t("tutorialSubtitle")}
           </p>
-          <div className="aspect-video w-full rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-black/5">
+          <div className="aspect-video w-full rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 shadow-sm">
             <iframe
               className="w-full h-full"
               src="https://www.youtube.com/embed/dQw4w9WgXcQ"
@@ -169,23 +172,87 @@ export default function Wizard() {
             />
           </div>
           <div className="mt-6">
-            <div className="text-sm font-medium mb-2">{t("tutorialChecklist")}</div>
-            <ul className="text-sm space-y-2">
-              <li className="flex items-center gap-2"><Check /> {t("checkEnableApi")}</li>
-              <li className="flex items-center gap-2"><Check /> {t("checkCreateOAuth")}</li>
-              <li className="flex items-center gap-2"><Check /> {t("checkRedirectUris")}</li>
-              <li className="flex items-center gap-2"><Check /> {t("checkDownloadJson")}</li>
+            <div className="text-sm font-medium mb-2">{t("redirectUri")}</div>
+            <button
+              type="button"
+              className="w-full text-left font-mono text-xs break-all p-2 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 hover:bg-black/5 dark:hover:bg-white/10 transition"
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(redirectUri);
+                  setCopied(true);
+                  setTimeout(() => setCopied(false), 2000);
+                } catch {}
+              }}
+              title={copied ? t("copied") : t("clickToCopy")}
+            >
+              {redirectUri}
+            </button>
+            <div className="text-xs mt-1 text-black/60 dark:text-white/60">{copied ? t("copied") : t("clickToCopy")}</div>
+          </div>
+          <div className="mt-8">
+            <div className="text-sm font-medium mb-3">{t("tutorialChecklist")}</div>
+            <ul className="text-sm space-y-3">
+              <li>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25"
+                    checked={checklist[0]}
+                    onChange={() => setChecklist((prev) => { const next = [...prev]; next[0] = !next[0]; return next; })}
+                  />
+                  <span>{t("checkEnableApi")}</span>
+                </label>
+              </li>
+              <li>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25"
+                    checked={checklist[1]}
+                    onChange={() => setChecklist((prev) => { const next = [...prev]; next[1] = !next[1]; return next; })}
+                  />
+                  <span>{t("checkCreateOAuth")}</span>
+                </label>
+              </li>
+              <li>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25"
+                    checked={checklist[2]}
+                    onChange={() => setChecklist((prev) => { const next = [...prev]; next[2] = !next[2]; return next; })}
+                  />
+                  <span>{t("checkRedirectUris")}</span>
+                </label>
+              </li>
+              <li>
+                <label className="flex items-start gap-3 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25"
+                    checked={checklist[3]}
+                    onChange={() => setChecklist((prev) => { const next = [...prev]; next[3] = !next[3]; return next; })}
+                  />
+                  <span>{t("checkDownloadJson")}</span>
+                </label>
+              </li>
             </ul>
           </div>
-          <div className="flex items-center justify-between pt-6">
+          <div className="flex items-center justify-between pt-8">
             <Button variant="secondary" onClick={() => setStep(1)}>{t("back")}</Button>
-            <Button onClick={() => setStep(3)}>{t("completedSetup")}</Button>
+            <Button onClick={() => setStep(3)} disabled={!checklist.every(Boolean)}>{t("completedSetup")}</Button>
           </div>
         </Card>
       )}
 
       {step === 3 && (
         <Card>
+          <div className="flex items-center justify-between mb-4">
+            <button aria-label={t("back")} className="flex items-center gap-2 text-sm text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white"
+              onClick={() => setStep(2)}>
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          </div>
           <div className="grid gap-4">
             <Field label={t("googleClientId")}>
               <input
@@ -212,16 +279,6 @@ export default function Wizard() {
                 placeholder="noreply@company.com"
               />
             </Field>
-            <Field label={t("redirectUri")}>
-              <div className="font-mono text-xs break-all p-2 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20">
-                {redirectUri}
-              </div>
-            </Field>
-          </div>
-          <div className="flex flex-wrap items-center gap-3 pt-6">
-            <Button variant="secondary" onClick={() => setStep(2)}>{t("back")}</Button>
-            <Button onClick={handleSave} disabled={saving}>{saving ? t("saving") + "..." : integrationId ? t("saveAgain") : t("save")}</Button>
-            <Button variant="outline" onClick={handleConnectGoogle} disabled={!integrationId}>{t("connectWithGoogle")}</Button>
           </div>
           <div className="mt-6 space-y-2">
             <div className="text-sm font-medium">{t("sendTestEmail")}</div>
@@ -253,6 +310,25 @@ export default function Wizard() {
                   }
                 }}
               >{testSendLoading ? t("sending") + "..." : t("send")}</Button>
+            </div>
+          </div>
+          <div className="pt-6">
+            <div className="grid gap-3">
+              <button
+                className="w-full h-11 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black text-black dark:text-white flex items-center justify-center gap-2"
+                onClick={handleConnectGoogle}
+                disabled={!integrationId}
+              >
+                <img src="/google.svg" alt="Google" className="w-5 h-5" />
+                <span>{t("connectWithGoogle")}</span>
+              </button>
+              <button
+                className="w-full h-11 rounded-md bg-blue-600 text-white"
+                onClick={handleSave}
+                disabled={saving}
+              >
+                {saving ? t("saving") + "..." : integrationId ? t("saveAgain") : t("save")}
+              </button>
             </div>
           </div>
         </Card>
