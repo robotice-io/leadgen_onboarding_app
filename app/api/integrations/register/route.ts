@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+export const runtime = "nodejs";
 import { randomId } from "@/lib/crypto";
 import { upsertIntegration } from "@/lib/store";
 
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
     return new Response(e instanceof Error ? e.message : "Server error", { status: 500 });
   }
 }
+
 
 
 

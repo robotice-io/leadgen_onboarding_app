@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+export const runtime = "nodejs";
 import { getIntegrationById, updateIntegrationTokens } from "@/lib/store";
 import { hmacSha256Hex, requireEnv } from "@/lib/crypto";
 
@@ -69,6 +70,7 @@ export async function GET(req: NextRequest) {
 
   return Response.redirect(`/onboarding?success=1`, 302);
 }
+
 
 
 
