@@ -2,8 +2,9 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { apiGet, apiPost, getAppBaseUrl, getApiBaseUrl } from "@/lib/api";
+import { apiGet, apiPost, getApiBaseUrl } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
+import HelpDrawer from "./HelpDrawer";
 
 type RegisterPayload = {
   googleClientId: string;
@@ -35,6 +36,9 @@ export default function Wizard() {
   const [checklist, setChecklist] = useState<boolean[]>([false, false, false, false]);
   const [copied, setCopied] = useState<boolean>(false);
   const [toast, setToast] = useState<{ tone: "success" | "error"; msg: string } | null>(null);
+  const [tenantCreated, setTenantCreated] = useState<boolean>(false);
+  const [emailQueuedFlag, setEmailQueuedFlag] = useState<boolean>(false);
+  const [helpOpen, setHelpOpen] = useState<boolean>(false);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const envBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -74,12 +78,16 @@ export default function Wizard() {
         const resTenant = await apiPost("/api/v1/tenants/", { name: orgName || "" });
         if (resTenant.status === 200) {
           setToast({ tone: "success", msg: t("companyCreated") });
+          setTenantCreated(true);
           setStep(2);
+          setHelpOpen(true);
           return;
         }
         if (resTenant.status === 500 || resTenant.status === 409) {
           setToast({ tone: "success", msg: t("companyExistsContinuing") });
+          setTenantCreated(true);
           setStep(2);
+          setHelpOpen(true);
           return;
         }
         if (resTenant.status === 422) {
@@ -170,16 +178,22 @@ export default function Wizard() {
                 />
               </Field>
             </div>
-            <div className="flex justify-end pt-6">
-              <Button onClick={() => setStep(2)}>{t("continueToTutorial")}</Button>
+            <div className="flex items-center justify-end gap-3 pt-6">
+              {tenantCreated ? (
+                <span className="text-sm text-green-600">{t("companyCreated")}</span>
+              ) : null}
+              <Button onClick={handleSave} disabled={saving || !(orgName || "").trim()}>{saving ? t("saving") + "..." : t("continueToTutorial")}</Button>
             </div>
           </Card>
         </StepPanel>
 
         <StepPanel active={step === 2}>
           <Card>
-            <h2 className="text-2xl font-semibold mb-3 text-center">{t("tutorialTitle")}</h2>
-            <p className="text-sm text-black/70 dark:text-white/70 text-center mb-8">
+            <div className="flex items-center justify-between">
+              <h2 className="text-2xl font-semibold mb-3">{t("tutorialTitle")}</h2>
+              <button className="h-9 px-3 rounded-md border border-black/10 dark:border-white/15 text-sm cursor-pointer" onClick={() => setHelpOpen(true)}>Guía rápida</button>
+            </div>
+            <p className="text-sm text-black/70 dark:text-white/70 mb-6">
               {t("tutorialSubtitle")}
             </p>
             <div className="aspect-video w-full rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 shadow-sm">
@@ -217,7 +231,7 @@ export default function Wizard() {
                   <label className="flex items-start gap-3 cursor-pointer select-none">
                     <input
                       type="checkbox"
-                      className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25"
+                    className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25 accent-blue-600"
                       checked={checklist[0]}
                       onChange={() => setChecklist((prev) => { const next = [...prev]; next[0] = !next[0]; return next; })}
                     />
@@ -228,7 +242,7 @@ export default function Wizard() {
                   <label className="flex items-start gap-3 cursor-pointer select-none">
                     <input
                       type="checkbox"
-                      className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25"
+                    className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25 accent-blue-600"
                       checked={checklist[1]}
                       onChange={() => setChecklist((prev) => { const next = [...prev]; next[1] = !next[1]; return next; })}
                     />
@@ -239,7 +253,7 @@ export default function Wizard() {
                   <label className="flex items-start gap-3 cursor-pointer select-none">
                     <input
                       type="checkbox"
-                      className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25"
+                    className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25 accent-blue-600"
                       checked={checklist[2]}
                       onChange={() => setChecklist((prev) => { const next = [...prev]; next[2] = !next[2]; return next; })}
                     />
@@ -250,7 +264,7 @@ export default function Wizard() {
                   <label className="flex items-start gap-3 cursor-pointer select-none">
                     <input
                       type="checkbox"
-                      className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25"
+                    className="mt-0.5 h-4 w-4 rounded border border-black/25 dark:border-white/25 accent-blue-600"
                       checked={checklist[3]}
                       onChange={() => setChecklist((prev) => { const next = [...prev]; next[3] = !next[3]; return next; })}
                     />
@@ -269,8 +283,8 @@ export default function Wizard() {
         <StepPanel active={step === 3}>
           <Card>
             <div className="flex items-center justify-between mb-4">
-              <button aria-label={t("back")} className="flex items-center gap-2 text-sm text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white"
-                onClick={() => setStep(2)}>
+              <button aria-label={t("back")} className="flex items-center gap-2 text-sm text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white cursor-pointer"
+                onClick={() => { setStep(2); setHelpOpen(true); }}>
                 <ArrowLeft className="w-5 h-5" />
               </button>
             </div>
@@ -320,6 +334,7 @@ export default function Wizard() {
                       const res = await apiPost("/api/v1/email/send", { to: testRecipient, subject: "Test email", body: `Hola de ${orgName || "Robotice"}` });
                       if (res.status === 202) {
                         setToast({ tone: "success", msg: t("queuedEmail") });
+                        setEmailQueuedFlag(true);
                       } else if (res.status === 422) {
                         setToast({ tone: "error", msg: t("invalidEmailFields") });
                       } else if (!res.ok) {
@@ -333,11 +348,14 @@ export default function Wizard() {
                   }}
                 >{testSendLoading ? t("sending") + "..." : t("send")}</Button>
               </div>
+              {emailQueuedFlag ? (
+                <div className="text-xs text-green-600">{t("queuedEmail")}</div>
+              ) : null}
             </div>
             <div className="pt-6">
               <div className="grid gap-3">
                 <button
-                  className="w-full h-11 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black text-black dark:text-white flex items-center justify-center gap-2"
+                className="w-full h-11 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black text-black dark:text-white flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
                   onClick={handleConnectGoogle}
                   disabled={false}
                 >
@@ -345,7 +363,7 @@ export default function Wizard() {
                   <span>{t("connectWithGoogle")}</span>
                 </button>
                 <button
-                  className="w-full h-11 rounded-md bg-blue-600 text-white"
+                  className="w-full h-11 rounded-md bg-blue-600 text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
                   onClick={handleSave}
                   disabled={saving}
                 >
@@ -356,6 +374,7 @@ export default function Wizard() {
           </Card>
         </StepPanel>
       </div>
+      <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} redirectUri={`${getApiBaseUrl().replace(/\/$/, "")}/api/v1/oauth/callback`} apiBase={getApiBaseUrl()} />
       <Toast toast={toast} onClose={() => setToast(null)} />
     </div>
   );
@@ -429,10 +448,10 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 function Button({ children, onClick, disabled, variant }: { children: React.ReactNode; onClick?: () => void; disabled?: boolean; variant?: "primary" | "secondary" | "outline" }) {
   const cls =
     variant === "secondary"
-      ? "h-10 px-4 rounded-md border border-black/10 dark:border-white/15"
+      ? "h-10 px-4 rounded-md border border-black/10 dark:border-white/15 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
       : variant === "outline"
-      ? "h-10 px-4 rounded-md border border-blue-600 text-blue-600"
-      : "h-10 px-4 rounded-md bg-blue-600 text-white";
+      ? "h-10 px-4 rounded-md border border-blue-600 text-blue-600 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+      : "h-10 px-4 rounded-md bg-blue-600 text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60";
   return (
     <button className={cls + (disabled ? " opacity-60 cursor-not-allowed" : "")} onClick={onClick} disabled={disabled}>
       {children}
