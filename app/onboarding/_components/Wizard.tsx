@@ -195,7 +195,7 @@ export default function Wizard() {
               <div className="text-sm font-medium mb-2">{t("redirectUri")}</div>
               <button
                 type="button"
-                className="w-full text-left font-mono text-xs break-all p-2 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 hover:bg-black/5 dark:hover:bg_WHITE/10 transition"
+                className="w-full text-left font-mono text-xs break-all p-2 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 hover:bg-black/5 dark:hover:bg-white/10 transition"
                 onClick={async () => {
                   try {
                     const shownRedirect = `${getApiBaseUrl().replace(/\/$/, "")}/api/v1/oauth/callback`;
@@ -208,7 +208,7 @@ export default function Wizard() {
               >
                 {`${getApiBaseUrl().replace(/\/$/, "")}/api/v1/oauth/callback`}
               </button>
-              <div className="text-xs mt-1 text-black/60 dark:text_WHITE/60">{copied ? t("copied") : t("clickToCopy")}</div>
+              <div className="text-xs mt-1 text-black/60 dark:text-white/60">{copied ? t("copied") : t("clickToCopy")}</div>
             </div>
             <div className="mt-8">
               <div className="text-sm font-medium mb-3">{t("tutorialChecklist")}</div>
@@ -269,7 +269,7 @@ export default function Wizard() {
         <StepPanel active={step === 3}>
           <Card>
             <div className="flex items-center justify-between mb-4">
-              <button aria-label={t("back")} className="flex items_CENTER gap-2 text-sm text-black/70 dark:text_WHITE/70 hover:text-black dark:hover:text_WHITE"
+              <button aria-label={t("back")} className="flex items-center gap-2 text-sm text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white"
                 onClick={() => setStep(2)}>
                 <ArrowLeft className="w-5 h-5" />
               </button>
@@ -296,7 +296,7 @@ export default function Wizard() {
                   type="email"
                   value={fromEmail}
                   onChange={(e) => setFromEmail(e.target.value)}
-                  className="w-full rounded-md border border-black/10 dark:border-white/15 bg_WHITE dark:bg-black/20 px-3 py-2 outline-none"
+                  className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
                   placeholder="noreply@company.com"
                 />
               </Field>
@@ -308,7 +308,7 @@ export default function Wizard() {
                   type="email"
                   value={testRecipient}
                   onChange={(e) => setTestRecipient(e.target.value)}
-                  className="flex-1 rounded-md border border-black/10 dark:border_WHITE/15 bg_WHITE dark:bg-black/20 px-3 py-2 outline-none"
+                  className="flex-1 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
                   placeholder={t("yourEmailPlaceholder")}
                 />
                 <Button variant="outline" disabled={!testRecipient || testSendLoading}
@@ -337,7 +337,7 @@ export default function Wizard() {
             <div className="pt-6">
               <div className="grid gap-3">
                 <button
-                  className="w-full h-11 rounded-md border border-black/10 dark:border-white/15 bg_WHITE dark:bg-black text-black dark:text_WHITE flex items-center justify-center gap-2"
+                  className="w-full h-11 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black text-black dark:text-white flex items-center justify-center gap-2"
                   onClick={handleConnectGoogle}
                   disabled={false}
                 >
@@ -345,7 +345,7 @@ export default function Wizard() {
                   <span>{t("connectWithGoogle")}</span>
                 </button>
                 <button
-                  className="w-full h-11 rounded-md bg-blue-600 text_WHITE"
+                  className="w-full h-11 rounded-md bg-blue-600 text-white"
                   onClick={handleSave}
                   disabled={saving}
                 >
@@ -356,6 +356,7 @@ export default function Wizard() {
           </Card>
         </StepPanel>
       </div>
+      <Toast toast={toast} onClose={() => setToast(null)} />
     </div>
   );
 }
@@ -390,7 +391,6 @@ function Stepper({ current }: { current: number }) {
           </div>
         );
       })}
-      <Toast toast={toast} onClose={() => setToast(null)} />
     </div>
   );
 }
