@@ -75,6 +75,13 @@ export default function Wizard() {
     } catch {}
   }, [step]);
 
+  // Auto-hide "Empresa creada" badge after 5s
+  useEffect(() => {
+    if (!tenantCreated) return;
+    const t = setTimeout(() => setTenantCreated(false), 5000);
+    return () => clearTimeout(t);
+  }, [tenantCreated]);
+
   // Prefetch callback route for faster return after OAuth
   useEffect(() => {
     try {
@@ -172,9 +179,9 @@ export default function Wizard() {
   return (
     <div className="w-full">
       <div ref={topRef} />
-      <div className="mb-6 sticky top-0 z-10 bg-white/70 dark:bg-black/40 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-black/5 dark:border-white/10">
+      <div className="mb-6 sticky top-[56px] z-20 bg-white/70 dark:bg-black/40 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-black/5 dark:border-white/10">
         {busyCount > 0 && (
-          <div className="fixed left-0 top-0 h-[3px] w-full z-50">
+          <div className="fixed left-0 top-0 h-[3px] w-full z-30 pointer-events-none">
             <div className="h-full w-full origin-left bg-blue-600 animate-[progress_1.2s_ease-in-out_infinite]" />
             <style jsx>{`@keyframes progress{0%{transform:scaleX(0.15)}50%{transform:scaleX(0.6)}100%{transform:scaleX(0.15)}}`}</style>
           </div>
@@ -203,7 +210,7 @@ export default function Wizard() {
             <div className="space-y-4">
               <Field label={t("emailAddress")}>
                 <input
-                  type="email"
+                  type="text"
                   value={contactEmail}
                   onChange={(e) => setContactEmail(e.target.value)}
                   className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
@@ -229,7 +236,7 @@ export default function Wizard() {
             </div>
             <div className="flex items-center justify-end gap-3 pt-6">
               {tenantCreated ? (
-                <span className="text-sm text-green-600">{t("companyCreated")}</span>
+                <span className="text-sm text-green-600 animate-in fade-in" aria-live="polite">{t("companyCreated")}</span>
               ) : null}
               <Button onClick={handleSave} disabled={saving || !(orgName || "").trim()}>{saving ? t("saving") + "..." : t("continueToTutorial")}</Button>
             </div>

@@ -71,6 +71,16 @@ function CallbackUi({ status, error }: { status: string; error: string }) {
 
 function SuccessCard() {
   const { t } = useI18n();
+  const [countdown, setCountdown] = useState<number>(5);
+  useEffect(() => {
+    const id = setInterval(() => setCountdown((c) => Math.max(0, c - 1)), 1000);
+    return () => clearInterval(id);
+  }, []);
+  useEffect(() => {
+    if (countdown === 0) {
+      window.location.href = "/onboarding";
+    }
+  }, [countdown]);
   return (
     <div className="w-full max-w-md text-center animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="mx-auto w-16 h-16 rounded-2xl bg-white dark:bg-black grid place-items-center shadow border border-black/10 dark:border-white/10">
@@ -78,6 +88,7 @@ function SuccessCard() {
       </div>
       <h1 className="mt-4 text-2xl font-semibold text-blue-600">{t("connectedHeadline")}</h1>
       <p className="mt-2 text-sm text-black/70 dark:text-white/70">{t("funnelTeaser")}</p>
+      <p className="mt-1 text-xs text-black/50 dark:text-white/50">Redirigiendo en {countdown}s…</p>
       <TestEmail />
       <div className="mt-6">
         <Link href="/onboarding" className="inline-flex h-10 px-4 items-center justify-center rounded-md bg-blue-600 text-white">
