@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { apiGet, apiPost, getAppBaseUrl } from "@/lib/api";
 import Link from "next/link";
-import { useI18n } from "@/lib/i18n";
+import { I18nProvider, useI18n } from "@/lib/i18n";
 
 export default function OAuthCallbackPage() {
   const { t } = useI18n();
@@ -39,6 +39,7 @@ export default function OAuthCallbackPage() {
   }, []);
 
   return (
+    <I18nProvider>
     <main className="min-h-screen relative overflow-hidden flex items-center justify-center px-6">
       <CornerLogo position="tl" />
       <CornerLogo position="tr" />
@@ -58,6 +59,7 @@ export default function OAuthCallbackPage() {
 
       {status === "ok" && <SuccessCard />}
     </main>
+    </I18nProvider>
   );
 }
 
