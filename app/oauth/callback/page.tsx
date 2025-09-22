@@ -6,7 +6,6 @@ import Link from "next/link";
 import { I18nProvider, useI18n } from "@/lib/i18n";
 
 export default function OAuthCallbackPage() {
-  const { t } = useI18n();
   const [status, setStatus] = useState<string>("loading");
   const [error, setError] = useState<string>("");
 
@@ -40,6 +39,14 @@ export default function OAuthCallbackPage() {
 
   return (
     <I18nProvider>
+      <CallbackUi status={status} error={error} />
+    </I18nProvider>
+  );
+}
+
+function CallbackUi({ status, error }: { status: string; error: string }) {
+  const { t } = useI18n();
+  return (
     <main className="min-h-screen relative overflow-hidden flex items-center justify-center px-6">
       <CornerLogo position="tl" />
       <CornerLogo position="tr" />
@@ -59,7 +66,6 @@ export default function OAuthCallbackPage() {
 
       {status === "ok" && <SuccessCard />}
     </main>
-    </I18nProvider>
   );
 }
 
