@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo, useState } from "react";
 import { ArrowLeft } from "lucide-react";
-import { apiGet, apiPost, getApiBaseUrl } from "@/lib/api";
+import { apiGet, apiPost, getApiBaseUrl, getAppBaseUrl } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
 import HelpDrawer from "./HelpDrawer";
 
@@ -115,7 +115,7 @@ export default function Wizard() {
     const doInit = async () => {
       try {
         setError("");
-        const shownRedirect = `${getApiBaseUrl().replace(/\/$/, "")}/api/v1/oauth/callback`;
+        const shownRedirect = `${getAppBaseUrl().replace(/\/$/, "")}/oauth/callback`;
         const url = `/api/v1/oauth/init?redirect_uri=${encodeURIComponent(shownRedirect)}`;
         const res = await apiGet(url);
         if (!res.ok) throw new Error(await res.text());
@@ -212,7 +212,7 @@ export default function Wizard() {
                 className="w-full text-left font-mono text-xs break-all p-2 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 hover:bg-black/5 dark:hover:bg-white/10 transition"
                 onClick={async () => {
                   try {
-                    const shownRedirect = `${getApiBaseUrl().replace(/\/$/, "")}/api/v1/oauth/callback`;
+                    const shownRedirect = `${getAppBaseUrl().replace(/\/$/, "")}/oauth/callback`;
                     await navigator.clipboard.writeText(shownRedirect);
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
@@ -220,7 +220,7 @@ export default function Wizard() {
                 }}
                 title={copied ? t("copied") : t("clickToCopy")}
               >
-                {`${getApiBaseUrl().replace(/\/$/, "")}/api/v1/oauth/callback`}
+                {`${getAppBaseUrl().replace(/\/$/, "")}/oauth/callback`}
               </button>
               <div className="text-xs mt-1 text-black/60 dark:text-white/60">{copied ? t("copied") : t("clickToCopy")}</div>
             </div>
