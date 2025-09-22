@@ -8,7 +8,7 @@ export default function Home() {
         <div className="flex flex-col items-center gap-8">
           <div className="pt-6" />
           <Image
-            src="/logo.png"
+            src="/landing_logo.png"
             alt="Robotice"
             width={220}
             height={220}

@@ -1,6 +1,7 @@
 "use client";
 
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { apiGet, apiPost, getApiBaseUrl, getAppBaseUrl } from "@/lib/api";
 import { useI18n } from "@/lib/i18n";
@@ -20,6 +21,8 @@ type RegisterResponse = {
 
 export default function Wizard() {
   const { t } = useI18n();
+  const topRef = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
   const [step, setStep] = useState<number>(1);
   const [orgName, setOrgName] = useState<string>("");
   const [contactEmail, setContactEmail] = useState<string>("");
@@ -31,24 +34,17 @@ export default function Wizard() {
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
   const [successMessage, setSuccessMessage] = useState<string>("");
-  const [testSendLoading, setTestSendLoading] = useState<boolean>(false);
-  const [testRecipient, setTestRecipient] = useState<string>("");
+  
   const [checklist, setChecklist] = useState<boolean[]>([false, false, false, false]);
   const [copied, setCopied] = useState<boolean>(false);
   const [toast, setToast] = useState<{ tone: "success" | "error"; msg: string } | null>(null);
   const [tenantCreated, setTenantCreated] = useState<boolean>(false);
-  const [emailQueuedFlag, setEmailQueuedFlag] = useState<boolean>(false);
+  
   const [helpOpen, setHelpOpen] = useState<boolean>(false);
   const [credsSaved, setCredsSaved] = useState<boolean>(false);
   const [tenantId, setTenantId] = useState<number | null>(null);
 
-  const origin = typeof window !== "undefined" ? window.location.origin : "";
-  const envBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
-  const baseUrl = envBaseUrl || origin || "";
-  const redirectUri = useMemo(() => {
-    if (!baseUrl) return "/api/oauth/google/callback";
-    return `${baseUrl.replace(/\/$/, "")}/api/oauth/google/callback`;
-  }, [baseUrl]);
+  
 
   // Read success flags from URL after OAuth callback redirect
   const readStatusFromUrl = useCallback(() => {
@@ -71,9 +67,30 @@ export default function Wizard() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Ensure view jumps to top when step changes (panels have different heights)
+  useEffect(() => {
+    try {
+      topRef.current?.scrollIntoView({ behavior: "auto", block: "start" });
+      if (typeof window !== "undefined") window.scrollTo({ top: 0, behavior: "auto" });
+    } catch {}
+  }, [step]);
+
+  // Prefetch callback route for faster return after OAuth
+  useEffect(() => {
+    try {
+      router.prefetch("/oauth/callback");
+    } catch {}
+  }, [router]);
+
+  // thin top progress bar control
+  const [busyCount, setBusyCount] = useState<number>(0);
+  const startBusy = () => setBusyCount((c) => c + 1);
+  const endBusy = () => setBusyCount((c) => Math.max(0, c - 1));
+
   const handleSave = async () => {
     setError("");
     setSaving(true);
+    startBusy();
     try {
       // Step 1: create tenant (ignore duplicate errors per spec)
       if (step === 1) {
@@ -120,6 +137,7 @@ export default function Wizard() {
       setError(e instanceof Error ? e.message : t("unknownError"));
     } finally {
       setSaving(false);
+      endBusy();
     }
   };
 
@@ -131,6 +149,7 @@ export default function Wizard() {
     const doInit = async () => {
       try {
         setError("");
+        startBusy();
         const shownRedirect = `${getAppBaseUrl().replace(/\/$/, "")}/oauth/callback`;
         // Persist tenant id for callback
         try {
@@ -144,6 +163,7 @@ export default function Wizard() {
         window.location.href = data.auth_url as string;
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : t("unknownError"));
+        endBusy();
       }
     };
     void doInit();
@@ -151,8 +171,17 @@ export default function Wizard() {
 
   return (
     <div className="w-full">
-      <div className="mb-6">
-        <Stepper current={step} />
+      <div ref={topRef} />
+      <div className="mb-6 sticky top-0 z-10 bg-white/70 dark:bg-black/40 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-black/5 dark:border-white/10">
+        {busyCount > 0 && (
+          <div className="fixed left-0 top-0 h-[3px] w-full z-50">
+            <div className="h-full w-full origin-left bg-blue-600 animate-[progress_1.2s_ease-in-out_infinite]" />
+            <style jsx>{`@keyframes progress{0%{transform:scaleX(0.15)}50%{transform:scaleX(0.6)}100%{transform:scaleX(0.15)}}`}</style>
+          </div>
+        )}
+        <div className="max-w-5xl mx-auto px-2 sm:px-4">
+          <Stepper current={step} />
+        </div>
       </div>
 
       {error ? (
@@ -242,7 +271,9 @@ export default function Wizard() {
               >
                 {`${getAppBaseUrl().replace(/\/$/, "")}/oauth/callback`}
               </button>
-              <div className="text-xs mt-1 text-black/60 dark:text-white/60">{copied ? t("copied") : t("clickToCopy")}</div>
+              <div className="text-xs mt-1 text-black/60 dark:text-white/60">
+                <span className={copied ? "text-blue-600" : ""}>{copied ? t("copied") : t("clickToCopy")}</span>
+              </div>
             </div>
             <div className="mt-8">
               <div className="text-sm font-medium mb-3">{t("tutorialChecklist")}</div>
@@ -339,15 +370,20 @@ export default function Wizard() {
               <div className="grid gap-3">
                 {!credsSaved ? (
                   <button
-                    className="w-full h-11 rounded-md bg-blue-600 text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                    className="relative w-full h-11 rounded-md bg-blue-600 text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 transition-all"
                     onClick={handleSave}
                     disabled={saving || !(googleClientId || "").trim() || !(googleClientSecret || "").trim()}
                   >
-                    {saving ? t("saving") + "..." : t("save")}
+                    <span className={saving ? "opacity-0" : ""}>{t("save")}</span>
+                    {saving && (
+                      <span className="absolute inset-0 grid place-items-center">
+                        <span className="h-4 w-4 border-2 border-white/70 border-t-transparent rounded-full animate-spin" />
+                      </span>
+                    )}
                   </button>
                 ) : (
                   <button
-                    className="w-full h-11 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black text-black dark:text-white flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                    className="w-full h-11 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black text-black dark:text-white flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 transition-all"
                     onClick={handleConnectGoogle}
                   >
                     <img src="/google.svg" alt="Google" className="w-5 h-5" />
@@ -369,7 +405,7 @@ function Stepper({ current }: { current: number }) {
   const { t } = useI18n();
   const steps = [t("stepCompany"), t("stepGuide"), t("stepConnect")];
   return (
-    <div className="flex items-center justify-center gap-6">
+    <div className="flex items-center justify-center gap-6 py-3">
       {steps.map((label, idx) => {
         const number = idx + 1;
         const active = number === current;
@@ -382,7 +418,7 @@ function Stepper({ current }: { current: number }) {
                 (completed
                   ? "bg-blue-600 text-white"
                   : active
-                  ? "border-2 border-blue-600 text-blue-600"
+                  ? "border-2 border-blue-600 text-blue-600 shadow-[0_0_0_3px_rgba(59,130,246,0.15)]"
                   : "border border-black/20 dark:border-white/20 text-black/50 dark:text-white/50")
               }
             >

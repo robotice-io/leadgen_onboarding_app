@@ -76,7 +76,7 @@ function SuccessCard() {
       <div className="mx-auto w-16 h-16 rounded-2xl bg-white dark:bg-black grid place-items-center shadow border border-black/10 dark:border-white/10">
         <img src="/google.svg" alt="Google" className="w-8 h-8" />
       </div>
-      <h1 className="mt-4 text-2xl font-semibold text-green-600">{t("connectedHeadline")}</h1>
+      <h1 className="mt-4 text-2xl font-semibold text-blue-600">{t("connectedHeadline")}</h1>
       <p className="mt-2 text-sm text-black/70 dark:text-white/70">{t("funnelTeaser")}</p>
       <TestEmail />
       <div className="mt-6">
@@ -128,7 +128,7 @@ function TestEmail() {
           {loading ? t("sending") + "..." : t("send")}
         </button>
       </div>
-      {msg ? <div className="mt-2 text-xs text-green-600">{msg}</div> : null}
+      {msg ? <div className="mt-2 text-xs text-blue-600">{msg}</div> : null}
     </div>
   );
 }
@@ -142,7 +142,7 @@ function CornerLogo({ position }: { position: "tl" | "tr" | "bl" | "br" }) {
   };
   return (
     <div className={`absolute ${map[position]} opacity-70`}> 
-      <img src="/logo.png" alt="Robotice" className="w-6 h-6 rounded" />
+      <img src="/icon.png" alt="Robotice" className="w-6 h-6 rounded" />
     </div>
   );
 }

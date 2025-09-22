@@ -8,7 +8,7 @@ type Dictionary = Record<string, string>;
 
 const ES: Dictionary = {
   brandName: "Robotice",
-  tagline: "Asistente de configuración de correo",
+  tagline: "LeadGen Wizzard",
   stepCompany: "Empresa",
   stepGuide: "Guía",
   stepConnect: "Conectar",
@@ -108,7 +108,7 @@ const ES: Dictionary = {
 
 const EN: Dictionary = {
   brandName: "Robotice",
-  tagline: "Cold Email Setup Wizard",
+  tagline: "LeadGen Wizzard",
   stepCompany: "Company",
   stepGuide: "Guide",
   stepConnect: "Connect",

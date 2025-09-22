@@ -24,7 +24,7 @@ export default function TopBar() {
 
 function LogoImage() {
   return (
-    <img src="/logo.png" alt="Robotice" className="w-8 h-8 rounded" />
+    <img src="/icon.png" alt="Robotice" className="w-8 h-8 rounded" />
   );
 }
 

@@ -16,9 +16,9 @@ export const metadata: Metadata = {
   title: "Robotice Onboarding",
   description: "Asistente de configuración de correo",
   icons: {
-    icon: "/logo.png",
-    shortcut: "/logo.png",
-    apple: "/logo.png",
+    icon: "/icon.png",
+    shortcut: "/icon.png",
+    apple: "/icon.png",
   },
 };
 
