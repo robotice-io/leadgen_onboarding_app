@@ -180,7 +180,7 @@ export default function Wizard() {
   return (
     <div className="w-full">
       <div ref={topRef} />
-      <div className="mb-6 sticky top-[56px] z-20 bg-white/70 dark:bg-black/40 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-black/5 dark:border-white/10">
+      <div className="mb-6 sticky top-[56px] z-20 bg-white/70 dark:bg-black/40 backdrop-blur supports-[backdrop-filter]:bg-white/70 border border-black/5 dark:border-white/10 rounded-xl shadow-sm">
         {busyCount > 0 && (
           <div className="fixed left-0 top-0 h-[3px] w-full z-30 pointer-events-none">
             <div className="h-full w-full origin-left bg-blue-600 animate-[progress_1.2s_ease-in-out_infinite]" />
