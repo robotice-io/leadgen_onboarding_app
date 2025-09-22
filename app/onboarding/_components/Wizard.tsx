@@ -4,6 +4,7 @@ import { useCallback, useMemo, useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
 import { apiGet, apiPost, getApiBaseUrl, getAppBaseUrl } from "@/lib/api";
+import Instructions from "./Instructions";
 import { useI18n } from "@/lib/i18n";
 import HelpDrawer from "./HelpDrawer";
 
@@ -252,15 +253,7 @@ export default function Wizard() {
             <p className="text-sm text-black/70 dark:text-white/70 mb-6">
               {t("tutorialSubtitle")}
             </p>
-            <div className="aspect-video w-full rounded-lg overflow-hidden border border-black/10 dark:border-white/10 bg-black/5 shadow-sm">
-              <iframe
-                className="w-full h-full"
-                src="https://www.youtube.com/embed/dQw4w9WgXcQ"
-                title="Gmail API Setup Tutorial"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
-            </div>
+            <Instructions />
             <div className="mt-6">
               <div className="text-sm font-medium mb-2">{t("redirectUri")}</div>
               <button
@@ -421,11 +414,11 @@ function Stepper({ current }: { current: number }) {
           <div key={label} className="flex items-center gap-2">
             <div
               className={
-                "w-9 h-9 rounded-full grid place-items-center text-xs " +
+                "w-9 h-9 rounded-full grid place-items-center text-xs transition-shadow " +
                 (completed
-                  ? "bg-blue-600 text-white"
+                  ? "bg-blue-600 text-white shadow-[0_6px_18px_-6px_rgba(59,130,246,0.45)]"
                   : active
-                  ? "border-2 border-blue-600 text-blue-600 shadow-[0_0_0_3px_rgba(59,130,246,0.15)]"
+                  ? "border border-blue-500 text-blue-600 shadow-[0_0_0_6px_rgba(59,130,246,0.12),0_10px_28px_-10px_rgba(59,130,246,0.45)]"
                   : "border border-black/20 dark:border-white/20 text-black/50 dark:text-white/50")
               }
             >
@@ -433,7 +426,7 @@ function Stepper({ current }: { current: number }) {
             </div>
             <span className={"text-sm " + (active ? "font-medium" : "text-black/60 dark:text-white/60")}>{label}</span>
             {idx < steps.length - 1 && (
-              <div className="w-10 h-px bg-black/10 dark:bg-white/10 mx-2" />
+              <div className="w-10 h-[2px] bg-gradient-to-r from-transparent via-blue-500/30 to-transparent mx-2 rounded-full" />
             )}
           </div>
         );
