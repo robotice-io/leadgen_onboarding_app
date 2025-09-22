@@ -60,6 +60,9 @@ const ES: Dictionary = {
   companyPlaceholder: "Nombre de tu empresa",
   industryPlaceholder: "Selecciona tu industria",
   googleConnected: "Conexión con Google exitosa. Refresh token guardado.",
+  connectedHeadline: "¡Conectado con Google!",
+  funnelTeaser: "¿Listo para acelerar tu embudo de ventas?",
+  backToWizard: "Volver al asistente",
   // Help drawer
   "help.quickGuideTitle": "Guía rápida — Conectar Gmail",
   "help.close": "Cerrar",
@@ -157,6 +160,9 @@ const EN: Dictionary = {
   companyPlaceholder: "Your company name",
   industryPlaceholder: "Select your industry",
   googleConnected: "Google connected successfully. Refresh token stored.",
+  connectedHeadline: "Connected with Google!",
+  funnelTeaser: "Ready to accelerate your sales funnel?",
+  backToWizard: "Back to the wizard",
   // Help drawer
   "help.quickGuideTitle": "Quick guide — Connect Gmail",
   "help.close": "Close",

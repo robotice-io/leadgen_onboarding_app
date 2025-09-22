@@ -39,6 +39,8 @@ export default function Wizard() {
   const [tenantCreated, setTenantCreated] = useState<boolean>(false);
   const [emailQueuedFlag, setEmailQueuedFlag] = useState<boolean>(false);
   const [helpOpen, setHelpOpen] = useState<boolean>(false);
+  const [credsSaved, setCredsSaved] = useState<boolean>(false);
+  const [tenantId, setTenantId] = useState<number | null>(null);
 
   const origin = typeof window !== "undefined" ? window.location.origin : "";
   const envBaseUrl = process.env.NEXT_PUBLIC_BASE_URL;
@@ -78,6 +80,10 @@ export default function Wizard() {
         const resTenant = await apiPost("/api/v1/tenants/", { name: orgName || "" });
         if (resTenant.status === 200) {
           setToast({ tone: "success", msg: t("companyCreated") });
+          try {
+            const body = await resTenant.json();
+            if (typeof body?.id === "number") setTenantId(body.id);
+          } catch {}
           setTenantCreated(true);
           setStep(2);
           setHelpOpen(true);
@@ -86,6 +92,15 @@ export default function Wizard() {
         if (resTenant.status === 500 || resTenant.status === 409) {
           setToast({ tone: "success", msg: t("companyExistsContinuing") });
           setTenantCreated(true);
+          // Best-effort: fetch tenants and match by name to get id
+          try {
+            const listRes = await apiGet("/api/v1/tenants");
+            if (listRes.ok) {
+              const arr = (await listRes.json()) as Array<{ id: number; name: string }>;
+              const match = arr.find((tnt) => (tnt?.name || "").toLowerCase() === (orgName || "").toLowerCase());
+              if (match) setTenantId(match.id);
+            }
+          } catch {}
           setStep(2);
           setHelpOpen(true);
           return;
@@ -100,6 +115,7 @@ export default function Wizard() {
 
       // Step 3: save local integration form (no backend call needed per spec)
       setSuccessMessage(t("savedNowConnect"));
+      setCredsSaved(true);
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : t("unknownError"));
     } finally {
@@ -116,6 +132,10 @@ export default function Wizard() {
       try {
         setError("");
         const shownRedirect = `${getAppBaseUrl().replace(/\/$/, "")}/oauth/callback`;
+        // Persist tenant id for callback
+        try {
+          if (tenantId != null) localStorage.setItem("robotice-tenant-id", String(tenantId));
+        } catch {}
         const url = `/api/v1/oauth/init?redirect_uri=${encodeURIComponent(shownRedirect)}`;
         const res = await apiGet(url);
         if (!res.ok) throw new Error(await res.text());
@@ -315,60 +335,25 @@ export default function Wizard() {
                 />
               </Field>
             </div>
-            <div className="mt-6 space-y-2">
-              <div className="text-sm font-medium">{t("sendTestEmail")}</div>
-              <div className="flex gap-2 items-center">
-                <input
-                  type="email"
-                  value={testRecipient}
-                  onChange={(e) => setTestRecipient(e.target.value)}
-                  className="flex-1 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-                  placeholder={t("yourEmailPlaceholder")}
-                />
-                <Button variant="outline" disabled={!testRecipient || testSendLoading}
-                  onClick={async () => {
-                    setError("");
-                    setSuccessMessage("");
-                    setTestSendLoading(true);
-                    try {
-                      const res = await apiPost("/api/v1/email/send", { to: testRecipient, subject: "Test email", body: `Hola de ${orgName || "Robotice"}` });
-                      if (res.status === 202) {
-                        setToast({ tone: "success", msg: t("queuedEmail") });
-                        setEmailQueuedFlag(true);
-                      } else if (res.status === 422) {
-                        setToast({ tone: "error", msg: t("invalidEmailFields") });
-                      } else if (!res.ok) {
-                        throw new Error(await res.text());
-                      }
-                    } catch (e: unknown) {
-                      setToast({ tone: "error", msg: e instanceof Error ? e.message : t("failedToSendTest") });
-                    } finally {
-                      setTestSendLoading(false);
-                    }
-                  }}
-                >{testSendLoading ? t("sending") + "..." : t("send")}</Button>
-              </div>
-              {emailQueuedFlag ? (
-                <div className="text-xs text-green-600">{t("queuedEmail")}</div>
-              ) : null}
-            </div>
             <div className="pt-6">
               <div className="grid gap-3">
-                <button
-                className="w-full h-11 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black text-black dark:text-white flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-                  onClick={handleConnectGoogle}
-                  disabled={false}
-                >
-                  <img src="/google.svg" alt="Google" className="w-5 h-5" />
-                  <span>{t("connectWithGoogle")}</span>
-                </button>
-                <button
-                  className="w-full h-11 rounded-md bg-blue-600 text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-                  onClick={handleSave}
-                  disabled={saving}
-                >
-                  {saving ? t("saving") + "..." : t("save")}
-                </button>
+                {!credsSaved ? (
+                  <button
+                    className="w-full h-11 rounded-md bg-blue-600 text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={handleSave}
+                    disabled={saving || !(googleClientId || "").trim() || !(googleClientSecret || "").trim()}
+                  >
+                    {saving ? t("saving") + "..." : t("save")}
+                  </button>
+                ) : (
+                  <button
+                    className="w-full h-11 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black text-black dark:text-white flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                    onClick={handleConnectGoogle}
+                  >
+                    <img src="/google.svg" alt="Google" className="w-5 h-5" />
+                    <span>{t("connectWithGoogle")}</span>
+                  </button>
+                )}
               </div>
             </div>
           </Card>
