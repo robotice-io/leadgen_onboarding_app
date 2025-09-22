@@ -41,7 +41,6 @@ export default function Wizard() {
   const [toast, setToast] = useState<{ tone: "success" | "error"; msg: string } | null>(null);
   const [tenantCreated, setTenantCreated] = useState<boolean>(false);
   
-  const [helpOpen, setHelpOpen] = useState<boolean>(false);
   const [credsSaved, setCredsSaved] = useState<boolean>(false);
   const [tenantId, setTenantId] = useState<number | null>(null);
 
@@ -111,7 +110,6 @@ export default function Wizard() {
           } catch {}
           setTenantCreated(true);
           setStep(2);
-          setHelpOpen(true);
           return;
         }
         if (resTenant.status === 500 || resTenant.status === 409) {
@@ -127,7 +125,6 @@ export default function Wizard() {
             }
           } catch {}
           setStep(2);
-          setHelpOpen(true);
           return;
         }
         if (resTenant.status === 422) {
@@ -248,7 +245,6 @@ export default function Wizard() {
           <Card>
             <div className="flex items-center justify-between">
               <h2 className="text-2xl font-semibold mb-3">{t("tutorialTitle")}</h2>
-              <button className="h-9 px-3 rounded-md border border-black/10 dark:border-white/15 text-sm cursor-pointer" onClick={() => setHelpOpen(true)}>Guía rápida</button>
             </div>
             <p className="text-sm text-black/70 dark:text-white/70 mb-6">
               {t("tutorialSubtitle")}
@@ -335,7 +331,7 @@ export default function Wizard() {
           <Card>
             <div className="flex items-center justify-between mb-4">
               <button aria-label={t("back")} className="flex items-center gap-2 text-sm text-black/70 dark:text-white/70 hover:text-black dark:hover:text-white cursor-pointer"
-                onClick={() => { setStep(2); setHelpOpen(true); }}>
+                onClick={() => { setStep(2); }}>
                 <ArrowLeft className="w-5 h-5" />
               </button>
             </div>
@@ -395,7 +391,6 @@ export default function Wizard() {
           </Card>
         </StepPanel>
       </div>
-      <HelpDrawer open={helpOpen} onClose={() => setHelpOpen(false)} redirectUri={`${getApiBaseUrl().replace(/\/$/, "")}/api/v1/oauth/callback`} apiBase={getApiBaseUrl()} />
       <Toast toast={toast} onClose={() => setToast(null)} />
     </div>
   );

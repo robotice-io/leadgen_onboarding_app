@@ -57,12 +57,12 @@ export default function Instructions() {
 
   return (
     <div className="max-h-[520px] overflow-y-auto rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5">
-      <div className="sticky top-0 z-10 bg-white/80 dark:bg-black/70 backdrop-blur p-3 border-b border-black/10 dark:border-white/10">
+      <div className="relative sticky top-0 z-10 bg-white/90 dark:bg-black/80 backdrop-blur-2xl p-3 border-b border-black/10 dark:border-white/10 shadow-[0_6px_20px_-10px_rgba(0,0,0,0.35)]">
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Busca en la guía..."
-          className="w-full h-9 rounded-md border border-black/10 dark:border-white/15 bg-white/80 dark:bg-black/40 px-3 outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+          className="w-full h-9 rounded-md border border-black/10 dark:border-white/15 bg-white/90 dark:bg-black/60 px-3 outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
         />
         <div className="mt-3 flex flex-wrap gap-2">
           {sections.map((s) => (
@@ -71,6 +71,7 @@ export default function Instructions() {
             </button>
           ))}
         </div>
+        <div className="pointer-events-none absolute left-0 right-0 -bottom-1 h-6 bg-gradient-to-b from-transparent to-black/20 dark:to-black/50" />
       </div>
 
       <div className="p-4 space-y-6">
