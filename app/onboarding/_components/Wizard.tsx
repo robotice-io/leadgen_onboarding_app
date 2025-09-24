@@ -99,10 +99,10 @@ export default function Wizard() {
     setSaving(true);
     startBusy();
     try {
-      // Step 1: create tenant (ignore duplicate errors per spec)
+      // Step 1: create tenant (handles 200/201; redirects to already-linked page on 400)
       if (step === 1) {
         const resTenant = await apiPost("/api/v1/tenants/", { name: orgName || "", email: contactEmail || "" });
-        if (resTenant.status === 200) {
+        if (resTenant.status === 200 || resTenant.status === 201) {
           setToast({ tone: "success", msg: t("companyCreated") });
           try {
             const body = await resTenant.json();
@@ -112,21 +112,8 @@ export default function Wizard() {
           setStep(2);
           return;
         }
-        if (resTenant.status === 500 || resTenant.status === 409) {
-          setToast({ tone: "success", msg: t("companyExistsContinuing") });
-          setTenantCreated(true);
-          // Best-effort: fetch tenants and match by name to get id
-          try {
-            const listRes = await apiGet("/api/v1/tenants");
-            if (listRes.ok) {
-              const arr = (await listRes.json()) as Array<{ id: number; name: string; email?: string }>;
-              const match =
-                arr.find((tnt) => (tnt?.email || "").toLowerCase() === (contactEmail || "").toLowerCase()) ||
-                arr.find((tnt) => (tnt?.name || "").toLowerCase() === (orgName || "").toLowerCase());
-              if (match) setTenantId(match.id);
-            }
-          } catch {}
-          setStep(2);
+        if (resTenant.status === 400) {
+          router.push("/onboarding/already-linked");
           return;
         }
         if (resTenant.status === 422) {
@@ -208,9 +195,7 @@ export default function Wizard() {
       {error ? (
         <Alert tone="error" message={error} />
       ) : null}
-      {successMessage ? (
-        <Alert tone="success" message={successMessage} />
-      ) : null}
+      {/* Only keep purely positive success toasts/messages elsewhere; remove intermediate green popup here */}
 
       <div className="relative min-h-[560px]">
         <StepPanel active={step === 1}>
