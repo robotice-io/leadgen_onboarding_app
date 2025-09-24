@@ -15,7 +15,7 @@ const geistMono = Geist_Mono({
 const pop = Poppins({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--font-poppins" });
 
 export const metadata: Metadata = {
-  title: "Robotice Onboarding",
+  title: "Robotice LeadGen Onboarding",
   description: "Asistente de configuración de correo",
   icons: {
     icon: "/icon.png",
