@@ -101,7 +101,7 @@ export default function Wizard() {
     try {
       // Step 1: create tenant (ignore duplicate errors per spec)
       if (step === 1) {
-        const resTenant = await apiPost("/api/v1/tenants/", { name: orgName || "" });
+        const resTenant = await apiPost("/api/v1/tenants/", { name: orgName || "", email: contactEmail || "" });
         if (resTenant.status === 200) {
           setToast({ tone: "success", msg: t("companyCreated") });
           try {
@@ -119,8 +119,10 @@ export default function Wizard() {
           try {
             const listRes = await apiGet("/api/v1/tenants");
             if (listRes.ok) {
-              const arr = (await listRes.json()) as Array<{ id: number; name: string }>;
-              const match = arr.find((tnt) => (tnt?.name || "").toLowerCase() === (orgName || "").toLowerCase());
+              const arr = (await listRes.json()) as Array<{ id: number; name: string; email?: string }>;
+              const match =
+                arr.find((tnt) => (tnt?.email || "").toLowerCase() === (contactEmail || "").toLowerCase()) ||
+                arr.find((tnt) => (tnt?.name || "").toLowerCase() === (orgName || "").toLowerCase());
               if (match) setTenantId(match.id);
             }
           } catch {}
@@ -135,7 +137,19 @@ export default function Wizard() {
         throw new Error(text || t("unknownError"));
       }
 
-      // Step 3: save local integration form (no backend call needed per spec)
+      // Step 3: Save BYOG client for tenant
+      if (!tenantId) throw new Error("Missing tenantId");
+      const shownRedirect = `${getAppBaseUrl().replace(/\/$/, "")}/oauth/callback`;
+      const body = {
+        client_id: googleClientId,
+        client_secret: googleClientSecret,
+        redirect_uri: shownRedirect,
+        scopes: ["openid", "email", "profile", "https://www.googleapis.com/auth/gmail.send"],
+        access_type: "offline",
+        prompt: "consent",
+      };
+      const resClient = await apiPost(`/api/v1/tenants/${tenantId}/oauth/client`, body);
+      if (!resClient.ok) throw new Error(await resClient.text());
       setSuccessMessage(t("savedNowConnect"));
       setCredsSaved(true);
     } catch (e: unknown) {
@@ -160,11 +174,13 @@ export default function Wizard() {
         try {
           if (tenantId != null) localStorage.setItem("robotice-tenant-id", String(tenantId));
         } catch {}
-        const url = `/api/v1/oauth/init?redirect_uri=${encodeURIComponent(shownRedirect)}`;
-        const res = await apiGet(url);
+        if (!tenantId) throw new Error("Missing tenantId");
+        const url = `/api/v1/oauth/init?tenant_id=${encodeURIComponent(String(tenantId))}`;
+        const res = await apiPost(url, {});
         if (!res.ok) throw new Error(await res.text());
         const data = await res.json();
         if (!data.auth_url) throw new Error("Missing auth_url");
+        try { localStorage.setItem("robotice-oauth-state", String(data.state || "")); } catch {}
         window.location.href = data.auth_url as string;
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : t("unknownError"));
@@ -236,7 +252,7 @@ export default function Wizard() {
               {tenantCreated ? (
                 <span className="text-sm text-green-600 animate-in fade-in" aria-live="polite">{t("companyCreated")}</span>
               ) : null}
-              <Button onClick={handleSave} disabled={saving || !(orgName || "").trim()}>{saving ? t("saving") + "..." : t("continueToTutorial")}</Button>
+              <Button onClick={handleSave} disabled={saving || !(orgName || "").trim() || !(contactEmail || "").trim()}>{saving ? t("saving") + "..." : t("continueToTutorial")}</Button>
             </div>
           </Card>
         </StepPanel>

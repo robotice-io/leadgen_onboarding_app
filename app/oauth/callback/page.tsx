@@ -16,13 +16,7 @@ export default function OAuthCallbackPage() {
         const code = params.get("code");
         const state = params.get("state");
         if (!code || !state) throw new Error("Missing code/state");
-        const shownRedirect = `${getAppBaseUrl().replace(/\/$/, "")}/oauth/callback`;
-        let tenantParam = "";
-        try {
-          const tid = localStorage.getItem("robotice-tenant-id");
-          if (tid) tenantParam = `&tenant_id=${encodeURIComponent(tid)}`;
-        } catch {}
-        const resCb = await apiGet(`/api/v1/oauth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}&redirect_uri=${encodeURIComponent(shownRedirect)}${tenantParam}`);
+        const resCb = await apiGet(`/api/v1/oauth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`);
         if (!resCb.ok) throw new Error(await resCb.text());
         const data = await resCb.json();
         if (data?.status !== "ok") throw new Error("Invalid callback");
@@ -122,10 +116,15 @@ function TestEmail() {
             setMsg("");
             setLoading(true);
             try {
+              let tenantId: number | undefined = undefined;
+              try {
+                const tid = localStorage.getItem("robotice-tenant-id");
+                if (tid) tenantId = Number(tid);
+              } catch {}
               const res = await fetch("/api/bridge/api/v1/email/send", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ to, subject: "Test email", body: t("funnelTeaser") }),
+                body: JSON.stringify({ tenant_id: tenantId, to, subject: "Test email", body: t("funnelTeaser") }),
               });
               if (res.status === 202) setMsg(t("queuedEmail"));
               else setMsg(await res.text());
