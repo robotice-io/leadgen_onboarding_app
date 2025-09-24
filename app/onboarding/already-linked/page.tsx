@@ -1,3 +1,4 @@
+"use client";
 import TopBar from "../_components/TopBar";
 import { I18nProvider, useI18n } from "@/lib/i18n";
 import { Poppins } from "next/font/google";

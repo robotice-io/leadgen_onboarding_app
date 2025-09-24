@@ -18,8 +18,8 @@ export const metadata: Metadata = {
   title: "Robotice LeadGen Onboarding",
   description: "Asistente de configuración de correo",
   icons: {
-    icon: "/icon.png",
-    shortcut: "/icon.png",
+    icon: ["/icon.png", "/favicon.ico"],
+    shortcut: "/favicon.ico",
     apple: "/icon.png",
   },
 };
