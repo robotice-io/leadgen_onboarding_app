@@ -7,6 +7,10 @@ function getApiBase() {
   return (env && env.replace(/\/$/, "")) || "http://192.241.157.92:8000";
 }
 
+function getApiKey(): string {
+  return process.env.API_KEY || "lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175";
+}
+
 async function proxy(req: NextRequest) {
   const apiBase = getApiBase();
   const url = new URL(req.url);
@@ -14,6 +18,7 @@ async function proxy(req: NextRequest) {
   const target = `${apiBase}${path}${url.search}`;
   const headers = new Headers(req.headers);
   headers.set("host", new URL(apiBase).host);
+  headers.set("X-API-Key", getApiKey());
   headers.delete("content-length");
   const init: RequestInit = {
     method: req.method,

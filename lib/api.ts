@@ -10,6 +10,14 @@ export function getApiBaseUrl(): string {
   return "http://192.241.157.92:8000";
 }
 
+export function getApiKey(): string {
+  if (typeof process !== "undefined" && process.env.API_KEY) {
+    return String(process.env.API_KEY);
+  }
+  // Default API key (should be moved to environment variable)
+  return "lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175";
+}
+
 function shouldProxyToNext(apiBase: string): boolean {
   if (typeof window === "undefined") return false;
   try {
@@ -25,17 +33,32 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
   const base = getApiBaseUrl().replace(/\/$/, "");
   const useProxy = shouldProxyToNext(base);
   const url = useProxy ? `/api/bridge${path}` : `${base}${path}`;
-  return fetch(url, { ...init, method: "GET", headers: { ...(init?.headers || {}), Accept: "application/json" } });
+  const apiKey = getApiKey();
+  return fetch(url, { 
+    ...init, 
+    method: "GET", 
+    headers: { 
+      ...(init?.headers || {}), 
+      Accept: "application/json",
+      "X-API-Key": apiKey
+    } 
+  });
 }
 
 export async function apiPost(path: string, body: unknown, init?: RequestInit): Promise<Response> {
   const base = getApiBaseUrl().replace(/\/$/, "");
   const useProxy = shouldProxyToNext(base);
   const url = useProxy ? `/api/bridge${path}` : `${base}${path}`;
+  const apiKey = getApiKey();
   return fetch(url, {
     ...init,
     method: "POST",
-    headers: { "Content-Type": "application/json", Accept: "application/json", ...(init?.headers || {}) },
+    headers: { 
+      "Content-Type": "application/json", 
+      Accept: "application/json", 
+      "X-API-Key": apiKey,
+      ...(init?.headers || {}) 
+    },
     body: JSON.stringify(body ?? {}),
   });
 }

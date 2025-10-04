@@ -11,7 +11,6 @@ import HelpDrawer from "./HelpDrawer";
 type RegisterPayload = {
   googleClientId: string;
   googleClientSecret: string;
-  fromEmail: string;
   googleRedirectUri: string;
 };
 
@@ -30,7 +29,6 @@ export default function Wizard() {
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [googleClientId, setGoogleClientId] = useState<string>("");
   const [googleClientSecret, setGoogleClientSecret] = useState<string>("");
-  const [fromEmail, setFromEmail] = useState<string>("");
   const [integrationId, setIntegrationId] = useState<string>("");
   const [saving, setSaving] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
@@ -106,7 +104,15 @@ export default function Wizard() {
           setToast({ tone: "success", msg: t("companyCreated") });
           try {
             const body = await resTenant.json();
-            if (typeof body?.id === "number") setTenantId(body.id);
+            if (typeof body?.id === "number") {
+              setTenantId(body.id);
+              // Store tenant data for success page
+              try {
+                localStorage.setItem("robotice-tenant-id", String(body.id));
+                localStorage.setItem("robotice-contact-email", contactEmail);
+                localStorage.setItem("robotice-org-name", orgName);
+              } catch {}
+            }
           } catch {}
           setTenantCreated(true);
           setStep(2);
@@ -351,15 +357,6 @@ export default function Wizard() {
                   onChange={(e) => setGoogleClientSecret(e.target.value)}
                   className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
                   placeholder="GOCSPX-..."
-                />
-              </Field>
-              <Field label={t("fromEmail")}>
-                <input
-                  type="email"
-                  value={fromEmail}
-                  onChange={(e) => setFromEmail(e.target.value)}
-                  className="w-full rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-                  placeholder="noreply@company.com"
                 />
               </Field>
             </div>

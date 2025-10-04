@@ -16,6 +16,10 @@ export function randomId(length = 16): string {
   return crypto.randomBytes(length).toString("hex");
 }
 
+export function generateSecureKey(length = 32): string {
+  return crypto.randomBytes(length).toString("hex");
+}
+
 
 
 

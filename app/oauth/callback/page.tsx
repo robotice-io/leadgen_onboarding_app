@@ -16,7 +16,13 @@ export default function OAuthCallbackPage() {
         const code = params.get("code");
         const state = params.get("state");
         if (!code || !state) throw new Error("Missing code/state");
-        const resCb = await apiGet(`/api/v1/oauth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}`);
+        const shownRedirect = `${getAppBaseUrl().replace(/\/$/, "")}/oauth/callback`;
+        let tenantParam = "";
+        try {
+          const tid = localStorage.getItem("robotice-tenant-id");
+          if (tid) tenantParam = `&tenant_id=${encodeURIComponent(tid)}`;
+        } catch {}
+        const resCb = await apiGet(`/api/v1/oauth/callback?code=${encodeURIComponent(code)}&state=${encodeURIComponent(state)}&redirect_uri=${encodeURIComponent(shownRedirect)}${tenantParam}`);
         if (!resCb.ok) throw new Error(await resCb.text());
         const data = await resCb.json();
         if (data?.status !== "ok") throw new Error("Invalid callback");
@@ -65,25 +71,14 @@ function CallbackUi({ status, error }: { status: string; error: string }) {
 
 function SuccessCard() {
   const { t } = useI18n();
-  const [countdown, setCountdown] = useState<number>(5);
-  useEffect(() => {
-    const id = setInterval(() => setCountdown((c) => Math.max(0, c - 1)), 1000);
-    return () => clearInterval(id);
-  }, []);
-  useEffect(() => {
-    if (countdown === 0) {
-      window.location.href = "/onboarding";
-    }
-  }, [countdown]);
   return (
     <div className="w-full max-w-md text-center animate-in fade-in slide-in-from-bottom-2 duration-500">
       <div className="mx-auto w-16 h-16 rounded-2xl bg-white dark:bg-black grid place-items-center shadow border border-black/10 dark:border-white/10">
         <img src="/google.svg" alt="Google" className="w-8 h-8" />
       </div>
       <h1 className="mt-4 text-2xl font-semibold text-blue-600">{t("connectedHeadline")}</h1>
-      <p className="mt-2 text-sm text-black/70 dark:text-white/70">{t("funnelTeaser")}</p>
-      <p className="mt-1 text-xs text-black/50 dark:text-white/50">Redirigiendo en {countdown}s…</p>
-      <TestEmail />
+      <p className="mt-2 text-sm text-black/60 dark:text-white/70">{t("funnelTeaser")}</p>
+      <TestConnection />
       <div className="mt-6">
         <Link href="/onboarding" className="inline-flex h-10 px-4 items-center justify-center rounded-md bg-blue-600 text-white">
           {t("backToWizard")}
@@ -93,52 +88,124 @@ function SuccessCard() {
   );
 }
 
-function TestEmail() {
-  const { t } = useI18n();
-  const [to, setTo] = useState<string>("");
+function TestConnection() {
+  const { t, lang } = useI18n();
   const [loading, setLoading] = useState<boolean>(false);
-  const [msg, setMsg] = useState<string>("");
+  const [status, setStatus] = useState<"idle" | "success" | "error">("idle");
+  const [message, setMessage] = useState<string>("");
+
+  const handleTest = async () => {
+    setLoading(true);
+    setStatus("idle");
+    setMessage("");
+    
+    try {
+      // Get data from localStorage
+      const tenantId = localStorage.getItem("robotice-tenant-id");
+      const contactEmail = localStorage.getItem("robotice-contact-email");
+      const orgName = localStorage.getItem("robotice-org-name");
+      const language = localStorage.getItem("robotice-lang") || "es";
+
+      if (!tenantId || !contactEmail || !orgName) {
+        throw new Error("Missing tenant data. Please complete the onboarding process first.");
+      }
+
+      const isSpanish = language === "es";
+
+      // Email templates based on language
+      const testEmailSubject = isSpanish 
+        ? "¡Esto es una prueba de LeadGen - Robotice.io! 🚀"
+        : "This is a LeadGen test from Robotice.io! 🚀";
+      
+      const testEmailBody = isSpanish
+        ? "¡Hola! Esta es una prueba de tu conexión con Gmail. Tu configuración de LeadGen está funcionando perfectamente. 🎉\n\n¡Bienvenido a Robotice! Tu sistema de generación de leads está listo para acelerar tu negocio."
+        : "Hello! This is a test of your Gmail connection. Your LeadGen setup is working perfectly. 🎉\n\nWelcome to Robotice! Your lead generation system is ready to accelerate your business.";
+
+      const adminSubject = "New Onboarding Completed - Robotice LeadGen";
+      const adminBody = `New user completed onboarding:
+- Email: ${contactEmail}
+- Company: ${orgName}
+- Language: ${language}
+- Timestamp: ${new Date().toLocaleString()}
+- Tenant ID: ${tenantId}`;
+
+      // Send test email to user
+      const testEmailRes = await fetch("/api/bridge/api/v1/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenant_id: Number(tenantId),
+          to: contactEmail,
+          subject: testEmailSubject,
+          body: testEmailBody
+        }),
+      });
+
+      // Send admin notification
+      const adminEmailRes = await fetch("/api/bridge/api/v1/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          tenant_id: 1, // Admin tenant ID
+          to: "jose@robotice.io",
+          subject: adminSubject,
+          body: adminBody
+        }),
+      });
+
+      // Check both responses
+      if (testEmailRes.status === 202 && adminEmailRes.status === 202) {
+        setStatus("success");
+        setMessage(isSpanish ? "¡Emails enviados correctamente! Revisa tu bandeja." : "Emails sent successfully! Check your inbox.");
+      } else {
+        const testError = testEmailRes.status !== 202 ? await testEmailRes.text() : null;
+        const adminError = adminEmailRes.status !== 202 ? await adminEmailRes.text() : null;
+        
+        if (testError && adminError) {
+          throw new Error(`Both emails failed: ${testError} | ${adminError}`);
+        } else if (testError) {
+          throw new Error(`Test email failed: ${testError}`);
+        } else if (adminError) {
+          setStatus("success");
+          setMessage(isSpanish ? "Email de prueba enviado, pero falló la notificación al admin." : "Test email sent, but admin notification failed.");
+        }
+      }
+    } catch (e) {
+      setStatus("error");
+      setMessage(e instanceof Error ? e.message : t("failedToSendTest"));
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="mt-6 text-left">
-      <div className="text-sm font-medium mb-2">{t("sendTestEmail")}</div>
-      <div className="flex gap-2 items-center">
-        <input
-          type="email"
-          value={to}
-          onChange={(e) => setTo(e.target.value)}
-          className="flex-1 rounded-md border border-black/10 dark:border-white/15 bg-white dark:bg-black/20 px-3 py-2 outline-none"
-          placeholder={t("yourEmailPlaceholder")}
-        />
-        <button
-          className="h-10 px-4 rounded-md border border-blue-600 text-blue-600 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed"
-          disabled={!to || loading}
-          onClick={async () => {
-            setMsg("");
-            setLoading(true);
-            try {
-              let tenantId: number | undefined = undefined;
-              try {
-                const tid = localStorage.getItem("robotice-tenant-id");
-                if (tid) tenantId = Number(tid);
-              } catch {}
-              const res = await fetch("/api/bridge/api/v1/email/send", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ tenant_id: tenantId, to, subject: "Test email", body: t("funnelTeaser") }),
-              });
-              if (res.status === 202) setMsg(t("queuedEmail"));
-              else setMsg(await res.text());
-            } catch (e) {
-              setMsg(String(e));
-            } finally {
-              setLoading(false);
-            }
-          }}
-        >
-          {loading ? t("sending") + "..." : t("send")}
-        </button>
-      </div>
-      {msg ? <div className="mt-2 text-xs text-blue-600">{msg}</div> : null}
+    <div className="mt-6">
+      <button
+        className="w-full h-10 px-4 rounded-md border border-blue-600 text-blue-600 cursor-pointer disabled:opacity-60 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2"
+        disabled={loading}
+        onClick={handleTest}
+      >
+        {loading ? (
+          <>
+            <span className="h-4 w-4 border-2 border-blue-600/70 border-t-transparent rounded-full animate-spin" />
+            <span>{t("sending")}...</span>
+          </>
+        ) : (
+          <span>{t("sendTestEmail")}</span>
+        )}
+      </button>
+      
+      {status === "success" && (
+        <div className="mt-3 text-sm text-green-600 text-center">
+          {message}
+        </div>
+      )}
+      
+      {status === "error" && (
+        <div className="mt-3 text-sm text-red-600 text-center">
+          {message}
+        </div>
+      )}
     </div>
   );
 }
