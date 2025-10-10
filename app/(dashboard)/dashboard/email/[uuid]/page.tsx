@@ -136,7 +136,7 @@ export default function EmailAnalyticsPage() {
             <Skeleton className="h-64 w-full" />
           </div>
         </div>
-      ) : (
+      ) : emailData ? (
         <>
           {/* Email Details */}
           <Card className="p-6">
@@ -316,7 +316,7 @@ export default function EmailAnalyticsPage() {
             </div>
           </Card>
         </>
-      )}
+      ) : null}
     </div>
   );
 }
