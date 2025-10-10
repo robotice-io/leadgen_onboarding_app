@@ -14,11 +14,12 @@ import {
   ChevronDown,
   Building2
 } from "lucide-react";
+import { User } from "@/types/types";
 
 interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
-  user: any;
+  user: User | null;
 }
 
 const navigation = [

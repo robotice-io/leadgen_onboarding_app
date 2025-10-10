@@ -105,7 +105,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
                 borderRadius: '8px',
                 color: '#F9FAFB'
               }}
-              formatter={(value: any, name: string) => [
+              formatter={(value: number, name: string) => [
                 name === 'rate' ? `${value}%` : value,
                 name === 'rate' ? 'Open Rate' : 'Emails Sent'
               ]}
@@ -158,7 +158,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
                   borderRadius: '8px',
                   color: '#F9FAFB'
                 }}
-                formatter={(value: any) => [`${value}%`, 'Share']}
+                formatter={(value: number) => [`${value}%`, 'Share']}
               />
             </PieChart>
           </ResponsiveContainer>

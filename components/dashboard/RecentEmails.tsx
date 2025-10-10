@@ -220,7 +220,7 @@ export function RecentEmails({ emails = mockEmails }: RecentEmailsProps) {
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Showing {filteredEmails.length} of {emails.length} emails
             </p>
-            <Button variant="outline" size="sm">
+            <Button variant="outline" className="h-9 px-3 text-sm">
               View All Emails
             </Button>
           </div>

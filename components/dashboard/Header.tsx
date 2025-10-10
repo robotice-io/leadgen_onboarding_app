@@ -1,11 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, Bell, Search, Sun, Moon, LogOut, User, Settings } from "lucide-react";
+import { Menu, Bell, Search, Sun, Moon, LogOut, User as UserIcon, Settings } from "lucide-react";
+import { User } from "@/types/types";
 
 interface HeaderProps {
   onMenuClick: () => void;
-  user: any;
+  user: User | null;
   onLogout: () => void;
 }
 
@@ -134,7 +135,7 @@ export function DashboardHeader({ onMenuClick, user, onLogout }: HeaderProps) {
                 </div>
                 
                 <button className="w-full px-4 py-2 text-left text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 flex items-center gap-3">
-                  <User className="h-4 w-4" />
+                  <UserIcon className="h-4 w-4" />
                   Profile
                 </button>
                 
