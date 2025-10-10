@@ -32,3 +32,5 @@ try {
   console.log('Create a .env.local file with the following content:');
   console.log('\n' + envContent);
 }
+
+

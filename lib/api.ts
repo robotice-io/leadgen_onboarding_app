@@ -29,19 +29,32 @@ function shouldProxyToNext(apiBase: string): boolean {
   }
 }
 
+function getAuthToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("robotice_auth_token");
+}
+
 export async function apiGet(path: string, init?: RequestInit): Promise<Response> {
   const base = getApiBaseUrl().replace(/\/$/, "");
   const useProxy = shouldProxyToNext(base);
   const url = useProxy ? `/api/bridge${path}` : `${base}${path}`;
   const apiKey = getApiKey();
+  const token = getAuthToken();
+  
+  const headers: Record<string, string> = {
+    ...(init?.headers as Record<string, string> || {}),
+    Accept: "application/json",
+    "X-API-Key": apiKey,
+  };
+  
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  
   return fetch(url, { 
     ...init, 
     method: "GET", 
-    headers: { 
-      ...(init?.headers || {}), 
-      Accept: "application/json",
-      "X-API-Key": apiKey
-    } 
+    headers
   });
 }
 
@@ -50,15 +63,23 @@ export async function apiPost(path: string, body: unknown, init?: RequestInit): 
   const useProxy = shouldProxyToNext(base);
   const url = useProxy ? `/api/bridge${path}` : `${base}${path}`;
   const apiKey = getApiKey();
+  const token = getAuthToken();
+  
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json", 
+    Accept: "application/json", 
+    "X-API-Key": apiKey,
+    ...(init?.headers as Record<string, string> || {})
+  };
+  
+  if (token) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+  
   return fetch(url, {
     ...init,
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json", 
-      Accept: "application/json", 
-      "X-API-Key": apiKey,
-      ...(init?.headers || {}) 
-    },
+    headers,
     body: JSON.stringify(body ?? {}),
   });
 }

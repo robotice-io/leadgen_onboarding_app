@@ -51,6 +51,10 @@ export default function Wizard() {
     if (params.get("success") === "1") {
       setSuccessMessage(t("googleConnected"));
       setStep(3);
+      // Redirect to dashboard after successful OAuth
+      setTimeout(() => {
+        window.location.href = "/dashboard";
+      }, 2000);
     }
     if (params.get("error")) {
       setError(params.get("error") || "");

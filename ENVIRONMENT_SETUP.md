@@ -86,3 +86,5 @@ After setting up the environment variables, you can test that the API key is bei
 2. Opening browser developer tools
 3. Making a request through the application
 4. Checking the Network tab to verify the `X-API-Key` header is present
+
+
