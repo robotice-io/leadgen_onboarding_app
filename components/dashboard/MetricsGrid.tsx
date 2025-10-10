@@ -20,7 +20,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       change: "+12%",
       changeType: "positive" as const,
       icon: Mail,
-      color: "blue",
+      color: "blue" as const,
     },
     {
       name: "Opens Today",
@@ -28,7 +28,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       change: "+8%",
       changeType: "positive" as const,
       icon: Eye,
-      color: "green",
+      color: "green" as const,
     },
     {
       name: "Open Rate",
@@ -36,7 +36,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       change: "+2.1%",
       changeType: "positive" as const,
       icon: TrendingUp,
-      color: "purple",
+      color: "purple" as const,
     },
     {
       name: "Unique Devices",
@@ -44,7 +44,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       change: "+5%",
       changeType: "positive" as const,
       icon: Users,
-      color: "orange",
+      color: "orange" as const,
     },
   ];
 
