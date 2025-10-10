@@ -77,9 +77,9 @@ export default function DashboardPage() {
             </div>
           ))}
         </div>
-      ) : (
+      ) : stats ? (
         <MetricsGrid stats={stats} />
-      )}
+      ) : null}
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -105,9 +105,9 @@ export default function DashboardPage() {
                 ))}
               </div>
             </div>
-          ) : (
+          ) : recentEmails ? (
             <RecentEmails emails={recentEmails} />
-          )}
+          ) : null}
         </div>
 
         {/* Activity Feed */}

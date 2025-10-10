@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Eye, Users, Clock, TrendingUp, Search, Filter } from "lucide-react";
+import { Eye, Users, Clock, Mail, Search } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 
