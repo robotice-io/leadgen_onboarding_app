@@ -15,6 +15,7 @@ import {
   Building2
 } from "lucide-react";
 import { User } from "@/types/types";
+import { useI18n } from "@/lib/i18n";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -23,17 +24,18 @@ interface SidebarProps {
   tenant: any;
 }
 
-const navigation = [
-  { name: "Dashboard", href: "/dashboard", icon: BarChart3 },
-  { name: "Campaigns", href: "/dashboard/campaigns", icon: Mail },
-  { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp },
-  { name: "Contacts", href: "/dashboard/contacts", icon: Users },
-  { name: "Settings", href: "/dashboard/settings", icon: Settings },
-];
-
 export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps) {
+  const { t } = useI18n();
   const pathname = usePathname();
   const [tenantMenuOpen, setTenantMenuOpen] = useState(false);
+
+  const navigation = [
+    { name: t("dashboard.title"), href: "/dashboard", icon: BarChart3 },
+    { name: "Campaigns", href: "/dashboard/campaigns", icon: Mail },
+    { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp },
+    { name: "Contacts", href: "/dashboard/contacts", icon: Users },
+    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+  ];
 
   return (
     <>
@@ -119,14 +121,14 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
                   {user?.first_name?.[0] || user?.email?.[0] || 'U'}
                 </span>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  Connect Account
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  Setup Gmail integration
-                </p>
-              </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+                        {t("dashboard.connectAccount")}
+                      </p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+                        {t("dashboard.setupGmail")}
+                      </p>
+                    </div>
             </Link>
           </div>
         </div>

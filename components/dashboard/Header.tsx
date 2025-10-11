@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { Menu, LogOut, User as UserIcon } from "lucide-react";
+import Link from "next/link";
+import { Menu, LogOut, User as UserIcon, Wrench } from "lucide-react";
 import { User } from "@/types/types";
+import { useI18n } from "@/lib/i18n";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -10,8 +12,28 @@ interface HeaderProps {
   onLogout: () => void;
 }
 
+function LangToggle({ lang, onChange }: { lang: "es" | "en"; onChange: (l: "es" | "en") => void }) {
+  return (
+    <div className="flex items-center gap-1 rounded-md border border-gray-300 dark:border-gray-600 overflow-hidden">
+      <button
+        className={"px-2 h-7 text-xs font-medium transition-colors " + (lang === "es" ? "bg-blue-600 text-white" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700")}
+        onClick={() => onChange("es")}
+      >
+        ES
+      </button>
+      <button
+        className={"px-2 h-7 text-xs font-medium transition-colors " + (lang === "en" ? "bg-blue-600 text-white" : "text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-700")}
+        onClick={() => onChange("en")}
+      >
+        EN
+      </button>
+    </div>
+  );
+}
+
 export function DashboardHeader({ onMenuClick, user, onLogout }: HeaderProps) {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const { lang, setLang, t } = useI18n();
 
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-b border-gray-200 dark:border-gray-800">
@@ -29,6 +51,19 @@ export function DashboardHeader({ onMenuClick, user, onLogout }: HeaderProps) {
 
         {/* Right Section */}
         <div className="flex items-center gap-3">
+          {/* Language Toggle */}
+          <LangToggle lang={lang} onChange={setLang} />
+          
+          {/* Connect Account Button */}
+          <Link
+            href="/onboarding"
+            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
+          >
+            <Wrench className="h-4 w-4" />
+            <span className="hidden sm:inline">{t("dashboard.connectAccount")}</span>
+            <span className="sm:hidden">Connect</span>
+          </Link>
+
           {/* User Menu */}
           <div className="relative">
             <button
@@ -62,7 +97,7 @@ export function DashboardHeader({ onMenuClick, user, onLogout }: HeaderProps) {
                   </p>
                 </div>
                 
-                <div className="border-t border-gray-200 dark:border-gray-700 mt-2 pt-2">
+                <div className="border-t border-gray-200 dark:border-gray-700">
                   <button 
                     onClick={onLogout}
                     className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3"

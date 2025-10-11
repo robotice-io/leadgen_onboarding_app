@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
 import { getLast7Days, formatDateForChart, get7DayPeriod } from "@/lib/calendar-utils";
+import { useI18n } from "@/lib/i18n";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from "recharts";
 import { Skeleton } from "@/components/ui/Skeleton";
 
@@ -52,6 +53,8 @@ const processChartDataWithCalendar = (apiData: any[]): OpenRateDataItem[] => {
 
 
 export function DashboardCharts({ tenantId }: DashboardChartsProps) {
+  const { t } = useI18n();
+  
   // Fetch real chart data from API
   const { data: chartData, isLoading } = useQuery({
     queryKey: ['chart-data', tenantId],
@@ -110,10 +113,10 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Open Rate Trend
+              {t("dashboard.openRateTrend")}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Last 7 days performance (accurate calendar dates)
+              {t("dashboard.last7Days")}
             </p>
           </div>
           <div className="flex items-center gap-4 text-sm">
@@ -173,10 +176,10 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Device Breakdown
+              {t("dashboard.deviceBreakdown")}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Email opens by device type
+              {t("dashboard.deviceBreakdownSubtitle")}
             </p>
           </div>
         </div>
@@ -230,10 +233,10 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Campaign Performance
+              {t("dashboard.campaignPerformance")}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Top performing campaigns this month
+              {t("dashboard.campaignPerformanceSubtitle")}
             </p>
           </div>
         </div>
@@ -242,10 +245,10 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
           <div className="text-center">
             <div className="text-gray-400 mb-2">📊</div>
             <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
-              Coming Soon
+              {t("dashboard.comingSoon")}
             </h4>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Campaign performance analytics will be available soon
+              {t("dashboard.comingSoonDescription")}
             </p>
           </div>
         </div>

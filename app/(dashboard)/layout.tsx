@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Poppins } from "next/font/google";
 import { isAuthenticated, getUser, getUserTenant, logout } from "@/lib/auth-client";
+import { I18nProvider } from "@/lib/i18n";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
 import { DashboardHeader } from "@/components/dashboard/Header";
 import { User } from "@/types/types";
@@ -70,37 +71,39 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${poppins.className}`}>
-      {/* Sidebar */}
-      <DashboardSidebar 
-        isOpen={sidebarOpen} 
-        onClose={() => setSidebarOpen(false)}
-        user={user}
-        tenant={tenant}
-      />
-
-      {/* Main Content */}
-      <div className="lg:pl-64">
-        {/* Header */}
-        <DashboardHeader 
-          onMenuClick={() => setSidebarOpen(true)}
+    <I18nProvider>
+      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${poppins.className}`}>
+        {/* Sidebar */}
+        <DashboardSidebar 
+          isOpen={sidebarOpen} 
+          onClose={() => setSidebarOpen(false)}
           user={user}
-          onLogout={handleLogout}
+          tenant={tenant}
         />
 
-        {/* Page Content */}
-        <main className="p-4 lg:p-8">
-          {children}
-        </main>
+        {/* Main Content */}
+        <div className="lg:pl-64">
+          {/* Header */}
+          <DashboardHeader 
+            onMenuClick={() => setSidebarOpen(true)}
+            user={user}
+            onLogout={handleLogout}
+          />
+
+          {/* Page Content */}
+          <main className="p-4 lg:p-8">
+            {children}
+          </main>
+        </div>
+
+        {/* Mobile Sidebar Overlay */}
+        {sidebarOpen && (
+          <div 
+            className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
       </div>
-
-      {/* Mobile Sidebar Overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        />
-      )}
-    </div>
+    </I18nProvider>
   );
 }

@@ -3,12 +3,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
 import { getTenant } from "@/lib/auth-client";
+import { useI18n } from "@/lib/i18n";
 import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { RecentEmails } from "@/components/dashboard/RecentEmails";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function DashboardPage() {
+  const { t } = useI18n();
   // Get tenant from localStorage
   const tenant = getTenant();
   const tenantId = tenant?.tenant_id;
@@ -65,10 +67,10 @@ export default function DashboardPage() {
         <div className="text-center">
           <div className="text-red-500 mb-2">⚠️</div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
-            Failed to load dashboard
+            {t("dashboard.failedToLoad")}
           </h3>
           <p className="text-gray-500 dark:text-gray-400">
-            Please check your connection and try again
+            {t("dashboard.checkConnection")}
           </p>
         </div>
       </div>
@@ -81,10 +83,10 @@ export default function DashboardPage() {
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Dashboard
+            {t("dashboard.title")}
           </h1>
           <p className="text-gray-500 dark:text-gray-400">
-            Welcome back! Here's what's happening with your campaigns.
+            {t("dashboard.welcome")}
           </p>
         </div>
       </div>

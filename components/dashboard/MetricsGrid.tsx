@@ -1,6 +1,7 @@
 "use client";
 
 import { Mail, TrendingUp, Users, Eye } from "lucide-react";
+import { useI18n } from "@/lib/i18n";
 
 interface MetricsGridProps {
   stats: {
@@ -19,6 +20,8 @@ interface MetricsGridProps {
 }
 
 export function MetricsGrid({ stats }: MetricsGridProps) {
+  const { t } = useI18n();
+  
   // Helper function to calculate percentage change
   const calculatePercentageChange = (current: number, previous: number | undefined): { change: string; changeType: 'positive' | 'negative' | 'neutral' } => {
     if (!previous || previous === 0) {
@@ -44,7 +47,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
 
   const metrics = [
     {
-      name: "Emails Sent Today",
+      name: t("dashboard.emailsSentToday"),
       value: stats.emails_sent_today.toLocaleString(),
       change: emailsChange.change,
       changeType: emailsChange.changeType,
@@ -52,7 +55,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       color: "blue" as const,
     },
     {
-      name: "Opens Today",
+      name: t("dashboard.opensToday"),
       value: stats.opens_today.toLocaleString(),
       change: opensChange.change,
       changeType: opensChange.changeType,
@@ -60,7 +63,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       color: "green" as const,
     },
     {
-      name: "Open Rate",
+      name: t("dashboard.openRate"),
       value: `${(stats.open_rate_today * 100).toFixed(1)}%`,
       change: openRateChange.change,
       changeType: openRateChange.changeType,
@@ -68,7 +71,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       color: "purple" as const,
     },
     {
-      name: "Unique Devices",
+      name: t("dashboard.uniqueDevices"),
       value: stats.unique_devices_today.toLocaleString(),
       change: devicesChange.change,
       changeType: devicesChange.changeType,

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Eye, Users, Clock, Mail, Search } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { useI18n } from "@/lib/i18n";
 
 interface Email {
   uuid: string;
@@ -22,6 +23,7 @@ interface RecentEmailsProps {
 
 
 export function RecentEmails({ emails = [] }: RecentEmailsProps) {
+  const { t } = useI18n();
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
@@ -62,10 +64,10 @@ export function RecentEmails({ emails = [] }: RecentEmailsProps) {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Recent Emails
+              {t("dashboard.recentEmails")}
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Latest email activity and performance
+              {t("dashboard.recentEmailsSubtitle")}
             </p>
           </div>
           
@@ -74,7 +76,7 @@ export function RecentEmails({ emails = [] }: RecentEmailsProps) {
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
               <Input
-                placeholder="Search emails..."
+                placeholder={t("dashboard.searchEmails")}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 w-64"
@@ -87,11 +89,11 @@ export function RecentEmails({ emails = [] }: RecentEmailsProps) {
               onChange={(e) => setStatusFilter(e.target.value)}
               className="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 px-3 py-2 text-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
             >
-              <option value="all">All Status</option>
-              <option value="sent">Sent</option>
-              <option value="delivered">Delivered</option>
-              <option value="opened">Opened</option>
-              <option value="clicked">Clicked</option>
+              <option value="all">{t("dashboard.allStatus")}</option>
+              <option value="sent">{t("dashboard.sent")}</option>
+              <option value="delivered">{t("dashboard.delivered")}</option>
+              <option value="opened">{t("dashboard.opened")}</option>
+              <option value="clicked">{t("dashboard.clicked")}</option>
             </select>
           </div>
         </div>
@@ -103,12 +105,12 @@ export function RecentEmails({ emails = [] }: RecentEmailsProps) {
           <div className="p-8 text-center">
             <Mail className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              No emails found
+              {t("dashboard.noEmailsFound")}
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
               {searchTerm || statusFilter !== "all" 
-                ? "Try adjusting your search or filter criteria"
-                : "Start sending emails to see them here"
+                ? t("dashboard.adjustSearch")
+                : t("dashboard.startSending")
               }
             </p>
           </div>
@@ -159,7 +161,7 @@ export function RecentEmails({ emails = [] }: RecentEmailsProps) {
                     href={`/dashboard/email/${email.uuid}`}
                     className="text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 text-sm font-medium"
                   >
-                    View Details
+                    {t("dashboard.viewDetails")}
                   </Link>
                 </div>
               </div>
@@ -173,10 +175,10 @@ export function RecentEmails({ emails = [] }: RecentEmailsProps) {
         <div className="p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50 rounded-b-xl">
           <div className="flex items-center justify-between">
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Showing {filteredEmails.length} of {emails.length} emails
+              {t("dashboard.showing")} {filteredEmails.length} {t("dashboard.of")} {emails.length} {t("dashboard.emails")}
             </p>
             <Button variant="outline" className="h-9 px-3 text-sm">
-              View All Emails
+              {t("dashboard.viewAllEmails")}
             </Button>
           </div>
         </div>
