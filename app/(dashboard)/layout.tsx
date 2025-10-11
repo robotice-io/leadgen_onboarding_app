@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Poppins } from "next/font/google";
-import { isAuthenticated, getUser, getUserTenant, logout } from "@/lib/auth-client";
+import { isAuthenticated, getUser, getUserTenant, getTenant, logout } from "@/lib/auth-client";
 import { I18nProvider } from "@/lib/i18n";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
 import { DashboardHeader } from "@/components/dashboard/Header";
@@ -37,14 +37,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       // Get tenant data from API
       try {
         const tenantData = await getUserTenant();
+        console.log("[DashboardLayout] Tenant data received:", tenantData);
         console.log("[DashboardLayout] Auth successful, loading dashboard for user:", userData, "tenant:", tenantData);
         setUser(userData);
         setTenant(tenantData);
       } catch (error) {
         console.warn("[DashboardLayout] Failed to fetch tenant data:", error);
-        // Still show dashboard even if tenant fetch fails
-        setUser(userData);
-        setTenant(null);
+        // Try to get tenant from localStorage as fallback
+        try {
+          const localTenant = getTenant();
+          console.log("[DashboardLayout] Using localStorage tenant:", localTenant);
+          setUser(userData);
+          setTenant(localTenant);
+        } catch (localError) {
+          console.warn("[DashboardLayout] No tenant data available:", localError);
+          setUser(userData);
+          setTenant(null);
+        }
       }
       setLoading(false);
     };
