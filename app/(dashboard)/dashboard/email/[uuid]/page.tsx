@@ -10,6 +10,29 @@ import { Skeleton } from "@/components/ui/Skeleton";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { getTenant } from "@/lib/auth-client";
 
+// Types for email analytics payload
+type DeviceType = "desktop" | "mobile" | "tablet" | string;
+
+interface EmailEvent {
+  id: number;
+  opened_at: string;
+  device_type: DeviceType;
+  user_agent: string;
+  ip_address?: string;
+}
+
+interface EmailAnalytics {
+  uuid: string;
+  subject: string;
+  recipient: string;
+  sent_at: string;
+  opens: number;
+  unique_devices: number;
+  last_opened_at?: string | null;
+  engagement_score: number;
+  events: EmailEvent[];
+}
+
 // Timeline/device demo data kept for visualization; real series come from API once wired
 
 const deviceData = [
@@ -37,7 +60,7 @@ export default function EmailAnalyticsPage() {
   const tenantId = tenant?.tenant_id as number | undefined;
 
   // Fetch email analytics
-  const { data: emailData, isLoading, error } = useQuery({
+  const { data: emailData, isLoading, error } = useQuery<EmailAnalytics>({
     queryKey: ['email-analytics', tenantId, emailUuid],
     queryFn: async () => {
       if (!tenantId) {
@@ -56,7 +79,8 @@ export default function EmailAnalyticsPage() {
         const txt = await res.text();
         throw new Error(`[${res.status}] ${txt || "Failed to fetch email analytics"}`);
       }
-      return res.json();
+      const data = (await res.json()) as EmailAnalytics;
+      return data;
     },
     enabled: !!tenantId && !!emailUuid,
     refetchInterval: 15000, // Poll every 15 seconds
@@ -285,8 +309,8 @@ export default function EmailAnalyticsPage() {
               Event Timeline
             </h3>
             <div className="space-y-4">
-              {emailData.events.map((event, index) => {
-                const DeviceIcon = getDeviceIcon(event.device_type);
+              {emailData.events.map((event: EmailEvent, index: number) => {
+                const DeviceIcon = getDeviceIcon(event.device_type as string);
                 return (
                   <div key={event.id} className="flex items-center gap-4 p-4 bg-gray-50 dark:bg-gray-800 rounded-lg">
                     <div className="flex-shrink-0">
