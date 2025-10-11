@@ -35,6 +35,9 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
   const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
   const url = useProxy ? `/api/bridge${fullPath}` : `${base}${fullPath}`;
   
+  console.log('[apiGet] Making request to:', url);
+  console.log('[apiGet] Full path:', fullPath);
+  
   const headers: Record<string, string> = {
     ...(init?.headers as Record<string, string> || {}),
     Accept: "application/json",
@@ -42,6 +45,8 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
 
   // Always include API key on every request
   headers["X-API-Key"] = getApiKey();
+  
+  console.log('[apiGet] Headers:', headers);
   
   return fetch(url, { 
     ...init, 

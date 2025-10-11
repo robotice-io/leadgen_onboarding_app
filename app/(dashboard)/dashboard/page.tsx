@@ -20,6 +20,12 @@ export default function DashboardPage() {
   // Convert to number if it's a string
   const tenantId = tenantIdFromStorage || (tenantIdFromLocalStorage ? parseInt(tenantIdFromLocalStorage) : null);
 
+  console.log('[DashboardPage] All localStorage keys:', Object.keys(localStorage));
+  console.log('[DashboardPage] robotice-tenant-id:', localStorage.getItem("robotice-tenant-id"));
+  console.log('[DashboardPage] robotice_auth_token:', localStorage.getItem("robotice_auth_token"));
+  console.log('[DashboardPage] robotice_user:', localStorage.getItem("robotice_user"));
+  console.log('[DashboardPage] robotice_tenant:', localStorage.getItem("robotice_tenant"));
+
   console.log('[DashboardPage] Tenant from localStorage:', tenant);
   console.log('[DashboardPage] tenantIdFromStorage:', tenantIdFromStorage);
   console.log('[DashboardPage] tenantIdFromLocalStorage:', tenantIdFromLocalStorage);
