@@ -4,11 +4,11 @@ export const runtime = "nodejs";
 
 function getApiBase() {
   const env = process.env.NEXT_PUBLIC_API_BASE_URL;
-  return (env && env.replace(/\/$/, "")) || "http://192.241.157.92:8000";
+  return (env && env.replace(/\/$/, "")) || "http://192.241.157.92:8000/api/v1";
 }
 
 function getApiKey(): string {
-  return process.env.API_KEY || "lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175";
+  return process.env.NEXT_PUBLIC_API_KEY || "lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175";
 }
 
 async function proxy(req: NextRequest) {
@@ -20,7 +20,7 @@ async function proxy(req: NextRequest) {
   headers.set("host", new URL(apiBase).host);
   
   // Only add API key for telemetry endpoints
-  // Auth endpoints and dashboard endpoints DO NOT require API key
+  // Auth and dashboard endpoints DO NOT require API key
   if (path.includes('/telemetry/')) {
     headers.set("X-API-Key", getApiKey());
   }

@@ -1,11 +1,27 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 import Wizard from "./_components/Wizard";
 import { I18nProvider } from "@/lib/i18n";
 import TopBar from "./_components/TopBar";
 import { Poppins } from "next/font/google";
+import { isAuthenticated } from "@/lib/auth-client";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
 export default function OnboardingPage() {
+  const router = useRouter();
+
+  useEffect(() => {
+    // Check if user is authenticated
+    if (!isAuthenticated()) {
+      console.log("[OnboardingPage] Not authenticated, redirecting to login");
+      router.push("/login");
+      return;
+    }
+  }, [router]);
+
   return (
     <I18nProvider>
       <div className="min-h-screen w-full bg-[linear-gradient(180deg,rgba(2,6,23,0)_0%,rgba(2,6,23,0)_60%,rgba(2,6,23,0.03)_100%)]">

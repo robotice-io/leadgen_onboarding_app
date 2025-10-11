@@ -2,37 +2,43 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
+import { getTenant } from "@/lib/auth-client";
 import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { RecentEmails } from "@/components/dashboard/RecentEmails";
 import { QuickActions } from "@/components/dashboard/QuickActions";
 import { Skeleton } from "@/components/ui/Skeleton";
 
-// Mock tenant ID - in real app, get from user context
-const TENANT_ID = 21;
-
 export default function DashboardPage() {
+  // Get tenant from localStorage
+  const tenant = getTenant();
+  const tenantId = tenant?.tenant_id;
+
   // Fetch dashboard stats with polling
   const { data: stats, isLoading: statsLoading, error: statsError } = useQuery({
-    queryKey: ['dashboard-stats', TENANT_ID],
+    queryKey: ['dashboard-stats', tenantId],
     queryFn: async () => {
-      const res = await apiGet(`/api/v1/dashboard/${TENANT_ID}/quick-stats`);
+      if (!tenantId) throw new Error('No tenant ID available');
+      const res = await apiGet(`/dashboard/${tenantId}/quick-stats`);
       if (!res.ok) throw new Error('Failed to fetch stats');
       return res.json();
     },
     refetchInterval: 15000, // Poll every 15 seconds
     refetchIntervalInBackground: false,
+    enabled: !!tenantId, // Only run if tenantId is available
   });
 
   // Fetch recent emails
   const { data: recentEmails, isLoading: emailsLoading } = useQuery({
-    queryKey: ['recent-emails', TENANT_ID],
+    queryKey: ['recent-emails', tenantId],
     queryFn: async () => {
-      const res = await apiGet(`/api/v1/dashboard/${TENANT_ID}/recent-emails`);
+      if (!tenantId) throw new Error('No tenant ID available');
+      const res = await apiGet(`/dashboard/${tenantId}/recent-emails`);
       if (!res.ok) throw new Error('Failed to fetch emails');
       return res.json();
     },
     refetchInterval: 30000, // Poll every 30 seconds
+    enabled: !!tenantId, // Only run if tenantId is available
   });
 
   if (statsError) {
@@ -83,7 +89,7 @@ export default function DashboardPage() {
 
       {/* Charts Section */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <DashboardCharts tenantId={TENANT_ID} />
+        {tenantId && <DashboardCharts tenantId={tenantId} />}
       </div>
 
       {/* Recent Activity */}

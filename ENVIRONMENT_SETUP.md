@@ -15,10 +15,10 @@ STATE_SIGNING_KEY=your-secure-random-key-here-change-in-production
 
 ## Environment Variables Explained
 
-### `API_KEY`
-- **Purpose**: Authentication key for all API requests
+### `NEXT_PUBLIC_API_KEY`
+- **Purpose**: Authentication key for telemetry endpoints only
 - **Value**: `lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175`
-- **Usage**: Automatically added to all API requests as `X-API-Key` header
+- **Usage**: Only added to `/telemetry/*` endpoints as `X-API-Key` header
 - **Security**: Keep this key secure and never commit it to version control
 
 ### `NEXT_PUBLIC_API_BASE_URL`

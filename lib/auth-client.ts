@@ -99,6 +99,7 @@ export function getTenant(): any | null {
   try { return JSON.parse(t); } catch { return null; }
 }
 
+
 export function setTenant(tenant: any): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(TENANT_KEY, JSON.stringify(tenant));

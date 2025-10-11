@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-const publicPaths = ['/', '/login', '/register', '/verify-email', '/forgot-password', '/reset-password', '/onboarding'];
+const publicPaths = ['/', '/login', '/register', '/verify-email', '/forgot-password', '/reset-password'];
+const authPaths = ['/login', '/register'];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -13,13 +14,12 @@ export function middleware(request: NextRequest) {
     pathname.startsWith('/api') ||
     pathname.startsWith('/static') ||
     pathname.startsWith('/oauth') ||
-    pathname.startsWith('/dashboard') || // Let client-side layout handle dashboard auth
     pathname.includes('.')
   ) {
     return NextResponse.next();
   }
 
-  // For any other protected routes, let client-side handle auth
+  // For protected routes like /onboarding and /dashboard, let client-side handle auth
   // (We use localStorage, not cookies, so server-side checks won't work)
   return NextResponse.next();
 }

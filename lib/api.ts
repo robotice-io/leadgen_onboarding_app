@@ -6,13 +6,13 @@ export function getApiBaseUrl(): string {
     const v = (window as any).ENV_API_BASE_URL as string | undefined;
     if (v) return v;
   }
-  // Default to provided server IP if no env is configured
-  return "http://192.241.157.92:8000";
+  // Default to provided server IP with /api/v1 path
+  return "http://192.241.157.92:8000/api/v1";
 }
 
 export function getApiKey(): string {
-  if (typeof process !== "undefined" && process.env.API_KEY) {
-    return String(process.env.API_KEY);
+  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_KEY) {
+    return String(process.env.NEXT_PUBLIC_API_KEY);
   }
   // Default API key (should be moved to environment variable)
   return "lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175";
