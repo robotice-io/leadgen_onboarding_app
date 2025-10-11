@@ -87,6 +87,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <DashboardHeader 
             onMenuClick={() => setSidebarOpen(true)}
             user={user}
+            tenant={tenant}
             onLogout={handleLogout}
           />
 
