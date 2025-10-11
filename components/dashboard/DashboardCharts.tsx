@@ -148,7 +148,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
                 name === 'rate' ? `${value}%` : value,
                 name === 'rate' ? 'Open Rate' : 'Emails Sent'
               ]}
-              labelFormatter={(label, payload) => {
+              labelFormatter={(label: any, payload: any) => {
                 if (payload && payload[0]) {
                   const data = payload[0].payload;
                   return `${data.dayName}, ${data.date}`; // Show full date in tooltip
