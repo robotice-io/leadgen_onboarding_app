@@ -38,15 +38,20 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
   const base = getApiBaseUrl().replace(/\/$/, "");
   const useProxy = shouldProxyToNext(base);
   const url = useProxy ? `/api/bridge${path}` : `${base}${path}`;
-  const apiKey = getApiKey();
   const token = getAuthToken();
   
   const headers: Record<string, string> = {
     ...(init?.headers as Record<string, string> || {}),
     Accept: "application/json",
-    "X-API-Key": apiKey,
   };
   
+  // Only add API key for telemetry endpoints
+  if (path.includes('/telemetry/')) {
+    const apiKey = getApiKey();
+    headers["X-API-Key"] = apiKey;
+  }
+  
+  // Add JWT token for authenticated endpoints
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
@@ -62,17 +67,22 @@ export async function apiPost(path: string, body: unknown, init?: RequestInit): 
   const base = getApiBaseUrl().replace(/\/$/, "");
   const useProxy = shouldProxyToNext(base);
   const url = useProxy ? `/api/bridge${path}` : `${base}${path}`;
-  const apiKey = getApiKey();
   const token = getAuthToken();
   
   const headers: Record<string, string> = {
     "Content-Type": "application/json", 
     Accept: "application/json", 
-    "X-API-Key": apiKey,
     ...(init?.headers as Record<string, string> || {})
   };
   
-  if (token) {
+  // Only add API key for telemetry endpoints
+  if (path.includes('/telemetry/')) {
+    const apiKey = getApiKey();
+    headers["X-API-Key"] = apiKey;
+  }
+  
+  // Add JWT token for authenticated endpoints (but not auth endpoints)
+  if (token && !path.includes('/auth/')) {
     headers.Authorization = `Bearer ${token}`;
   }
   

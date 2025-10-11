@@ -48,9 +48,13 @@ export function setUser(user: any): void {
 }
 
 export async function login(email: string, password: string): Promise<AuthTokens> {
-  const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/login`, {
+  const apiBase = getApiBaseUrl();
+  const res = await fetch(`${apiBase}/api/v1/auth/login`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      // No API key required for auth endpoints
+    },
     body: JSON.stringify({ email, password }),
   });
 
@@ -72,9 +76,13 @@ export async function register(
   firstName?: string,
   lastName?: string
 ): Promise<void> {
-  const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/register`, {
+  const apiBase = getApiBaseUrl();
+  const res = await fetch(`${apiBase}/api/v1/auth/register`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      // No API key required for auth endpoints
+    },
     body: JSON.stringify({ 
       email, 
       password,
@@ -132,10 +140,12 @@ export async function getCurrentUser(): Promise<any> {
   const token = getToken();
   if (!token) throw new Error("Not authenticated");
 
-  const res = await fetch(`${getApiBaseUrl()}/api/v1/auth/me`, {
+  const apiBase = getApiBaseUrl();
+  const res = await fetch(`${apiBase}/api/v1/auth/me`, {
     headers: { 
       "Authorization": `Bearer ${token}`,
-      "Content-Type": "application/json"
+      "Content-Type": "application/json",
+      // No API key required for auth endpoints
     },
   });
 
