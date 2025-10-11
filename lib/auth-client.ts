@@ -275,6 +275,8 @@ export async function resetPassword(token: string, newPassword: string): Promise
 
 export async function getCurrentUser(): Promise<any> {
   const url = getRequestUrl("/api/v1/auth/user-info");
+  console.log('[getCurrentUser] Making request to:', url);
+  
   const res = await fetch(url, {
     headers: { 
       "Content-Type": "application/json",
@@ -299,11 +301,20 @@ export async function getCurrentUser(): Promise<any> {
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
-  return res.json();
+  const userData = await res.json();
+  console.log('[getCurrentUser] Received user data:', userData);
+  
+  return userData;
 }
 
 export async function getUserTenant(): Promise<any> {
+  // First get the current user to ensure we have the right user context
+  const user = await getCurrentUser();
+  console.log('[getUserTenant] Current user:', user);
+  
   const url = getRequestUrl("/api/v1/auth/tenant-info");
+  console.log('[getUserTenant] Making request to:', url);
+  
   const res = await fetch(url, {
     headers: { 
       "Content-Type": "application/json",
@@ -328,7 +339,10 @@ export async function getUserTenant(): Promise<any> {
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
-  return res.json();
+  const tenantData = await res.json();
+  console.log('[getUserTenant] Received tenant data:', tenantData);
+  
+  return tenantData;
 }
 
 export async function logout(): Promise<void> {
