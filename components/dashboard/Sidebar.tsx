@@ -29,6 +29,40 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
   const pathname = usePathname();
   const [tenantMenuOpen, setTenantMenuOpen] = useState(false);
 
+  // Get tenant info with fallbacks
+  const getTenantName = () => {
+    // Try tenant data first
+    if (tenant?.name) return tenant.name;
+    if (tenant?.org_name) return tenant.org_name;
+    if (tenant?.company_name) return tenant.company_name;
+    
+    // Try localStorage data as fallback
+    try {
+      const orgName = localStorage.getItem("robotice-org-name");
+      if (orgName) return orgName;
+    } catch {}
+    
+    // Try user data
+    if (user?.company) return user.company;
+    
+    return "My Company";
+  };
+
+  const getTenantEmail = () => {
+    // Try tenant data first
+    if (tenant?.email) return tenant.email;
+    if (tenant?.contact_email) return tenant.contact_email;
+    
+    // Try localStorage data as fallback
+    try {
+      const contactEmail = localStorage.getItem("robotice-contact-email");
+      if (contactEmail) return contactEmail;
+    } catch {}
+    
+    // Fallback to user email
+    return user?.email || "";
+  };
+
   const navigation = [
     { name: t("dashboard.title"), href: "/dashboard", icon: BarChart3 },
     { name: "Campaigns", href: "/dashboard/campaigns", icon: Mail },
@@ -65,10 +99,10 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
                 <Building2 className="h-5 w-5 text-gray-500" />
                 <div className="text-left">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {tenant?.name || tenant?.org_name || tenant?.company_name || user?.company || "My Company"}
+                    {getTenantName()}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {tenant?.email || tenant?.contact_email || user?.email}
+                    {getTenantEmail()}
                   </p>
                 </div>
               </div>

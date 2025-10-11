@@ -50,6 +50,40 @@ export function DashboardHeader({ onMenuClick, user, tenant, onLogout }: HeaderP
     user_email: user?.email
   });
 
+  // Get tenant info with fallbacks
+  const getTenantName = () => {
+    // Try tenant data first
+    if (tenant?.name) return tenant.name;
+    if (tenant?.org_name) return tenant.org_name;
+    if (tenant?.company_name) return tenant.company_name;
+    
+    // Try localStorage data as fallback
+    try {
+      const orgName = localStorage.getItem("robotice-org-name");
+      if (orgName) return orgName;
+    } catch {}
+    
+    // Try user data
+    if (user?.company) return user.company;
+    
+    return "My Company";
+  };
+
+  const getTenantEmail = () => {
+    // Try tenant data first
+    if (tenant?.email) return tenant.email;
+    if (tenant?.contact_email) return tenant.contact_email;
+    
+    // Try localStorage data as fallback
+    try {
+      const contactEmail = localStorage.getItem("robotice-contact-email");
+      if (contactEmail) return contactEmail;
+    } catch {}
+    
+    // Fallback to user email
+    return user?.email || "";
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-white/95 dark:bg-gray-900/95 backdrop-blur border-b border-gray-200 dark:border-gray-800">
       <div className="flex h-16 items-center justify-between px-4 lg:px-8">
@@ -92,10 +126,10 @@ export function DashboardHeader({ onMenuClick, user, tenant, onLogout }: HeaderP
               </div>
               <div className="hidden sm:block text-left">
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {tenant?.name || tenant?.org_name || tenant?.company_name || user?.company || "My Company"}
+                  {getTenantName()}
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400">
-                  {tenant?.email || tenant?.contact_email || user?.email}
+                  {getTenantEmail()}
                 </p>
               </div>
             </button>
@@ -105,10 +139,10 @@ export function DashboardHeader({ onMenuClick, user, tenant, onLogout }: HeaderP
               <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 z-50">
                 <div className="px-4 py-2 border-b border-gray-200 dark:border-gray-700">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {tenant?.name || tenant?.org_name || tenant?.company_name || user?.company || "My Company"}
+                    {getTenantName()}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {tenant?.email || tenant?.contact_email || user?.email}
+                    {getTenantEmail()}
                   </p>
                 </div>
                 
