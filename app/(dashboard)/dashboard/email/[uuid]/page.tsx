@@ -8,27 +8,9 @@ import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
+import { getTenant } from "@/lib/auth-client";
 
-// Mock tenant ID - in real app, get from user context
-const TENANT_ID = 21;
-
-// Mock data for email analytics
-const mockEmailData = {
-  uuid: "email-123",
-  subject: "Summer Sale - 50% Off Everything!",
-  recipient: "john@example.com",
-  sent_at: "2025-01-10T15:30:00Z",
-  opens: 8,
-  unique_devices: 3,
-  last_opened_at: "2025-01-10T18:45:00Z",
-  engagement_score: 85,
-  events: [
-    { id: 1, opened_at: "2025-01-10T15:35:00Z", device_type: "desktop", user_agent: "Chrome 120", ip_address: "192.168.1.1" },
-    { id: 2, opened_at: "2025-01-10T16:20:00Z", device_type: "mobile", user_agent: "Safari iOS", ip_address: "192.168.1.1" },
-    { id: 3, opened_at: "2025-01-10T17:10:00Z", device_type: "desktop", user_agent: "Chrome 120", ip_address: "192.168.1.1" },
-    { id: 4, opened_at: "2025-01-10T18:45:00Z", device_type: "tablet", user_agent: "Safari iPad", ip_address: "192.168.1.1" },
-  ]
-};
+// Timeline/device demo data kept for visualization; real series come from API once wired
 
 const deviceData = [
   { name: "Desktop", value: 50, color: "#3B82F6" },
@@ -51,20 +33,33 @@ export default function EmailAnalyticsPage() {
   const params = useParams();
   const router = useRouter();
   const emailUuid = params.uuid as string;
+  const tenant = getTenant();
+  const tenantId = tenant?.tenant_id as number | undefined;
 
   // Fetch email analytics
   const { data: emailData, isLoading, error } = useQuery({
-    queryKey: ['email-analytics', TENANT_ID, emailUuid],
+    queryKey: ['email-analytics', tenantId, emailUuid],
     queryFn: async () => {
-      // In real app, fetch from API
-      // const res = await apiGet(`/api/v1/dashboard/${TENANT_ID}/email/${emailUuid}`);
-      // return res.json();
-      
-      // Mock data for now
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      return mockEmailData;
+      if (!tenantId) {
+        throw new Error("[NO_TENANT] Tenant not found in session. Link or select a tenant.");
+      }
+      const res = await apiGet(`/api/v1/dashboard/${tenantId}/email/${emailUuid}`);
+      if (res.status === 404) {
+        const txt = await res.text();
+        throw new Error(`[404] ${txt || "Email not found"}`);
+      }
+      if (res.status === 401 || res.status === 403) {
+        const txt = await res.text();
+        throw new Error(`[${res.status}] ${txt || "Not authenticated"}`);
+      }
+      if (!res.ok) {
+        const txt = await res.text();
+        throw new Error(`[${res.status}] ${txt || "Failed to fetch email analytics"}`);
+      }
+      return res.json();
     },
-    refetchInterval: 30000, // Poll every 30 seconds
+    enabled: !!tenantId && !!emailUuid,
+    refetchInterval: 15000, // Poll every 15 seconds
   });
 
   const getDeviceIcon = (deviceType: string) => {
@@ -87,16 +82,23 @@ export default function EmailAnalyticsPage() {
   };
 
   if (error) {
+    const message = (error as Error)?.message || "Failed to load email analytics";
+    const notFound = message.startsWith("[404]");
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
           <div className="text-red-500 mb-2">⚠️</div>
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
-            Failed to load email analytics
+            {notFound ? "Email not found" : "Failed to load email analytics"}
           </h3>
-          <p className="text-gray-500 dark:text-gray-400">
-            Please check your connection and try again
+          <p className="text-gray-500 dark:text-gray-400 mb-3">
+            {message.replace(/^\[[0-9]{3}\]\s?/, "")}
           </p>
+          <div className="flex items-center justify-center gap-3">
+            <Button variant="outline" onClick={() => router.back()}>
+              <ArrowLeft className="h-4 w-4 mr-2" /> Back
+            </Button>
+          </div>
         </div>
       </div>
     );

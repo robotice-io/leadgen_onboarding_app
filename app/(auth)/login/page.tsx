@@ -28,13 +28,12 @@ export default function LoginPage() {
       await login(email, password);
       setToast({ message: "Login successful!", type: "success" });
       
-      // Redirect to dashboard
+      // Small delay to show success message, then redirect
       setTimeout(() => {
         window.location.href = "/dashboard";
-      }, 1000);
+      }, 800);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
-    } finally {
       setLoading(false);
     }
   }

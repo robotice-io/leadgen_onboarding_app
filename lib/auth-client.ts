@@ -5,6 +5,8 @@ import { getApiBaseUrl } from "./api";
 export interface AuthTokens {
   access_token: string;
   token_type: string;
+  expires_in?: number;
+  refresh_token?: string;
   user?: {
     id: number;
     email: string;
@@ -14,6 +16,8 @@ export interface AuthTokens {
 
 const TOKEN_KEY = "robotice_auth_token";
 const USER_KEY = "robotice_user";
+const REFRESH_TOKEN_KEY = "robotice_refresh_token";
+const TENANT_KEY = "robotice_tenant";
 
 // Check if we need to proxy requests through Next.js API routes
 function shouldUseProxy(apiBase: string): boolean {
@@ -73,6 +77,98 @@ export function setUser(user: any): void {
   localStorage.setItem(USER_KEY, JSON.stringify(user));
 }
 
+export function getRefreshToken(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem(REFRESH_TOKEN_KEY);
+}
+
+export function setRefreshToken(token: string): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(REFRESH_TOKEN_KEY, token);
+}
+
+export function removeRefreshToken(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(REFRESH_TOKEN_KEY);
+}
+
+export function getTenant(): any | null {
+  if (typeof window === "undefined") return null;
+  const t = localStorage.getItem(TENANT_KEY);
+  if (!t) return null;
+  try { return JSON.parse(t); } catch { return null; }
+}
+
+export function setTenant(tenant: any): void {
+  if (typeof window === "undefined") return;
+  localStorage.setItem(TENANT_KEY, JSON.stringify(tenant));
+}
+
+export function removeTenant(): void {
+  if (typeof window === "undefined") return;
+  localStorage.removeItem(TENANT_KEY);
+}
+
+let refreshTimerId: number | undefined;
+
+async function refreshAccessTokenInternal(): Promise<AuthTokens> {
+  const rt = getRefreshToken();
+  if (!rt) throw new Error("No refresh token");
+
+  const url = getRequestUrl("/api/v1/auth/refresh");
+  const res = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${rt}`,
+      "Content-Type": "application/json",
+    },
+  });
+
+  if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error("[429] Too many attempts. Try again in a minute.");
+    }
+    const text = await res.text();
+    let msg = text || "Token refresh failed";
+    try {
+      const j = JSON.parse(text);
+      msg = j.detail || j.message || msg;
+    } catch {}
+    throw new Error(`[${res.status}] ${msg}`);
+  }
+
+  const data: AuthTokens = await res.json();
+  if (data.access_token) setToken(data.access_token);
+  if (data.refresh_token) setRefreshToken(data.refresh_token);
+  if (typeof data.expires_in === "number") scheduleTokenRefresh(data.expires_in);
+  return data;
+}
+
+export async function refreshAccessToken(): Promise<AuthTokens> {
+  const tokens = await refreshAccessTokenInternal();
+  return tokens;
+}
+
+export function scheduleTokenRefresh(expiresInSeconds?: number): void {
+  if (typeof window === "undefined") return;
+  if (refreshTimerId) {
+    window.clearTimeout(refreshTimerId);
+    refreshTimerId = undefined;
+  }
+  const fallback = 1800; // 30 minutes default
+  const seconds = typeof expiresInSeconds === "number" && expiresInSeconds > 0 ? expiresInSeconds : fallback;
+  // Refresh 3 minutes before expiry, minimum 60s
+  const delayMs = Math.max(60, seconds - 180) * 1000;
+  refreshTimerId = window.setTimeout(async () => {
+    try {
+      await refreshAccessTokenInternal();
+    } catch {
+      // If refresh fails, ensure user is logged out to avoid loops
+      await logout();
+    }
+  }, delayMs);
+}
+
 export async function login(email: string, password: string): Promise<AuthTokens> {
   const url = getRequestUrl("/api/v1/auth/login");
   const res = await fetch(url, {
@@ -85,6 +181,9 @@ export async function login(email: string, password: string): Promise<AuthTokens
   });
 
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error("[429] Too many attempts. Try again in a minute.");
+    }
     const errorText = await res.text();
     let errorMessage = errorText || "Login failed";
     
@@ -99,9 +198,28 @@ export async function login(email: string, password: string): Promise<AuthTokens
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
-  const data = await res.json();
+  const data: AuthTokens = await res.json();
   setToken(data.access_token);
-  if (data.user) setUser(data.user);
+  if (data.refresh_token) setRefreshToken(data.refresh_token);
+  
+  // Fetch user data immediately after login
+  try {
+    const userData = await getCurrentUser();
+    setUser(userData);
+  } catch (error) {
+    console.error("Failed to fetch user data:", error);
+  }
+  
+  // Try to fetch and persist tenant data (optional)
+  try {
+    const tenant = await getUserTenant();
+    if (tenant) setTenant(tenant);
+  } catch (e) {
+    // No tenant is acceptable for new users
+  }
+
+  // Schedule silent refresh
+  scheduleTokenRefresh(data.expires_in);
   
   return data;
 }
@@ -128,6 +246,9 @@ export async function register(
   });
 
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error("[429] Too many attempts. Try again in a minute.");
+    }
     const errorText = await res.text();
     let errorMessage = errorText || "Registration failed";
     
@@ -151,6 +272,9 @@ export async function verifyEmail(token: string): Promise<void> {
   });
 
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error("[429] Too many attempts. Try again in a minute.");
+    }
     const error = await res.text();
     throw new Error(error || "Email verification failed");
   }
@@ -165,6 +289,9 @@ export async function forgotPassword(email: string): Promise<void> {
   });
 
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error("[429] Too many attempts. Try again in a minute.");
+    }
     const error = await res.text();
     throw new Error(error || "Failed to send reset email");
   }
@@ -179,6 +306,9 @@ export async function resetPassword(token: string, newPassword: string): Promise
   });
 
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error("[429] Too many attempts. Try again in a minute.");
+    }
     const error = await res.text();
     throw new Error(error || "Password reset failed");
   }
@@ -198,6 +328,9 @@ export async function getCurrentUser(): Promise<any> {
   });
 
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error("[429] Too many attempts. Try again in a minute.");
+    }
     const errorText = await res.text();
     let errorMessage = errorText || "Failed to get user info";
     
@@ -228,6 +361,9 @@ export async function getUserTenant(): Promise<any> {
   });
 
   if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error("[429] Too many attempts. Try again in a minute.");
+    }
     const errorText = await res.text();
     let errorMessage = errorText || "Failed to get tenant info";
     
@@ -246,6 +382,8 @@ export async function getUserTenant(): Promise<any> {
 
 export async function logout(): Promise<void> {
   removeToken();
+  removeRefreshToken();
+  removeTenant();
   window.location.href = "/login";
 }
 
