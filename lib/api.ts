@@ -6,8 +6,8 @@ export function getApiBaseUrl(): string {
     const v = (window as any).ENV_API_BASE_URL as string | undefined;
     if (v) return v;
   }
-  // Default to provided server IP with /api/v1 path
-  return "http://192.241.157.92:8000/api/v1";
+  // Default to provided server IP
+  return "http://192.241.157.92:8000";
 }
 
 export function getApiKey(): string {
@@ -37,7 +37,8 @@ function getAuthToken(): string | null {
 export async function apiGet(path: string, init?: RequestInit): Promise<Response> {
   const base = getApiBaseUrl().replace(/\/$/, "");
   const useProxy = shouldProxyToNext(base);
-  const url = useProxy ? `/api/bridge${path}` : `${base}${path}`;
+  const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
+  const url = useProxy ? `/api/bridge${fullPath}` : `${base}${fullPath}`;
   const token = getAuthToken();
   
   const headers: Record<string, string> = {
@@ -66,7 +67,8 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
 export async function apiPost(path: string, body: unknown, init?: RequestInit): Promise<Response> {
   const base = getApiBaseUrl().replace(/\/$/, "");
   const useProxy = shouldProxyToNext(base);
-  const url = useProxy ? `/api/bridge${path}` : `${base}${path}`;
+  const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
+  const url = useProxy ? `/api/bridge${fullPath}` : `${base}${fullPath}`;
   const token = getAuthToken();
   
   const headers: Record<string, string> = {

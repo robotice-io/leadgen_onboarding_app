@@ -4,7 +4,7 @@ export const runtime = "nodejs";
 
 function getApiBase() {
   const env = process.env.NEXT_PUBLIC_API_BASE_URL;
-  return (env && env.replace(/\/$/, "")) || "http://192.241.157.92:8000/api/v1";
+  return (env && env.replace(/\/$/, "")) || "http://192.241.157.92:8000";
 }
 
 function getApiKey(): string {

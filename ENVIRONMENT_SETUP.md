@@ -22,7 +22,7 @@ STATE_SIGNING_KEY=your-secure-random-key-here-change-in-production
 - **Security**: Keep this key secure and never commit it to version control
 
 ### `NEXT_PUBLIC_API_BASE_URL`
-- **Purpose**: Base URL for the backend API
+- **Purpose**: Base URL for the backend API (without /api/v1)
 - **Value**: `http://192.241.157.92:8000`
 - **Usage**: Used for direct API calls and proxy configuration
 
