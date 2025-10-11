@@ -166,27 +166,37 @@ export async function login(email: string, password: string): Promise<AuthTokens
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
-  // API key mode: backend returns user info or success; fetch user/tenant next
-  const data = await res.json().catch(() => ({}));
+  // Parse the login response
+  const loginData = await res.json();
+  console.log('[login] Login response received:', loginData);
   
-  // Fetch user data immediately after login (API key required)
-  try {
-    const userData = await getCurrentUser();
-    setUser(userData);
-    console.log('[login] Stored fresh user data:', userData);
-  } catch (error) {
-    console.error("Failed to fetch user data:", error);
+  // Extract user and tenant data from login response
+  const userData = loginData.user;
+  const tenantData = loginData.tenant;
+  const tenantId = tenantData?.id;
+  
+  console.log('[login] Extracted user data:', userData);
+  console.log('[login] Extracted tenant data:', tenantData);
+  console.log('[login] Extracted tenant ID:', tenantId);
+  
+  if (!userData) {
+    throw new Error("Login response missing user data");
   }
   
-  // Try to fetch and persist tenant data (optional)
-  try {
-    const tenant = await getUserTenant();
-    if (tenant) setTenant(tenant);
-    console.log('[login] Stored fresh tenant data:', tenant);
-  } catch (e) {
-    // No tenant is acceptable for new users
-    console.warn('[login] No tenant data available:', e);
+  if (!tenantData || !tenantId) {
+    throw new Error("Login response missing tenant data");
   }
+  
+  // Store user and tenant data from login response
+  setUser(userData);
+  setTenant(tenantData);
+  
+  // Store tenant ID in localStorage for API calls
+  localStorage.setItem("robotice-tenant-id", tenantId.toString());
+  
+  console.log('[login] Stored user data:', userData);
+  console.log('[login] Stored tenant data:', tenantData);
+  console.log('[login] Stored tenant ID in localStorage:', tenantId);
   
   // Return a minimal token object for compatibility
   return { access_token: "", token_type: "api-key" } as AuthTokens;
@@ -283,99 +293,25 @@ export async function resetPassword(token: string, newPassword: string): Promise
 }
 
 export async function getCurrentUser(): Promise<any> {
-  const url = getRequestUrl("/api/v1/auth/user-info");
-  console.log('[getCurrentUser] Making request to:', url);
+  // Get user data from localStorage (stored during login)
+  const userData = getUser();
+  console.log('[getCurrentUser] Retrieved user data from localStorage:', userData);
   
-  // Get tenant ID from localStorage for the X-Tenant-ID header
-  const tenantId = localStorage.getItem("robotice-tenant-id");
-  console.log('[getCurrentUser] Using tenant ID from localStorage:', tenantId);
-  
-  const headers: Record<string, string> = { 
-    "Content-Type": "application/json",
-    "X-API-Key": getApiKey(),
-  };
-  
-  // Add tenant ID header if available
-  if (tenantId) {
-    headers["X-Tenant-ID"] = tenantId;
+  if (!userData) {
+    throw new Error("No user data found. Please log in again.");
   }
-  
-  const res = await fetch(url, { headers });
-
-  if (!res.ok) {
-    if (res.status === 429) {
-      throw new Error("[429] Too many attempts. Try again in a minute.");
-    }
-    const errorText = await res.text();
-    let errorMessage = errorText || "Failed to get user info";
-    
-    try {
-      const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson.detail || errorJson.message || errorText;
-    } catch {
-      // If not JSON, use the text as is
-    }
-    
-    throw new Error(`[${res.status}] ${errorMessage}`);
-  }
-
-  const userData = await res.json();
-  console.log('[getCurrentUser] Received user data:', userData);
   
   return userData;
 }
 
 export async function getUserTenant(): Promise<any> {
-  // First get the current user to ensure we have the right user context
-  const user = await getCurrentUser();
-  console.log('[getUserTenant] Current user:', user);
+  // Get tenant data from localStorage (stored during login)
+  const tenantData = getTenant();
+  console.log('[getUserTenant] Retrieved tenant data from localStorage:', tenantData);
   
-  // Clear any stale tenant data from localStorage
-  removeTenant();
-  console.log('[getUserTenant] Cleared stale tenant data from localStorage');
-  
-  const url = getRequestUrl("/api/v1/auth/tenant-info");
-  console.log('[getUserTenant] Making request to:', url);
-  
-  // Get tenant ID from localStorage for the X-Tenant-ID header
-  const tenantId = localStorage.getItem("robotice-tenant-id");
-  console.log('[getUserTenant] Using tenant ID from localStorage:', tenantId);
-  
-  const headers: Record<string, string> = { 
-    "Content-Type": "application/json",
-    "X-API-Key": getApiKey(),
-  };
-  
-  // Add tenant ID header if available
-  if (tenantId) {
-    headers["X-Tenant-ID"] = tenantId;
+  if (!tenantData) {
+    throw new Error("No tenant data found. Please log in again.");
   }
-  
-  const res = await fetch(url, { headers });
-
-  if (!res.ok) {
-    if (res.status === 429) {
-      throw new Error("[429] Too many attempts. Try again in a minute.");
-    }
-    const errorText = await res.text();
-    let errorMessage = errorText || "Failed to get tenant info";
-    
-    try {
-      const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson.detail || errorJson.message || errorText;
-    } catch {
-      // If not JSON, use the text as is
-    }
-    
-    throw new Error(`[${res.status}] ${errorMessage}`);
-  }
-
-  const tenantData = await res.json();
-  console.log('[getUserTenant] Received tenant data:', tenantData);
-  
-  // Store the fresh tenant data
-  setTenant(tenantData);
-  console.log('[getUserTenant] Stored fresh tenant data in localStorage');
   
   return tenantData;
 }
