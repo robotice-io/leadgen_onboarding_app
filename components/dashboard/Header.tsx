@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Menu, LogOut, User as UserIcon, Wrench } from "lucide-react";
+import { Menu, LogOut, User as UserIcon } from "lucide-react";
 import { User } from "@/types/types";
 import { useI18n } from "@/lib/i18n";
 
@@ -102,16 +101,6 @@ export function DashboardHeader({ onMenuClick, user, tenant, onLogout }: HeaderP
         <div className="flex items-center gap-3">
           {/* Language Toggle */}
           <LangToggle lang={lang} onChange={setLang} />
-          
-          {/* Connect Account Button */}
-          <Link
-            href="/onboarding"
-            className="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/30 transition-colors"
-          >
-            <Wrench className="h-4 w-4" />
-            <span className="hidden sm:inline">{t("dashboard.connectAccount")}</span>
-            <span className="sm:hidden">Connect</span>
-          </Link>
 
           {/* User Menu */}
           <div className="relative">
