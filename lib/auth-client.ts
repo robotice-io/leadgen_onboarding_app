@@ -59,8 +59,18 @@ export async function login(email: string, password: string): Promise<AuthTokens
   });
 
   if (!res.ok) {
-    const error = await res.text();
-    throw new Error(error || "Login failed");
+    const errorText = await res.text();
+    let errorMessage = errorText || "Login failed";
+    
+    // Try to parse JSON error response
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.detail || errorJson.message || errorText;
+    } catch {
+      // If not JSON, use the text as is
+    }
+    
+    throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
   const data = await res.json();
@@ -92,8 +102,17 @@ export async function register(
   });
 
   if (!res.ok) {
-    const error = await res.text();
-    throw new Error(error || "Registration failed");
+    const errorText = await res.text();
+    let errorMessage = errorText || "Registration failed";
+    
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.detail || errorJson.message || errorText;
+    } catch {
+      // If not JSON, use the text as is
+    }
+    
+    throw new Error(`[${res.status}] ${errorMessage}`);
   }
 }
 
@@ -150,7 +169,17 @@ export async function getCurrentUser(): Promise<any> {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to get user info");
+    const errorText = await res.text();
+    let errorMessage = errorText || "Failed to get user info";
+    
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.detail || errorJson.message || errorText;
+    } catch {
+      // If not JSON, use the text as is
+    }
+    
+    throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
   return res.json();
@@ -170,7 +199,17 @@ export async function getUserTenant(): Promise<any> {
   });
 
   if (!res.ok) {
-    throw new Error("Failed to get tenant info");
+    const errorText = await res.text();
+    let errorMessage = errorText || "Failed to get tenant info";
+    
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.detail || errorJson.message || errorText;
+    } catch {
+      // If not JSON, use the text as is
+    }
+    
+    throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
   return res.json();
