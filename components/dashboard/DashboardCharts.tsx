@@ -183,7 +183,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
         </div>
       </div>
 
-      {/* Campaign Performance */}
+      {/* Campaign Performance - Coming Soon */}
       <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 lg:col-span-2">
         <div className="flex items-center justify-between mb-6">
           <div>
@@ -194,47 +194,19 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
               Top performing campaigns this month
             </p>
           </div>
-          <div className="flex items-center gap-4 text-sm">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span className="text-gray-600 dark:text-gray-400">Opens</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span className="text-gray-600 dark:text-gray-400">Clicks</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 bg-purple-500 rounded-full"></div>
-              <span className="text-gray-600 dark:text-gray-400">Conversions</span>
-            </div>
-          </div>
         </div>
         
-        <ResponsiveContainer width="100%" height={300}>
-          <BarChart data={campaignData}>
-            <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
-            <XAxis 
-              dataKey="name" 
-              stroke="#6B7280"
-              fontSize={12}
-            />
-            <YAxis 
-              stroke="#6B7280"
-              fontSize={12}
-            />
-            <Tooltip 
-              contentStyle={{
-                backgroundColor: '#1F2937',
-                border: '1px solid #374151',
-                borderRadius: '8px',
-                color: '#F9FAFB'
-              }}
-            />
-            <Bar dataKey="opens" fill="#3B82F6" radius={[2, 2, 0, 0]} />
-            <Bar dataKey="clicks" fill="#10B981" radius={[2, 2, 0, 0]} />
-            <Bar dataKey="conversions" fill="#8B5CF6" radius={[2, 2, 0, 0]} />
-          </BarChart>
-        </ResponsiveContainer>
+        <div className="flex items-center justify-center h-64">
+          <div className="text-center">
+            <div className="text-gray-400 mb-2">📊</div>
+            <h4 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+              Coming Soon
+            </h4>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Campaign performance analytics will be available soon
+            </p>
+          </div>
+        </div>
       </div>
     </>
   );
