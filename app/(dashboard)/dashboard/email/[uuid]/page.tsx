@@ -33,24 +33,71 @@ interface EmailAnalytics {
   events: EmailEvent[];
 }
 
-// Timeline/device demo data kept for visualization; real series come from API once wired
+interface DeviceDataItem {
+  name: string;
+  value: number;
+  color: string;
+}
 
-const deviceData = [
-  { name: "Desktop", value: 50, color: "#3B82F6" },
-  { name: "Mobile", value: 30, color: "#10B981" },
-  { name: "Tablet", value: 20, color: "#F59E0B" },
-];
+interface TimelineDataItem {
+  time: string;
+  opens: number;
+}
 
-const timelineData = [
-  { time: "15:30", opens: 0 },
-  { time: "15:35", opens: 1 },
-  { time: "16:00", opens: 1 },
-  { time: "16:20", opens: 2 },
-  { time: "17:00", opens: 2 },
-  { time: "17:10", opens: 3 },
-  { time: "18:00", opens: 3 },
-  { time: "18:45", opens: 4 },
-];
+// Helper functions to generate real data from API response
+const generateDeviceData = (events: EmailEvent[]): DeviceDataItem[] => {
+  if (!events || events.length === 0) {
+    return [
+      { name: "No Data", value: 100, color: "#6B7280" }
+    ];
+  }
+
+  const deviceCounts: Record<string, number> = {};
+  events.forEach(event => {
+    const device = event.device_type || 'unknown';
+    deviceCounts[device] = (deviceCounts[device] || 0) + 1;
+  });
+
+  const total = events.length;
+  const colors = {
+    desktop: "#3B82F6",
+    mobile: "#10B981", 
+    tablet: "#F59E0B",
+    unknown: "#6B7280"
+  };
+
+  return Object.entries(deviceCounts).map(([device, count]) => ({
+    name: device.charAt(0).toUpperCase() + device.slice(1),
+    value: Math.round((count / total) * 100),
+    color: colors[device as keyof typeof colors] || colors.unknown
+  }));
+};
+
+const generateTimelineData = (events: EmailEvent[]): TimelineDataItem[] => {
+  if (!events || events.length === 0) {
+    return [
+      { time: "No Data", opens: 0 }
+    ];
+  }
+
+  // Sort events by time
+  const sortedEvents = [...events].sort((a, b) => 
+    new Date(a.opened_at).getTime() - new Date(b.opened_at).getTime()
+  );
+
+  // Group events by hour and count cumulative opens
+  const hourlyData: Record<string, number> = {};
+  sortedEvents.forEach((event, index) => {
+    const date = new Date(event.opened_at);
+    const hour = `${date.getHours().toString().padStart(2, '0')}:00`;
+    hourlyData[hour] = index + 1; // Cumulative opens
+  });
+
+  return Object.entries(hourlyData).map(([time, opens]) => ({
+    time,
+    opens
+  }));
+};
 
 export default function EmailAnalyticsPage() {
   const params = useParams();
@@ -232,7 +279,7 @@ export default function EmailAnalyticsPage() {
                 Open Timeline
               </h3>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={timelineData}>
+                <LineChart data={emailData ? generateTimelineData(emailData.events) : []}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
                   <XAxis 
                     dataKey="time" 
@@ -271,7 +318,7 @@ export default function EmailAnalyticsPage() {
                 <ResponsiveContainer width="100%" height={200}>
                   <PieChart>
                     <Pie
-                      data={deviceData}
+                      data={emailData ? generateDeviceData(emailData.events) : []}
                       cx="50%"
                       cy="50%"
                       innerRadius={40}
@@ -279,7 +326,7 @@ export default function EmailAnalyticsPage() {
                       paddingAngle={5}
                       dataKey="value"
                     >
-                      {deviceData.map((entry, index) => (
+                      {(emailData ? generateDeviceData(emailData.events) : []).map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
                       ))}
                     </Pie>
@@ -288,7 +335,7 @@ export default function EmailAnalyticsPage() {
                 </ResponsiveContainer>
               </div>
               <div className="flex justify-center gap-4 mt-4">
-                {deviceData.map((item) => (
+                {(emailData ? generateDeviceData(emailData.events) : []).map((item) => (
                   <div key={item.name} className="flex items-center gap-2">
                     <div 
                       className="w-3 h-3 rounded-full" 

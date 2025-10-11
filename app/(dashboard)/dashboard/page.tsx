@@ -18,9 +18,27 @@ export default function DashboardPage() {
     queryKey: ['dashboard-stats', tenantId],
     queryFn: async () => {
       if (!tenantId) throw new Error('No tenant ID available');
-      const res = await apiGet(`/api/v1/dashboard/${tenantId}/quick-stats`);
-      if (!res.ok) throw new Error('Failed to fetch stats');
-      return res.json();
+      
+      // Fetch both current and previous day stats for comparison
+      const [currentRes, previousRes] = await Promise.all([
+        apiGet(`/api/v1/dashboard/${tenantId}/quick-stats`),
+        apiGet(`/api/v1/dashboard/${tenantId}/quick-stats?period=yesterday`)
+      ]);
+      
+      if (!currentRes.ok) throw new Error('Failed to fetch current stats');
+      
+      const currentStats = await currentRes.json();
+      let previousStats = null;
+      
+      // Try to get previous day stats (optional - if not available, we'll show no change)
+      if (previousRes.ok) {
+        previousStats = await previousRes.json();
+      }
+      
+      return {
+        ...currentStats,
+        previous: previousStats
+      };
     },
     refetchInterval: 15000, // Poll every 15 seconds
     refetchIntervalInBackground: false,

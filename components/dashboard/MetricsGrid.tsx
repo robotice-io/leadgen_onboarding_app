@@ -9,40 +9,69 @@ interface MetricsGridProps {
     open_rate_today: number;
     unique_devices_today: number;
     last_updated: string;
+    previous?: {
+      emails_sent_today: number;
+      opens_today: number;
+      open_rate_today: number;
+      unique_devices_today: number;
+    } | null;
   };
 }
 
 export function MetricsGrid({ stats }: MetricsGridProps) {
+  // Helper function to calculate percentage change
+  const calculatePercentageChange = (current: number, previous: number | undefined): { change: string; changeType: 'positive' | 'negative' | 'neutral' } => {
+    if (!previous || previous === 0) {
+      return { change: "—", changeType: "neutral" };
+    }
+    
+    const percentage = ((current - previous) / previous) * 100;
+    const roundedPercentage = Math.round(percentage * 10) / 10; // Round to 1 decimal place
+    
+    if (roundedPercentage > 0) {
+      return { change: `+${roundedPercentage}%`, changeType: "positive" };
+    } else if (roundedPercentage < 0) {
+      return { change: `${roundedPercentage}%`, changeType: "negative" };
+    } else {
+      return { change: "0%", changeType: "neutral" };
+    }
+  };
+
+  const emailsChange = calculatePercentageChange(stats.emails_sent_today, stats.previous?.emails_sent_today);
+  const opensChange = calculatePercentageChange(stats.opens_today, stats.previous?.opens_today);
+  const openRateChange = calculatePercentageChange(stats.open_rate_today * 100, stats.previous?.open_rate_today ? stats.previous.open_rate_today * 100 : undefined);
+  const devicesChange = calculatePercentageChange(stats.unique_devices_today, stats.previous?.unique_devices_today);
+
   const metrics = [
     {
       name: "Emails Sent Today",
       value: stats.emails_sent_today.toLocaleString(),
-      change: "+12%",
-      changeType: "positive" as const,
+      change: emailsChange.change,
+      changeType: emailsChange.changeType,
       icon: Mail,
       color: "blue" as const,
     },
     {
       name: "Opens Today",
       value: stats.opens_today.toLocaleString(),
-      change: "+8%",
-      changeType: "positive" as const,
+      change: opensChange.change,
+      changeType: opensChange.changeType,
       icon: Eye,
       color: "green" as const,
     },
     {
       name: "Open Rate",
       value: `${(stats.open_rate_today * 100).toFixed(1)}%`,
-      change: "+2.1%",
-      changeType: "positive" as const,
+      change: openRateChange.change,
+      changeType: openRateChange.changeType,
       icon: TrendingUp,
       color: "purple" as const,
     },
     {
       name: "Unique Devices",
       value: stats.unique_devices_today.toLocaleString(),
-      change: "+5%",
-      changeType: "positive" as const,
+      change: devicesChange.change,
+      changeType: devicesChange.changeType,
       icon: Users,
       color: "orange" as const,
     },
@@ -90,7 +119,9 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
               <div className={`text-sm font-medium px-2 py-1 rounded-full ${
                 metric.changeType === 'positive' 
                   ? 'text-green-700 dark:text-green-400 bg-green-100 dark:bg-green-900/30' 
-                  : 'text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/30'
+                  : metric.changeType === 'negative'
+                  ? 'text-red-700 dark:text-red-400 bg-red-100 dark:bg-red-900/30'
+                  : 'text-gray-700 dark:text-gray-400 bg-gray-100 dark:bg-gray-900/30'
               }`}>
                 {metric.change}
               </div>

@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
+import { getLast7Days, formatDateForChart, get7DayPeriod } from "@/lib/calendar-utils";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar } from "recharts";
 import { Skeleton } from "@/components/ui/Skeleton";
 
@@ -19,7 +20,35 @@ interface OpenRateDataItem {
   date: string;
   rate: number;
   emails: number;
+  displayDate: string;  // Added for accurate calendar display
+  dayName: string;       // Added for day name
+  dayNumber: number;    // Added for day number
 }
+
+// Helper function to process chart data with accurate calendar information
+const processChartDataWithCalendar = (apiData: any[]): OpenRateDataItem[] => {
+  const last7Days = getLast7Days();
+  
+  // Create a map of API data by date for quick lookup
+  const apiDataMap = new Map();
+  apiData.forEach(item => {
+    apiDataMap.set(item.date, item);
+  });
+  
+  // Process each day with accurate calendar information
+  return last7Days.map(day => {
+    const apiItem = apiDataMap.get(day.date);
+    
+    return {
+      date: day.date,
+      rate: apiItem?.rate || 0,
+      emails: apiItem?.emails || 0,
+      displayDate: formatDateForChart(day.date, 'short'), // e.g., "Mon 15"
+      dayName: day.dayName,                               // e.g., "Mon"
+      dayNumber: day.dayNumber                            // e.g., 15
+    };
+  });
+};
 
 
 export function DashboardCharts({ tenantId }: DashboardChartsProps) {
@@ -29,9 +58,12 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
     queryFn: async () => {
       if (!tenantId) throw new Error('No tenant ID available');
       
+      // Get accurate 7-day period
+      const { startDate, endDate } = get7DayPeriod();
+      
       // Fetch all chart data in parallel
       const [openRateRes, deviceRes] = await Promise.all([
-        apiGet(`/api/v1/dashboard/${tenantId}/charts/open-rate-trend?days=7`),
+        apiGet(`/api/v1/dashboard/${tenantId}/charts/open-rate-trend?start_date=${startDate}&end_date=${endDate}`),
         apiGet(`/api/v1/dashboard/${tenantId}/charts/device-breakdown`)
       ]);
 
@@ -43,8 +75,11 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
         deviceRes.json()
       ]);
 
+      // Process the open rate data with accurate calendar information
+      const processedOpenRateData = processChartDataWithCalendar(openRateData.trend_data || []);
+
       return {
-        openRateData: openRateData.trend_data || [],
+        openRateData: processedOpenRateData,
         deviceData: deviceData.device_breakdown || [],
         campaignData: [] // TODO: Implement campaign performance endpoint
       };
@@ -78,7 +113,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
               Open Rate Trend
             </h3>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Last 7 days performance
+              Last 7 days performance (accurate calendar dates)
             </p>
           </div>
           <div className="flex items-center gap-4 text-sm">
@@ -93,7 +128,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
           <LineChart data={chartData?.openRateData || []}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
             <XAxis 
-              dataKey="date" 
+              dataKey="displayDate" 
               stroke="#6B7280"
               fontSize={12}
             />
@@ -113,6 +148,13 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
                 name === 'rate' ? `${value}%` : value,
                 name === 'rate' ? 'Open Rate' : 'Emails Sent'
               ]}
+              labelFormatter={(label, payload) => {
+                if (payload && payload[0]) {
+                  const data = payload[0].payload;
+                  return `${data.dayName}, ${data.date}`; // Show full date in tooltip
+                }
+                return label;
+              }}
             />
             <Line 
               type="monotone" 
