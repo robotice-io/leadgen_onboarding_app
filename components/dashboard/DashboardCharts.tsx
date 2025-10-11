@@ -9,6 +9,18 @@ interface DashboardChartsProps {
   tenantId: number;
 }
 
+interface DeviceDataItem {
+  name: string;
+  value: number;
+  color: string;
+}
+
+interface OpenRateDataItem {
+  date: string;
+  rate: number;
+  emails: number;
+}
+
 
 export function DashboardCharts({ tenantId }: DashboardChartsProps) {
   // Fetch real chart data from API
@@ -139,7 +151,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
                 paddingAngle={5}
                 dataKey="value"
               >
-                {(chartData?.deviceData || []).map((entry, index) => (
+                {(chartData?.deviceData || []).map((entry: DeviceDataItem, index: number) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -157,7 +169,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
         </div>
         
         <div className="flex justify-center gap-6 mt-4">
-          {(chartData?.deviceData || []).map((item) => (
+          {(chartData?.deviceData || []).map((item: DeviceDataItem) => (
             <div key={item.name} className="flex items-center gap-2">
               <div 
                 className="w-3 h-3 rounded-full" 
