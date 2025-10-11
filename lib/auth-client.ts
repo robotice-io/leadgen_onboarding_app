@@ -135,7 +135,6 @@ export async function login(email: string, password: string): Promise<AuthTokens
   // Clear any stale data before login
   removeToken();
   removeRefreshToken();
-  removeUser();
   removeTenant();
   console.log('[login] Cleared all stale data before login');
   
