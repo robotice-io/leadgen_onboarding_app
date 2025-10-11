@@ -55,19 +55,33 @@ const processChartDataWithCalendar = (apiData: any[]): OpenRateDataItem[] => {
 export function DashboardCharts({ tenantId }: DashboardChartsProps) {
   const { t } = useI18n();
   
+  // CRITICAL FIX: If tenantId is 11 (hardcoded), try to get correct tenant from localStorage
+  let actualTenantId = tenantId;
+  if (tenantId === 11) {
+    try {
+      const localStorageTenantId = localStorage.getItem("robotice-tenant-id");
+      if (localStorageTenantId && parseInt(localStorageTenantId) !== 11) {
+        actualTenantId = parseInt(localStorageTenantId);
+        console.log('[DashboardCharts] API returned wrong tenant (11), using localStorage tenant ID:', actualTenantId);
+      }
+    } catch (e) {
+      console.warn('[DashboardCharts] Failed to get localStorage tenant ID:', e);
+    }
+  }
+  
   // Fetch real chart data from API
   const { data: chartData, isLoading } = useQuery({
-    queryKey: ['chart-data', tenantId],
+    queryKey: ['chart-data', actualTenantId],
     queryFn: async () => {
-      if (!tenantId) throw new Error('No tenant ID available');
+      if (!actualTenantId) throw new Error('No tenant ID available');
       
       // Get accurate 7-day period
       const { startDate, endDate } = get7DayPeriod();
       
       // Fetch all chart data in parallel
       const [openRateRes, deviceRes] = await Promise.all([
-        apiGet(`/api/v1/dashboard/${tenantId}/charts/open-rate-trend?start_date=${startDate}&end_date=${endDate}`),
-        apiGet(`/api/v1/dashboard/${tenantId}/charts/device-breakdown`)
+        apiGet(`/api/v1/dashboard/${actualTenantId}/charts/open-rate-trend?start_date=${startDate}&end_date=${endDate}`),
+        apiGet(`/api/v1/dashboard/${actualTenantId}/charts/device-breakdown`)
       ]);
 
       if (!openRateRes.ok) throw new Error('Failed to fetch open rate trend');
@@ -88,7 +102,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
       };
     },
     refetchInterval: 60000, // Refresh every minute
-    enabled: !!tenantId,
+    enabled: !!actualTenantId,
   });
 
   if (isLoading) {

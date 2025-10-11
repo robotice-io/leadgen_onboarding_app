@@ -18,7 +18,14 @@ export default function DashboardPage() {
   const tenantIdFromLocalStorage = localStorage.getItem("robotice-tenant-id");
   
   // Convert to number if it's a string
-  const tenantId = tenantIdFromStorage || (tenantIdFromLocalStorage ? parseInt(tenantIdFromLocalStorage) : null);
+  let tenantId = tenantIdFromStorage || (tenantIdFromLocalStorage ? parseInt(tenantIdFromLocalStorage) : null);
+
+  // CRITICAL FIX: If API returns wrong tenant data, use localStorage tenant ID
+  // This happens when backend APIs return hardcoded tenant 11 data instead of user-specific data
+  if (tenantId === 11 && tenantIdFromLocalStorage && parseInt(tenantIdFromLocalStorage) !== 11) {
+    console.log('[DashboardPage] API returned wrong tenant (11), using localStorage tenant ID:', tenantIdFromLocalStorage);
+    tenantId = parseInt(tenantIdFromLocalStorage);
+  }
 
   console.log('[DashboardPage] All localStorage keys:', Object.keys(localStorage));
   console.log('[DashboardPage] robotice-tenant-id:', localStorage.getItem("robotice-tenant-id"));
