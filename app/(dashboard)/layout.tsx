@@ -17,14 +17,29 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isAuthenticated()) {
-      window.location.href = "/login";
-      return;
-    }
+    // Give a brief moment for localStorage to be available
+    const checkAuth = () => {
+      if (!isAuthenticated()) {
+        console.log("[DashboardLayout] Not authenticated, redirecting to login");
+        window.location.href = "/login";
+        return;
+      }
+      
+      const userData = getUser();
+      if (!userData) {
+        console.log("[DashboardLayout] No user data found, redirecting to login");
+        window.location.href = "/login";
+        return;
+      }
+      
+      console.log("[DashboardLayout] Auth successful, user:", userData);
+      setUser(userData);
+      setLoading(false);
+    };
     
-    const userData = getUser();
-    setUser(userData);
-    setLoading(false);
+    // Small delay to ensure localStorage is populated after login redirect
+    const timer = setTimeout(checkAuth, 50);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleLogout = async () => {
