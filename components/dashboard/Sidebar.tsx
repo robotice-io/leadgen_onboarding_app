@@ -75,7 +75,7 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
     <>
       {/* Desktop Sidebar */}
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 px-6 py-4">
+        <div className="flex grow flex-col gap-y-3 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 px-6 py-4">
           {/* Logo */}
           <div className="flex h-24 shrink-0 items-center justify-center">
             <Link href="/" className="flex items-center justify-center">
@@ -172,7 +172,7 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
       <div className={`lg:hidden fixed inset-y-0 z-50 flex w-64 flex-col transition-transform duration-300 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-white dark:bg-gray-900 px-6 py-4">
+        <div className="flex grow flex-col gap-y-3 overflow-y-auto bg-white dark:bg-gray-900 px-6 py-4">
           {/* Mobile Header */}
           <div className="flex h-24 shrink-0 items-center justify-between">
             <Link href="/" className="flex items-center justify-center">

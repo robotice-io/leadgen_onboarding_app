@@ -17,8 +17,8 @@ export default function DashboardPage() {
   const tenantIdFromStorage = tenant?.tenant_id;
   const tenantIdFromLocalStorage = localStorage.getItem("robotice-tenant-id");
   
-  // Use the most reliable tenant ID source
-  const tenantId = tenantIdFromStorage || tenantIdFromLocalStorage;
+  // Convert to number if it's a string
+  const tenantId = tenantIdFromStorage || (tenantIdFromLocalStorage ? parseInt(tenantIdFromLocalStorage) : null);
 
   console.log('[DashboardPage] Tenant from localStorage:', tenant);
   console.log('[DashboardPage] tenantIdFromStorage:', tenantIdFromStorage);
