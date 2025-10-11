@@ -16,17 +16,13 @@ export default function PostLoginGate() {
         setError(null);
 
         const tenant = await getUserTenant();
-
-        if (tenant?.onboarding_status === "completed") {
-          router.replace("/dashboard");
-        } else {
-          const step = tenant?.onboarding_step || 1;
-          router.replace(`/onboarding?step=${step}`);
-        }
+        // New flow: always go to dashboard; wizard is launched from there if user wants
+        router.replace("/dashboard");
       } catch (e) {
         console.error("Failed to check onboarding status:", e);
         setError("Failed to check account status");
-        router.replace("/onboarding");
+        // Fallback to dashboard as well
+        router.replace("/dashboard");
       } finally {
         setLoading(false);
       }

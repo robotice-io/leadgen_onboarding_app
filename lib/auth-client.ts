@@ -337,6 +337,6 @@ export async function logout(): Promise<void> {
 }
 
 export function isAuthenticated(): boolean {
-  // In API key mode, consider authenticated if API key is present
-  try { return !!getApiKey(); } catch { return false; }
+  // Check if user session exists (has logged in)
+  return !!getUser();
 }

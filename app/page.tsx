@@ -23,7 +23,7 @@ export default function Home() {
           </p>
           <div className="pt-1" />
           <Link
-            href="/onboarding"
+            href="/login"
             className="inline-flex items-center justify-center w-64 h-11 rounded-md bg-blue-600 text-white text-base font-semibold"
           >
             Empezar
