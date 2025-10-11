@@ -286,12 +286,21 @@ export async function getCurrentUser(): Promise<any> {
   const url = getRequestUrl("/api/v1/auth/user-info");
   console.log('[getCurrentUser] Making request to:', url);
   
-  const res = await fetch(url, {
-    headers: { 
-      "Content-Type": "application/json",
-      "X-API-Key": getApiKey(),
-    },
-  });
+  // Get tenant ID from localStorage for the X-Tenant-ID header
+  const tenantId = localStorage.getItem("robotice-tenant-id");
+  console.log('[getCurrentUser] Using tenant ID from localStorage:', tenantId);
+  
+  const headers: Record<string, string> = { 
+    "Content-Type": "application/json",
+    "X-API-Key": getApiKey(),
+  };
+  
+  // Add tenant ID header if available
+  if (tenantId) {
+    headers["X-Tenant-ID"] = tenantId;
+  }
+  
+  const res = await fetch(url, { headers });
 
   if (!res.ok) {
     if (res.status === 429) {
@@ -328,12 +337,21 @@ export async function getUserTenant(): Promise<any> {
   const url = getRequestUrl("/api/v1/auth/tenant-info");
   console.log('[getUserTenant] Making request to:', url);
   
-  const res = await fetch(url, {
-    headers: { 
-      "Content-Type": "application/json",
-      "X-API-Key": getApiKey(),
-    },
-  });
+  // Get tenant ID from localStorage for the X-Tenant-ID header
+  const tenantId = localStorage.getItem("robotice-tenant-id");
+  console.log('[getUserTenant] Using tenant ID from localStorage:', tenantId);
+  
+  const headers: Record<string, string> = { 
+    "Content-Type": "application/json",
+    "X-API-Key": getApiKey(),
+  };
+  
+  // Add tenant ID header if available
+  if (tenantId) {
+    headers["X-Tenant-ID"] = tenantId;
+  }
+  
+  const res = await fetch(url, { headers });
 
   if (!res.ok) {
     if (res.status === 429) {
