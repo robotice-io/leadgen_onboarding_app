@@ -132,6 +132,13 @@ export function scheduleTokenRefresh(expiresInSeconds?: number): void {
 }
 
 export async function login(email: string, password: string): Promise<AuthTokens> {
+  // Clear any stale data before login
+  removeToken();
+  removeRefreshToken();
+  removeUser();
+  removeTenant();
+  console.log('[login] Cleared all stale data before login');
+  
   const url = getRequestUrl("/api/v1/auth/login");
   const res = await fetch(url, {
     method: "POST",
@@ -167,6 +174,7 @@ export async function login(email: string, password: string): Promise<AuthTokens
   try {
     const userData = await getCurrentUser();
     setUser(userData);
+    console.log('[login] Stored fresh user data:', userData);
   } catch (error) {
     console.error("Failed to fetch user data:", error);
   }
@@ -175,8 +183,10 @@ export async function login(email: string, password: string): Promise<AuthTokens
   try {
     const tenant = await getUserTenant();
     if (tenant) setTenant(tenant);
+    console.log('[login] Stored fresh tenant data:', tenant);
   } catch (e) {
     // No tenant is acceptable for new users
+    console.warn('[login] No tenant data available:', e);
   }
   
   // Return a minimal token object for compatibility
@@ -312,6 +322,10 @@ export async function getUserTenant(): Promise<any> {
   const user = await getCurrentUser();
   console.log('[getUserTenant] Current user:', user);
   
+  // Clear any stale tenant data from localStorage
+  removeTenant();
+  console.log('[getUserTenant] Cleared stale tenant data from localStorage');
+  
   const url = getRequestUrl("/api/v1/auth/tenant-info");
   console.log('[getUserTenant] Making request to:', url);
   
@@ -341,6 +355,10 @@ export async function getUserTenant(): Promise<any> {
 
   const tenantData = await res.json();
   console.log('[getUserTenant] Received tenant data:', tenantData);
+  
+  // Store the fresh tenant data
+  setTenant(tenantData);
+  console.log('[getUserTenant] Stored fresh tenant data in localStorage');
   
   return tenantData;
 }
