@@ -274,11 +274,14 @@ export async function resetPassword(token: string, newPassword: string): Promise
 }
 
 export async function getCurrentUser(): Promise<any> {
-  const url = getRequestUrl("/api/v1/auth/user-info");
+  const token = getToken();
+  if (!token) throw new Error("No authentication token available");
+  
+  const url = getRequestUrl("/api/v1/auth/me");
   const res = await fetch(url, {
     headers: { 
+      "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json",
-      "X-API-Key": getApiKey(),
     },
   });
 
@@ -303,11 +306,14 @@ export async function getCurrentUser(): Promise<any> {
 }
 
 export async function getUserTenant(): Promise<any> {
-  const url = getRequestUrl("/api/v1/auth/tenant-info");
+  const token = getToken();
+  if (!token) throw new Error("No authentication token available");
+  
+  const url = getRequestUrl("/api/v1/auth/me/tenant");
   const res = await fetch(url, {
     headers: { 
+      "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json",
-      "X-API-Key": getApiKey(),
     },
   });
 

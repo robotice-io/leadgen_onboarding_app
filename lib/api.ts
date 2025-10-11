@@ -40,8 +40,14 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
     Accept: "application/json",
   };
 
-  // Always include API key on every request
-  headers["X-API-Key"] = getApiKey();
+  // Add API key for telemetry, tenant, OAuth, and email endpoints
+  // Dashboard and auth endpoints DO NOT require API key
+  if (path.includes('/telemetry/') || 
+      path.includes('/tenants/') || 
+      path.includes('/oauth/') || 
+      path.includes('/email/')) {
+    headers["X-API-Key"] = getApiKey();
+  }
   
   return fetch(url, { 
     ...init, 
@@ -62,8 +68,14 @@ export async function apiPost(path: string, body: unknown, init?: RequestInit): 
     ...(init?.headers as Record<string, string> || {})
   };
 
-  // Always include API key on every request
-  headers["X-API-Key"] = getApiKey();
+  // Add API key for telemetry, tenant, OAuth, and email endpoints
+  // Dashboard and auth endpoints DO NOT require API key
+  if (path.includes('/telemetry/') || 
+      path.includes('/tenants/') || 
+      path.includes('/oauth/') || 
+      path.includes('/email/')) {
+    headers["X-API-Key"] = getApiKey();
+  }
   
   return fetch(url, {
     ...init,

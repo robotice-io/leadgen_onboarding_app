@@ -73,7 +73,10 @@ export function RecentEmails({ emails = mockEmails }: RecentEmailsProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
-  const filteredEmails = emails.filter(email => {
+  // Ensure emails is an array to prevent filter errors
+  const safeEmails = Array.isArray(emails) ? emails : mockEmails;
+
+  const filteredEmails = safeEmails.filter(email => {
     const matchesSearch = email.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          email.recipient.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesStatus = statusFilter === "all" || email.status === statusFilter;
