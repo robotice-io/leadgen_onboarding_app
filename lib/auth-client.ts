@@ -156,6 +156,26 @@ export async function getCurrentUser(): Promise<any> {
   return res.json();
 }
 
+export async function getUserTenant(): Promise<any> {
+  const token = getToken();
+  if (!token) throw new Error("Not authenticated");
+
+  const apiBase = getApiBaseUrl();
+  const res = await fetch(`${apiBase}/api/v1/auth/me/tenant`, {
+    headers: { 
+      "Authorization": `Bearer ${token}`,
+      "Content-Type": "application/json",
+      // No API key required for auth endpoints
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("Failed to get tenant info");
+  }
+
+  return res.json();
+}
+
 export async function logout(): Promise<void> {
   removeToken();
   window.location.href = "/login";
