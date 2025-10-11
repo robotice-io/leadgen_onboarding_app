@@ -15,6 +15,32 @@ export interface AuthTokens {
 const TOKEN_KEY = "robotice_auth_token";
 const USER_KEY = "robotice_user";
 
+// Check if we need to proxy requests through Next.js API routes
+function shouldUseProxy(apiBase: string): boolean {
+  if (typeof window === "undefined") return false;
+  try {
+    const isFrontendHttps = window.location.protocol === "https:";
+    const apiIsHttp = apiBase.startsWith("http://");
+    return isFrontendHttps && apiIsHttp;
+  } catch {
+    return false;
+  }
+}
+
+// Get the correct URL (either direct or through proxy)
+function getRequestUrl(path: string): string {
+  const apiBase = getApiBaseUrl();
+  const useProxy = shouldUseProxy(apiBase);
+  
+  if (useProxy) {
+    // Use Next.js API proxy to avoid mixed content errors
+    return `/api/bridge${path}`;
+  } else {
+    // Direct connection to API
+    return `${apiBase}${path}`;
+  }
+}
+
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(TOKEN_KEY);
@@ -48,8 +74,8 @@ export function setUser(user: any): void {
 }
 
 export async function login(email: string, password: string): Promise<AuthTokens> {
-  const apiBase = getApiBaseUrl();
-  const res = await fetch(`${apiBase}/api/v1/auth/login`, {
+  const url = getRequestUrl("/api/v1/auth/login");
+  const res = await fetch(url, {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
@@ -86,8 +112,8 @@ export async function register(
   firstName?: string,
   lastName?: string
 ): Promise<void> {
-  const apiBase = getApiBaseUrl();
-  const res = await fetch(`${apiBase}/api/v1/auth/register`, {
+  const url = getRequestUrl("/api/v1/auth/register");
+  const res = await fetch(url, {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
@@ -159,8 +185,8 @@ export async function getCurrentUser(): Promise<any> {
   const token = getToken();
   if (!token) throw new Error("Not authenticated");
 
-  const apiBase = getApiBaseUrl();
-  const res = await fetch(`${apiBase}/api/v1/auth/me`, {
+  const url = getRequestUrl("/api/v1/auth/me");
+  const res = await fetch(url, {
     headers: { 
       "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json",
@@ -189,8 +215,8 @@ export async function getUserTenant(): Promise<any> {
   const token = getToken();
   if (!token) throw new Error("Not authenticated");
 
-  const apiBase = getApiBaseUrl();
-  const res = await fetch(`${apiBase}/api/v1/auth/me/tenant`, {
+  const url = getRequestUrl("/api/v1/auth/me/tenant");
+  const res = await fetch(url, {
     headers: { 
       "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json",
