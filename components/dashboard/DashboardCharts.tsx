@@ -9,44 +9,36 @@ interface DashboardChartsProps {
   tenantId: number;
 }
 
-// Mock data for charts (replace with real API data)
-const openRateData = [
-  { date: "Jan 1", rate: 24.5, emails: 120 },
-  { date: "Jan 2", rate: 28.2, emails: 145 },
-  { date: "Jan 3", rate: 31.8, emails: 167 },
-  { date: "Jan 4", rate: 29.4, emails: 134 },
-  { date: "Jan 5", rate: 35.2, emails: 189 },
-  { date: "Jan 6", rate: 33.7, emails: 156 },
-  { date: "Jan 7", rate: 40.1, emails: 203 },
-];
-
-const deviceData = [
-  { name: "Desktop", value: 45, color: "#3B82F6" },
-  { name: "Mobile", value: 35, color: "#10B981" },
-  { name: "Tablet", value: 20, color: "#F59E0B" },
-];
-
-const campaignData = [
-  { name: "Summer Sale", opens: 245, clicks: 89, conversions: 23 },
-  { name: "Product Launch", opens: 189, clicks: 67, conversions: 18 },
-  { name: "Newsletter", opens: 156, clicks: 45, conversions: 12 },
-  { name: "Welcome Series", opens: 134, clicks: 56, conversions: 15 },
-];
 
 export function DashboardCharts({ tenantId }: DashboardChartsProps) {
-  // In a real app, fetch chart data from API
+  // Fetch real chart data from API
   const { data: chartData, isLoading } = useQuery({
     queryKey: ['chart-data', tenantId],
     queryFn: async () => {
-      // Mock API call - replace with real endpoint
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      if (!tenantId) throw new Error('No tenant ID available');
+      
+      // Fetch all chart data in parallel
+      const [openRateRes, deviceRes] = await Promise.all([
+        apiGet(`/api/v1/dashboard/${tenantId}/charts/open-rate-trend?days=7`),
+        apiGet(`/api/v1/dashboard/${tenantId}/charts/device-breakdown`)
+      ]);
+
+      if (!openRateRes.ok) throw new Error('Failed to fetch open rate trend');
+      if (!deviceRes.ok) throw new Error('Failed to fetch device breakdown');
+
+      const [openRateData, deviceData] = await Promise.all([
+        openRateRes.json(),
+        deviceRes.json()
+      ]);
+
       return {
-        openRateData,
-        deviceData,
-        campaignData
+        openRateData: openRateData.trend_data || [],
+        deviceData: deviceData.device_breakdown || [],
+        campaignData: [] // TODO: Implement campaign performance endpoint
       };
     },
     refetchInterval: 60000, // Refresh every minute
+    enabled: !!tenantId,
   });
 
   if (isLoading) {
@@ -86,7 +78,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
         </div>
         
         <ResponsiveContainer width="100%" height={300}>
-          <LineChart data={openRateData}>
+          <LineChart data={chartData?.openRateData || []}>
             <CartesianGrid strokeDasharray="3 3" stroke="#374151" opacity={0.3} />
             <XAxis 
               dataKey="date" 
@@ -139,7 +131,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
           <ResponsiveContainer width="100%" height={300}>
             <PieChart>
               <Pie
-                data={deviceData}
+                data={chartData?.deviceData || []}
                 cx="50%"
                 cy="50%"
                 innerRadius={60}
@@ -147,7 +139,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
                 paddingAngle={5}
                 dataKey="value"
               >
-                {deviceData.map((entry, index) => (
+                {(chartData?.deviceData || []).map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={entry.color} />
                 ))}
               </Pie>
@@ -165,7 +157,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
         </div>
         
         <div className="flex justify-center gap-6 mt-4">
-          {deviceData.map((item) => (
+          {(chartData?.deviceData || []).map((item) => (
             <div key={item.name} className="flex items-center gap-2">
               <div 
                 className="w-3 h-3 rounded-full" 

@@ -20,61 +20,13 @@ interface RecentEmailsProps {
   emails: Email[];
 }
 
-// Mock data if no emails provided
-const mockEmails: Email[] = [
-  {
-    uuid: "1",
-    subject: "Summer Sale - 50% Off Everything!",
-    recipient: "john@example.com",
-    sent_at: "2025-01-10T15:30:00Z",
-    opens: 3,
-    unique_devices: 2,
-    status: "opened"
-  },
-  {
-    uuid: "2", 
-    subject: "Welcome to Robotice LeadGen",
-    recipient: "sarah@company.com",
-    sent_at: "2025-01-10T14:15:00Z",
-    opens: 1,
-    unique_devices: 1,
-    status: "opened"
-  },
-  {
-    uuid: "3",
-    subject: "Your Monthly Newsletter",
-    recipient: "mike@startup.io",
-    sent_at: "2025-01-10T13:45:00Z",
-    opens: 0,
-    unique_devices: 0,
-    status: "delivered"
-  },
-  {
-    uuid: "4",
-    subject: "Product Launch Announcement",
-    recipient: "lisa@tech.com",
-    sent_at: "2025-01-10T12:20:00Z",
-    opens: 5,
-    unique_devices: 3,
-    status: "clicked"
-  },
-  {
-    uuid: "5",
-    subject: "Follow-up: Demo Request",
-    recipient: "alex@business.net",
-    sent_at: "2025-01-10T11:10:00Z",
-    opens: 2,
-    unique_devices: 1,
-    status: "opened"
-  }
-];
 
-export function RecentEmails({ emails = mockEmails }: RecentEmailsProps) {
+export function RecentEmails({ emails = [] }: RecentEmailsProps) {
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState<string>("all");
 
   // Ensure emails is an array to prevent filter errors
-  const safeEmails = Array.isArray(emails) ? emails : mockEmails;
+  const safeEmails = Array.isArray(emails) ? emails : [];
 
   const filteredEmails = safeEmails.filter(email => {
     const matchesSearch = email.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||

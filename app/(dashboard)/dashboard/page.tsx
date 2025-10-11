@@ -6,7 +6,6 @@ import { getTenant } from "@/lib/auth-client";
 import { MetricsGrid } from "@/components/dashboard/MetricsGrid";
 import { DashboardCharts } from "@/components/dashboard/DashboardCharts";
 import { RecentEmails } from "@/components/dashboard/RecentEmails";
-import { QuickActions } from "@/components/dashboard/QuickActions";
 import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function DashboardPage() {
@@ -19,7 +18,7 @@ export default function DashboardPage() {
     queryKey: ['dashboard-stats', tenantId],
     queryFn: async () => {
       if (!tenantId) throw new Error('No tenant ID available');
-      const res = await apiGet(`/dashboard/${tenantId}/quick-stats`);
+      const res = await apiGet(`/api/v1/dashboard/${tenantId}/quick-stats`);
       if (!res.ok) throw new Error('Failed to fetch stats');
       return res.json();
     },
@@ -33,9 +32,10 @@ export default function DashboardPage() {
     queryKey: ['recent-emails', tenantId],
     queryFn: async () => {
       if (!tenantId) throw new Error('No tenant ID available');
-      const res = await apiGet(`/dashboard/${tenantId}/recent-emails`);
+      const res = await apiGet(`/api/v1/dashboard/${tenantId}/recent-emails?limit=10`);
       if (!res.ok) throw new Error('Failed to fetch emails');
-      return res.json();
+      const data = await res.json();
+      return data.recent_emails || []; // Extract emails array from response
     },
     refetchInterval: 30000, // Poll every 30 seconds
     enabled: !!tenantId, // Only run if tenantId is available
@@ -69,7 +69,6 @@ export default function DashboardPage() {
             Welcome back! Here's what's happening with your campaigns.
           </p>
         </div>
-        <QuickActions />
       </div>
 
       {/* Metrics Grid */}
@@ -92,9 +91,9 @@ export default function DashboardPage() {
         {tenantId && <DashboardCharts tenantId={tenantId} />}
       </div>
 
-      {/* Recent Activity */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <div className="lg:col-span-2">
+      {/* Recent Emails */}
+      <div className="grid grid-cols-1 gap-8">
+        <div>
           {emailsLoading ? (
             <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
               <Skeleton className="h-6 w-32 mb-4" />
@@ -114,59 +113,6 @@ export default function DashboardPage() {
           ) : recentEmails ? (
             <RecentEmails emails={recentEmails} />
           ) : null}
-        </div>
-
-        {/* Activity Feed */}
-        <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-            Recent Activity
-          </h3>
-          <div className="space-y-4">
-            <div className="flex items-start gap-3">
-              <div className="h-2 w-2 bg-green-500 rounded-full mt-2"></div>
-              <div>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  Campaign "Summer Sale" completed
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  2 minutes ago
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-2 w-2 bg-blue-500 rounded-full mt-2"></div>
-              <div>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  New email opened by john@example.com
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  5 minutes ago
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-2 w-2 bg-yellow-500 rounded-full mt-2"></div>
-              <div>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  Campaign "Product Launch" scheduled
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  1 hour ago
-                </p>
-              </div>
-            </div>
-            <div className="flex items-start gap-3">
-              <div className="h-2 w-2 bg-purple-500 rounded-full mt-2"></div>
-              <div>
-                <p className="text-sm text-gray-900 dark:text-white">
-                  50 new contacts imported
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  3 hours ago
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

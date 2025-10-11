@@ -20,6 +20,7 @@ interface SidebarProps {
   isOpen: boolean;
   onClose: () => void;
   user: User | null;
+  tenant: any;
 }
 
 const navigation = [
@@ -30,7 +31,7 @@ const navigation = [
   { name: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
-export function DashboardSidebar({ isOpen, onClose, user }: SidebarProps) {
+export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps) {
   const pathname = usePathname();
   const [tenantMenuOpen, setTenantMenuOpen] = useState(false);
 
@@ -65,10 +66,10 @@ export function DashboardSidebar({ isOpen, onClose, user }: SidebarProps) {
                 <Building2 className="h-5 w-5 text-gray-500" />
                 <div className="text-left">
                   <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {user?.company || "My Company"}
+                    {tenant?.name || tenant?.org_name || tenant?.company_name || user?.company || "My Company"}
                   </p>
                   <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {user?.email}
+                    {tenant?.email || tenant?.contact_email || user?.email}
                   </p>
                 </div>
               </div>
@@ -112,7 +113,10 @@ export function DashboardSidebar({ isOpen, onClose, user }: SidebarProps) {
 
           {/* Bottom Section */}
           <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
-            <div className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800">
+            <Link
+              href="/onboarding"
+              className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30 transition-all"
+            >
               <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
                 <span className="text-xs font-medium text-white">
                   {user?.first_name?.[0] || user?.email?.[0] || 'U'}
@@ -120,13 +124,13 @@ export function DashboardSidebar({ isOpen, onClose, user }: SidebarProps) {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                  {user?.first_name} {user?.last_name}
+                  Connect Account
                 </p>
                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                  Free Plan
+                  Setup Gmail integration
                 </p>
               </div>
-            </div>
+            </Link>
           </div>
         </div>
       </div>

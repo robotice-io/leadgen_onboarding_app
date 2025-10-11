@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Poppins } from "next/font/google";
-import { isAuthenticated, getUser, logout } from "@/lib/auth-client";
+import { isAuthenticated, getUser, getUserTenant, logout } from "@/lib/auth-client";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
 import { DashboardHeader } from "@/components/dashboard/Header";
 import { User } from "@/types/types";
@@ -13,6 +13,7 @@ const poppins = Poppins({ subsets: ["latin"], weight: ["400", "500", "600", "700
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
+  const [tenant, setTenant] = useState<any>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -32,8 +33,18 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return;
       }
       
-      console.log("[DashboardLayout] Auth successful, loading dashboard for user:", userData);
-      setUser(userData);
+      // Get tenant data from API
+      try {
+        const tenantData = await getUserTenant();
+        console.log("[DashboardLayout] Auth successful, loading dashboard for user:", userData, "tenant:", tenantData);
+        setUser(userData);
+        setTenant(tenantData);
+      } catch (error) {
+        console.warn("[DashboardLayout] Failed to fetch tenant data:", error);
+        // Still show dashboard even if tenant fetch fails
+        setUser(userData);
+        setTenant(null);
+      }
       setLoading(false);
     };
     
@@ -65,6 +76,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         isOpen={sidebarOpen} 
         onClose={() => setSidebarOpen(false)}
         user={user}
+        tenant={tenant}
       />
 
       {/* Main Content */}
