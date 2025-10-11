@@ -1,6 +1,6 @@
 "use client";
 
-import { getApiBaseUrl } from "./api";
+import { getApiBaseUrl, getApiKey } from "./api";
 
 export interface AuthTokens {
   access_token: string;
@@ -112,37 +112,9 @@ export function removeTenant(): void {
 
 let refreshTimerId: number | undefined;
 
+// API key-based auth does not require refresh; keep stubs for compatibility
 async function refreshAccessTokenInternal(): Promise<AuthTokens> {
-  const rt = getRefreshToken();
-  if (!rt) throw new Error("No refresh token");
-
-  const url = getRequestUrl("/api/v1/auth/refresh");
-  const res = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Authorization": `Bearer ${rt}`,
-      "Content-Type": "application/json",
-    },
-  });
-
-  if (!res.ok) {
-    if (res.status === 429) {
-      throw new Error("[429] Too many attempts. Try again in a minute.");
-    }
-    const text = await res.text();
-    let msg = text || "Token refresh failed";
-    try {
-      const j = JSON.parse(text);
-      msg = j.detail || j.message || msg;
-    } catch {}
-    throw new Error(`[${res.status}] ${msg}`);
-  }
-
-  const data: AuthTokens = await res.json();
-  if (data.access_token) setToken(data.access_token);
-  if (data.refresh_token) setRefreshToken(data.refresh_token);
-  if (typeof data.expires_in === "number") scheduleTokenRefresh(data.expires_in);
-  return data;
+  return Promise.resolve({ access_token: "", token_type: "api-key" });
 }
 
 export async function refreshAccessToken(): Promise<AuthTokens> {
@@ -151,23 +123,12 @@ export async function refreshAccessToken(): Promise<AuthTokens> {
 }
 
 export function scheduleTokenRefresh(expiresInSeconds?: number): void {
+  // No-op under API key auth
   if (typeof window === "undefined") return;
   if (refreshTimerId) {
     window.clearTimeout(refreshTimerId);
     refreshTimerId = undefined;
   }
-  const fallback = 1800; // 30 minutes default
-  const seconds = typeof expiresInSeconds === "number" && expiresInSeconds > 0 ? expiresInSeconds : fallback;
-  // Refresh 3 minutes before expiry, minimum 60s
-  const delayMs = Math.max(60, seconds - 180) * 1000;
-  refreshTimerId = window.setTimeout(async () => {
-    try {
-      await refreshAccessTokenInternal();
-    } catch {
-      // If refresh fails, ensure user is logged out to avoid loops
-      await logout();
-    }
-  }, delayMs);
 }
 
 export async function login(email: string, password: string): Promise<AuthTokens> {
@@ -176,7 +137,7 @@ export async function login(email: string, password: string): Promise<AuthTokens
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      // No API key required for auth endpoints
+      "X-API-Key": getApiKey(),
     },
     body: JSON.stringify({ email, password }),
   });
@@ -199,11 +160,10 @@ export async function login(email: string, password: string): Promise<AuthTokens
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
-  const data: AuthTokens = await res.json();
-  setToken(data.access_token);
-  if (data.refresh_token) setRefreshToken(data.refresh_token);
+  // API key mode: backend returns user info or success; fetch user/tenant next
+  const data = await res.json().catch(() => ({}));
   
-  // Fetch user data immediately after login
+  // Fetch user data immediately after login (API key required)
   try {
     const userData = await getCurrentUser();
     setUser(userData);
@@ -218,11 +178,9 @@ export async function login(email: string, password: string): Promise<AuthTokens
   } catch (e) {
     // No tenant is acceptable for new users
   }
-
-  // Schedule silent refresh
-  scheduleTokenRefresh(data.expires_in);
   
-  return data;
+  // Return a minimal token object for compatibility
+  return { access_token: "", token_type: "api-key" } as AuthTokens;
 }
 
 export async function register(
@@ -236,7 +194,7 @@ export async function register(
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      // No API key required for auth endpoints
+      "X-API-Key": getApiKey(),
     },
     body: JSON.stringify({ 
       email, 
@@ -316,15 +274,11 @@ export async function resetPassword(token: string, newPassword: string): Promise
 }
 
 export async function getCurrentUser(): Promise<any> {
-  const token = getToken();
-  if (!token) throw new Error("Not authenticated");
-
-  const url = getRequestUrl("/api/v1/auth/me");
+  const url = getRequestUrl("/api/v1/auth/user-info");
   const res = await fetch(url, {
     headers: { 
-      "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json",
-      // No API key required for auth endpoints
+      "X-API-Key": getApiKey(),
     },
   });
 
@@ -349,15 +303,11 @@ export async function getCurrentUser(): Promise<any> {
 }
 
 export async function getUserTenant(): Promise<any> {
-  const token = getToken();
-  if (!token) throw new Error("Not authenticated");
-
-  const url = getRequestUrl("/api/v1/auth/me/tenant");
+  const url = getRequestUrl("/api/v1/auth/tenant-info");
   const res = await fetch(url, {
     headers: { 
-      "Authorization": `Bearer ${token}`,
       "Content-Type": "application/json",
-      // No API key required for auth endpoints
+      "X-API-Key": getApiKey(),
     },
   });
 
@@ -382,12 +332,11 @@ export async function getUserTenant(): Promise<any> {
 }
 
 export async function logout(): Promise<void> {
-  removeToken();
-  removeRefreshToken();
   removeTenant();
   window.location.href = "/login";
 }
 
 export function isAuthenticated(): boolean {
-  return !!getToken();
+  // In API key mode, consider authenticated if API key is present
+  try { return !!getApiKey(); } catch { return false; }
 }

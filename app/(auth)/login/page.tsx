@@ -30,7 +30,7 @@ export default function LoginPage() {
       
       // Small delay to show success message, then redirect
       setTimeout(() => {
-        window.location.href = "/onboarding";
+        window.location.href = "/post-login";
       }, 800);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");

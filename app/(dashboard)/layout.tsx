@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Poppins } from "next/font/google";
-import { isAuthenticated, getUser, logout } from "@/lib/auth-client";
+import { isAuthenticated, getUser, getUserTenant, logout } from "@/lib/auth-client";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
 import { DashboardHeader } from "@/components/dashboard/Header";
 import { User } from "@/types/types";
@@ -18,7 +18,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     // Give a brief moment for localStorage to be available
-    const checkAuth = () => {
+    const checkAuth = async () => {
       if (!isAuthenticated()) {
         console.log("[DashboardLayout] Not authenticated, redirecting to login");
         window.location.href = "/login";
@@ -32,13 +32,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         return;
       }
       
-      console.log("[DashboardLayout] Auth successful, user:", userData);
+      // Ensure tenant is fully onboarded; otherwise redirect to onboarding wizard
+      try {
+        const tenant = await getUserTenant();
+        if (tenant?.onboarding_status !== "completed") {
+          const step = tenant?.onboarding_step || 1;
+          console.log("[DashboardLayout] Tenant not completed, redirecting to onboarding step", step);
+          window.location.href = `/onboarding?step=${step}`;
+          return;
+        }
+      } catch (e) {
+        console.warn("[DashboardLayout] Failed to load tenant info; redirecting to onboarding", e);
+        window.location.href = "/onboarding";
+        return;
+      }
+
+      console.log("[DashboardLayout] Auth successful and tenant onboarded, user:", userData);
       setUser(userData);
       setLoading(false);
     };
     
     // Small delay to ensure localStorage is populated after login redirect
-    const timer = setTimeout(checkAuth, 50);
+    const timer = setTimeout(() => { void checkAuth(); }, 50);
     return () => clearTimeout(timer);
   }, []);
 

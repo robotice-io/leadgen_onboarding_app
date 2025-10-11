@@ -19,11 +19,8 @@ async function proxy(req: NextRequest) {
   const headers = new Headers(req.headers);
   headers.set("host", new URL(apiBase).host);
   
-  // Only add API key for telemetry endpoints
-  // Auth and dashboard endpoints DO NOT require API key
-  if (path.includes('/telemetry/')) {
-    headers.set("X-API-Key", getApiKey());
-  }
+  // Always attach API key for every proxied request
+  headers.set("X-API-Key", getApiKey());
   
   headers.delete("content-length");
   const init: RequestInit = {

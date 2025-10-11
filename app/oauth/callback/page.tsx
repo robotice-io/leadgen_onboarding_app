@@ -130,36 +130,28 @@ function TestConnection() {
 - Tenant ID: ${tenantId}`;
 
       // Send test email to user
-      const testEmailRes = await fetch("/api/bridge/api/v1/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tenant_id: Number(tenantId),
-          to: contactEmail,
-          subject: testEmailSubject,
-          body: testEmailBody
-        }),
+      const testEmailRes = await apiPost("/email/send", {
+        tenant_id: Number(tenantId),
+        to: contactEmail,
+        subject: testEmailSubject,
+        body: testEmailBody
       });
 
       // Send admin notification
-      const adminEmailRes = await fetch("/api/bridge/api/v1/email/send", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          tenant_id: 1, // Admin tenant ID
-          to: "jose@robotice.io",
-          subject: adminSubject,
-          body: adminBody
-        }),
+      const adminEmailRes = await apiPost("/email/send", {
+        tenant_id: 1, // Admin tenant ID
+        to: "jose@robotice.io",
+        subject: adminSubject,
+        body: adminBody
       });
 
       // Check both responses
-      if (testEmailRes.status === 202 && adminEmailRes.status === 202) {
+      if (testEmailRes.ok && adminEmailRes.ok) {
         setStatus("success");
         setMessage(isSpanish ? "¡Emails enviados correctamente! Revisa tu bandeja." : "Emails sent successfully! Check your inbox.");
       } else {
-        const testError = testEmailRes.status !== 202 ? await testEmailRes.text() : null;
-        const adminError = adminEmailRes.status !== 202 ? await adminEmailRes.text() : null;
+        const testError = !testEmailRes.ok ? await testEmailRes.text() : null;
+        const adminError = !adminEmailRes.ok ? await adminEmailRes.text() : null;
         
         if (testError && adminError) {
           throw new Error(`Both emails failed: ${testError} | ${adminError}`);
@@ -168,6 +160,8 @@ function TestConnection() {
         } else if (adminError) {
           setStatus("success");
           setMessage(isSpanish ? "Email de prueba enviado, pero falló la notificación al admin." : "Test email sent, but admin notification failed.");
+        } else {
+          throw new Error("Unknown error occurred");
         }
       }
     } catch (e) {

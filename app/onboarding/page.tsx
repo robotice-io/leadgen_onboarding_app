@@ -6,7 +6,7 @@ import Wizard from "./_components/Wizard";
 import { I18nProvider } from "@/lib/i18n";
 import TopBar from "./_components/TopBar";
 import { Poppins } from "next/font/google";
-import { isAuthenticated } from "@/lib/auth-client";
+import { isAuthenticated, getUserTenant } from "@/lib/auth-client";
 
 const poppins = Poppins({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
@@ -20,6 +20,18 @@ export default function OnboardingPage() {
       router.push("/login");
       return;
     }
+    // If already completed, route to dashboard
+    (async () => {
+      try {
+        const tenant = await getUserTenant();
+        if (tenant?.onboarding_status === "completed") {
+          router.replace("/dashboard");
+        }
+      } catch (e) {
+        // Fail-open: stay in onboarding, logs only
+        console.warn("[OnboardingPage] Failed to load tenant info", e);
+      }
+    })();
   }, [router]);
 
   return (
