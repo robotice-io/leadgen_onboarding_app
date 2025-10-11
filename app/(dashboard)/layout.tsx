@@ -18,14 +18,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   useEffect(() => {
     if (!isAuthenticated()) {
-      router.push("/login");
+      window.location.href = "/login";
       return;
     }
     
     const userData = getUser();
     setUser(userData);
     setLoading(false);
-  }, [router]);
+  }, []);
 
   const handleLogout = async () => {
     await logout();

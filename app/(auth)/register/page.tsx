@@ -52,7 +52,7 @@ export default function RegisterPage() {
       });
       
       setTimeout(() => {
-        router.push("/verify-email");
+        window.location.href = "/verify-email";
       }, 2000);
     } catch (err) {
       setToast({

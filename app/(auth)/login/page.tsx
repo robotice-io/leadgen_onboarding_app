@@ -28,10 +28,10 @@ export default function LoginPage() {
       await login(email, password);
       setToast({ message: "Login successful!", type: "success" });
       
-      // Redirect to dashboard or onboarding
+      // Redirect to dashboard
       setTimeout(() => {
-        router.push("/onboarding");
-      }, 500);
+        window.location.href = "/dashboard";
+      }, 1000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

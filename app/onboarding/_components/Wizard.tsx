@@ -123,7 +123,7 @@ export default function Wizard() {
           return;
         }
         if (resTenant.status === 400) {
-          router.push("/onboarding/already-linked");
+          window.location.href = "/onboarding/already-linked";
           return;
         }
         if (resTenant.status === 422) {
