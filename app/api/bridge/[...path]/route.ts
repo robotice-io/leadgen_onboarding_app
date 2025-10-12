@@ -8,7 +8,11 @@ function getApiBase() {
 }
 
 function getApiKey(): string {
-  return process.env.NEXT_PUBLIC_API_KEY || "lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175";
+  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+  if (!apiKey) {
+    throw new Error("API key not configured. Please set NEXT_PUBLIC_API_KEY in your environment variables.");
+  }
+  return apiKey;
 }
 
 async function proxy(req: NextRequest) {

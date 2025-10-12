@@ -1,90 +1,89 @@
-# Environment Setup Guide
+# 🔒 Environment Variables Setup
 
-## Required Environment Variables
+## **Security Notice**
+API keys and sensitive configuration should NEVER be hardcoded in the application. This guide shows how to properly configure environment variables.
 
-Create a `.env.local` file in the root directory with the following variables:
+## **Setup Instructions**
+
+### **1. Create Environment File**
+Copy the example file and create your local environment configuration:
 
 ```bash
-# API Configuration
-NEXT_PUBLIC_API_BASE_URL=http://192.241.157.92:8000
-API_KEY=lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175
-
-# State signing key for OAuth (generate a secure random key for production)
-STATE_SIGNING_KEY=your-secure-random-key-here-change-in-production
+cp env.example .env.local
 ```
 
-## Environment Variables Explained
+### **2. Configure Your Environment Variables**
+Edit `.env.local` with your actual values:
 
-### `NEXT_PUBLIC_API_KEY`
-- **Purpose**: Authentication key for telemetry, tenant, and OAuth endpoints
-- **Value**: `lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175`
-- **Usage**: Added to `/telemetry/*`, `/tenants/*`, and `/oauth/*` endpoints as `X-API-Key` header
-- **Security**: Keep this key secure and never commit it to version control
+```env
+# Backend API Configuration
+NEXT_PUBLIC_API_BASE_URL=http://192.241.157.92:8000
+NEXT_PUBLIC_API_KEY=your-actual-api-key-here
 
-### `NEXT_PUBLIC_API_BASE_URL`
-- **Purpose**: Base URL for the backend API (without /api/v1)
-- **Value**: `http://192.241.157.92:8000`
-- **Usage**: Used for direct API calls and proxy configuration
+# App Configuration
+NEXT_PUBLIC_APP_BASE_URL=http://localhost:3000
 
-### `STATE_SIGNING_KEY`
-- **Purpose**: HMAC signing key for OAuth state validation
-- **Value**: Generate a secure random string (32+ characters)
-- **Usage**: Used to sign OAuth state parameters for security
+# OAuth Configuration (if needed)
+STATE_SIGNING_KEY=your-state-signing-key-here
 
-## Setup Instructions
+# Development/Production flags
+NODE_ENV=development
+```
 
-1. **Create the environment file:**
-   ```bash
-   # In the project root directory
-   touch .env.local
-   ```
+### **3. Security Best Practices**
 
-2. **Add the environment variables:**
-   Copy the content above into your `.env.local` file
+#### **✅ DO:**
+- Use environment variables for all sensitive data
+- Keep `.env.local` in `.gitignore` (already configured)
+- Use different API keys for development/production
+- Rotate API keys regularly
 
-3. **Generate a secure STATE_SIGNING_KEY:**
-   ```bash
-   # Using Node.js
-   node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-   
-   # Or using OpenSSL
-   openssl rand -hex 32
-   ```
+#### **❌ DON'T:**
+- Hardcode API keys in source code
+- Commit `.env.local` to version control
+- Share API keys in chat/email
+- Use production keys in development
 
-4. **Restart your development server:**
-   ```bash
-   npm run dev
-   ```
+### **4. Production Deployment**
 
-## Security Notes
+For production deployments (Vercel, Netlify, etc.), set environment variables in your hosting platform's dashboard:
 
-- ✅ The API key is automatically included in all requests
-- ✅ Environment variables are not exposed to the client-side
-- ✅ The bridge proxy properly forwards the API key
-- ⚠️ Never commit `.env.local` to version control
-- ⚠️ Use different keys for development and production
+- **Vercel**: Project Settings → Environment Variables
+- **Netlify**: Site Settings → Environment Variables
+- **Railway**: Project → Variables
 
-## API Key Implementation
+### **5. Verification**
 
-The API key is automatically added to all requests in the following ways:
+After setting up environment variables, restart your development server:
 
-1. **Client-side requests** (via `lib/api.ts`):
-   - `apiGet()` and `apiPost()` functions automatically include `X-API-Key` header
+```bash
+npm run dev
+```
 
-2. **Server-side proxy** (via `app/api/bridge/[...path]/route.ts`):
-   - Bridge API route forwards the API key to the backend
+The application should work without any hardcoded API keys.
 
-3. **Environment fallback**:
-   - If `API_KEY` environment variable is not set, uses the default key
-   - This ensures the application works even without proper environment setup
+## **🔍 Troubleshooting**
 
-## Testing the Setup
+### **Error: "API key not configured"**
+- Ensure `.env.local` exists and contains `NEXT_PUBLIC_API_KEY`
+- Restart your development server after adding environment variables
+- Check that the environment variable name is exactly `NEXT_PUBLIC_API_KEY`
 
-After setting up the environment variables, you can test that the API key is being sent correctly by:
+### **Error: "Environment variable not found"**
+- Verify the variable name matches exactly (case-sensitive)
+- Ensure the variable starts with `NEXT_PUBLIC_` for client-side access
+- Check that `.env.local` is in the project root directory
 
-1. Starting the development server
-2. Opening browser developer tools
-3. Making a request through the application
-4. Checking the Network tab to verify the `X-API-Key` header is present
+## **📝 Environment Variable Reference**
 
+| Variable | Description | Required | Example |
+|----------|-------------|----------|---------|
+| `NEXT_PUBLIC_API_BASE_URL` | Backend API base URL | Yes | `http://192.241.157.92:8000` |
+| `NEXT_PUBLIC_API_KEY` | API authentication key | Yes | `lk_...` |
+| `NEXT_PUBLIC_APP_BASE_URL` | Frontend app base URL | No | `http://localhost:3000` |
+| `STATE_SIGNING_KEY` | OAuth state signing key | No | `random-string` |
+| `NODE_ENV` | Environment mode | No | `development` |
 
+---
+
+**Remember: Security is everyone's responsibility! 🔐**

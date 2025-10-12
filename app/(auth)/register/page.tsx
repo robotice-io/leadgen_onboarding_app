@@ -45,9 +45,10 @@ export default function RegisterPage() {
     }
 
     try {
-      await register(email, password, firstName, lastName);
+      const response = await register(email, password, firstName, lastName);
+      
       setToast({ 
-        message: "Registration successful! Please check your email to verify your account.", 
+        message: response.message || "Registration successful! Please check your email to verify your account.", 
         type: "success" 
       });
       

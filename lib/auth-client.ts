@@ -207,7 +207,7 @@ export async function register(
   password: string, 
   firstName?: string,
   lastName?: string
-): Promise<void> {
+): Promise<any> {
   const url = getRequestUrl("/api/v1/auth/register");
   const res = await fetch(url, {
     method: "POST",
@@ -239,30 +239,53 @@ export async function register(
     
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
+
+  // Return the registration response for UI feedback
+  const response = await res.json();
+  return response;
 }
 
-export async function verifyEmail(token: string): Promise<void> {
+export async function verifyEmail(verificationCode: string): Promise<any> {
   const url = getRequestUrl("/api/v1/auth/verify-email");
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ token }),
+    headers: { 
+      "Content-Type": "application/json",
+      "X-API-Key": getApiKey(),
+    },
+    body: JSON.stringify({ verification_code: verificationCode }),
   });
 
   if (!res.ok) {
     if (res.status === 429) {
       throw new Error("[429] Too many attempts. Try again in a minute.");
     }
-    const error = await res.text();
-    throw new Error(error || "Email verification failed");
+    const errorText = await res.text();
+    let errorMessage = errorText || "Email verification failed";
+    
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.detail || errorJson.message || errorText;
+    } catch {
+      // If not JSON, use the text as is
+    }
+    
+    throw new Error(`[${res.status}] ${errorMessage}`);
   }
+
+  // Return the verification response for UI feedback
+  const response = await res.json();
+  return response;
 }
 
-export async function forgotPassword(email: string): Promise<void> {
+export async function forgotPassword(email: string): Promise<any> {
   const url = getRequestUrl("/api/v1/auth/forgot-password");
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "X-API-Key": getApiKey(),
+    },
     body: JSON.stringify({ email }),
   });
 
@@ -270,16 +293,32 @@ export async function forgotPassword(email: string): Promise<void> {
     if (res.status === 429) {
       throw new Error("[429] Too many attempts. Try again in a minute.");
     }
-    const error = await res.text();
-    throw new Error(error || "Failed to send reset email");
+    const errorText = await res.text();
+    let errorMessage = errorText || "Failed to send reset email";
+    
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.detail || errorJson.message || errorText;
+    } catch {
+      // If not JSON, use the text as is
+    }
+    
+    throw new Error(`[${res.status}] ${errorMessage}`);
   }
+
+  // Return the forgot password response for UI feedback
+  const response = await res.json();
+  return response;
 }
 
-export async function resetPassword(token: string, newPassword: string): Promise<void> {
+export async function resetPassword(token: string, newPassword: string): Promise<any> {
   const url = getRequestUrl("/api/v1/auth/reset-password");
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { 
+      "Content-Type": "application/json",
+      "X-API-Key": getApiKey(),
+    },
     body: JSON.stringify({ token, new_password: newPassword }),
   });
 
@@ -287,9 +326,22 @@ export async function resetPassword(token: string, newPassword: string): Promise
     if (res.status === 429) {
       throw new Error("[429] Too many attempts. Try again in a minute.");
     }
-    const error = await res.text();
-    throw new Error(error || "Password reset failed");
+    const errorText = await res.text();
+    let errorMessage = errorText || "Password reset failed";
+    
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson.detail || errorJson.message || errorText;
+    } catch {
+      // If not JSON, use the text as is
+    }
+    
+    throw new Error(`[${res.status}] ${errorMessage}`);
   }
+
+  // Return the reset password response for UI feedback
+  const response = await res.json();
+  return response;
 }
 
 export async function getCurrentUser(): Promise<any> {

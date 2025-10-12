@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { KeyRound } from "lucide-react";
+import { forgotPassword } from "@/lib/auth-client";
 
 export default function ForgotPasswordPage() {
   const [loading, setLoading] = useState(false);
@@ -21,12 +22,18 @@ export default function ForgotPasswordPage() {
     const email = formData.get("email") as string;
 
     try {
-      // TODO: Implement forgot password API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const response = await forgotPassword(email);
+      
       setSubmitted(true);
-      setToast({ message: "Password reset link sent!", type: "success" });
+      setToast({ 
+        message: response.message || "Password reset link sent!", 
+        type: "success" 
+      });
     } catch (err) {
-      setToast({ message: "Failed to send reset link", type: "error" });
+      setToast({ 
+        message: err instanceof Error ? err.message : "Failed to send reset link", 
+        type: "error" 
+      });
     } finally {
       setLoading(false);
     }

@@ -14,8 +14,9 @@ export function getApiKey(): string {
   if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_KEY) {
     return String(process.env.NEXT_PUBLIC_API_KEY);
   }
-  // Default API key (should be moved to environment variable)
-  return "lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175";
+  
+  // Throw error if API key is not configured
+  throw new Error("API key not configured. Please set NEXT_PUBLIC_API_KEY in your environment variables.");
 }
 
 function shouldProxyToNext(apiBase: string): boolean {
@@ -35,9 +36,6 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
   const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
   const url = useProxy ? `/api/bridge${fullPath}` : `${base}${fullPath}`;
   
-  console.log('[apiGet] Making request to:', url);
-  console.log('[apiGet] Full path:', fullPath);
-  
   const headers: Record<string, string> = {
     ...(init?.headers as Record<string, string> || {}),
     Accept: "application/json",
@@ -45,8 +43,6 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
 
   // Always include API key on every request
   headers["X-API-Key"] = getApiKey();
-  
-  console.log('[apiGet] Headers:', headers);
   
   return fetch(url, { 
     ...init, 
