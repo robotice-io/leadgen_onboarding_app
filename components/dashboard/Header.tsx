@@ -35,20 +35,6 @@ export function DashboardHeader({ onMenuClick, user, tenant, onLogout }: HeaderP
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const { lang, setLang, t } = useI18n();
 
-  // Debug logging
-  console.log("[DashboardHeader] Received tenant data:", tenant);
-  console.log("[DashboardHeader] Tenant name options:", {
-    name: tenant?.name,
-    org_name: tenant?.org_name,
-    company_name: tenant?.company_name,
-    user_company: user?.company
-  });
-  console.log("[DashboardHeader] Tenant email options:", {
-    email: tenant?.email,
-    contact_email: tenant?.contact_email,
-    user_email: user?.email
-  });
-
   // Get tenant info with fallbacks
   const getTenantName = () => {
     // Try tenant data first

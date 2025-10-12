@@ -46,7 +46,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         // Try to get tenant from localStorage as fallback
         try {
           const localTenant = getTenant();
-          console.log("[DashboardLayout] Using localStorage tenant:", localTenant);
           setUser(userData);
           setTenant(localTenant);
         } catch (localError) {

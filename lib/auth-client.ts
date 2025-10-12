@@ -168,16 +168,11 @@ export async function login(email: string, password: string): Promise<AuthTokens
 
   // Parse the login response
   const loginData = await res.json();
-  console.log('[login] Login response received:', loginData);
   
   // Extract user and tenant data from login response
   const userData = loginData.user;
   const tenantData = loginData.tenant;
   const tenantId = tenantData?.id;
-  
-  console.log('[login] Extracted user data:', userData);
-  console.log('[login] Extracted tenant data:', tenantData);
-  console.log('[login] Extracted tenant ID:', tenantId);
   
   if (!userData) {
     throw new Error("Login response missing user data");
@@ -193,10 +188,6 @@ export async function login(email: string, password: string): Promise<AuthTokens
   
   // Store tenant ID in localStorage for API calls
   localStorage.setItem("robotice-tenant-id", tenantId.toString());
-  
-  console.log('[login] Stored user data:', userData);
-  console.log('[login] Stored tenant data:', tenantData);
-  console.log('[login] Stored tenant ID in localStorage:', tenantId);
   
   // Return a minimal token object for compatibility
   return { access_token: "", token_type: "api-key" } as AuthTokens;
@@ -347,7 +338,6 @@ export async function resetPassword(token: string, newPassword: string): Promise
 export async function getCurrentUser(): Promise<any> {
   // Get user data from localStorage (stored during login)
   const userData = getUser();
-  console.log('[getCurrentUser] Retrieved user data from localStorage:', userData);
   
   if (!userData) {
     throw new Error("No user data found. Please log in again.");
@@ -359,7 +349,6 @@ export async function getCurrentUser(): Promise<any> {
 export async function getUserTenant(): Promise<any> {
   // Get tenant data from localStorage (stored during login)
   const tenantData = getTenant();
-  console.log('[getUserTenant] Retrieved tenant data from localStorage:', tenantData);
   
   if (!tenantData) {
     throw new Error("No tenant data found. Please log in again.");

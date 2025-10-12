@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardHeader, CardBody, CardFooter } from "@/components/ui/Card";
@@ -10,7 +10,7 @@ import { Toast } from "@/components/ui/Toast";
 import { Mail, CheckCircle, KeyRound } from "lucide-react";
 import { verifyEmail } from "@/lib/auth-client";
 
-export default function VerifyEmailPage() {
+function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [verificationCode, setVerificationCode] = useState("");
@@ -174,5 +174,29 @@ export default function VerifyEmailPage() {
         />
       )}
     </>
+  );
+}
+
+export default function VerifyEmailPage() {
+  return (
+    <Suspense fallback={
+      <Card>
+        <CardHeader>
+          <div className="flex justify-center mb-4">
+            <div className="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-800 animate-pulse"></div>
+          </div>
+          <h1 className="text-2xl font-semibold text-center mb-2">Loading...</h1>
+        </CardHeader>
+        <CardBody>
+          <div className="text-center py-4">
+            <p className="text-sm text-black/60 dark:text-white/70">
+              Loading verification form...
+            </p>
+          </div>
+        </CardBody>
+      </Card>
+    }>
+      <VerifyEmailForm />
+    </Suspense>
   );
 }

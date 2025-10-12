@@ -20,25 +20,12 @@ export default function DashboardPage() {
   // Convert to number if it's a string
   const tenantId = tenantIdFromStorage || (tenantIdFromLocalStorage ? parseInt(tenantIdFromLocalStorage) : null);
 
-  console.log('[DashboardPage] All localStorage keys:', Object.keys(localStorage));
-  console.log('[DashboardPage] robotice-tenant-id:', localStorage.getItem("robotice-tenant-id"));
-  console.log('[DashboardPage] robotice_auth_token:', localStorage.getItem("robotice_auth_token"));
-  console.log('[DashboardPage] robotice_user:', localStorage.getItem("robotice_user"));
-  console.log('[DashboardPage] robotice_tenant:', localStorage.getItem("robotice_tenant"));
-
-  console.log('[DashboardPage] Tenant from localStorage:', tenant);
-  console.log('[DashboardPage] tenantIdFromStorage:', tenantIdFromStorage);
-  console.log('[DashboardPage] tenantIdFromLocalStorage:', tenantIdFromLocalStorage);
-  console.log('[DashboardPage] Final tenantId:', tenantId);
-  console.log('[DashboardPage] Tenant ID type:', typeof tenantId);
-
   // Fetch dashboard stats with polling
   const { data: stats, isLoading: statsLoading, error: statsError } = useQuery({
     queryKey: ['dashboard-stats', tenantId],
     queryFn: async () => {
       if (!tenantId) throw new Error('No tenant ID available');
       
-      console.log('[DashboardPage] Fetching stats for tenant:', tenantId);
       
       // Fetch both current and previous day stats for comparison
       const [currentRes, previousRes] = await Promise.all([
@@ -46,24 +33,18 @@ export default function DashboardPage() {
         apiGet(`/api/v1/dashboard/${tenantId}/quick-stats?period=yesterday`)
       ]);
       
-      console.log('[DashboardPage] Current stats response:', currentRes.status, currentRes.ok);
-      console.log('[DashboardPage] Previous stats response:', previousRes.status, previousRes.ok);
-      
       if (!currentRes.ok) {
         const errorText = await currentRes.text();
-        console.error('[DashboardPage] Failed to fetch current stats:', errorText);
         throw new Error(`Failed to fetch current stats: ${errorText}`);
       }
       
       const currentStats = await currentRes.json();
-      console.log('[DashboardPage] Current stats data:', currentStats);
       
       let previousStats = null;
       
       // Try to get previous day stats (optional - if not available, we'll show no change)
       if (previousRes.ok) {
         previousStats = await previousRes.json();
-        console.log('[DashboardPage] Previous stats data:', previousStats);
       }
       
       const result = {
@@ -71,7 +52,6 @@ export default function DashboardPage() {
         previous: previousStats
       };
       
-      console.log('[DashboardPage] Final stats result:', result);
       return result;
     },
     refetchInterval: 15000, // Poll every 15 seconds
@@ -85,23 +65,17 @@ export default function DashboardPage() {
     queryFn: async () => {
       if (!tenantId) throw new Error('No tenant ID available');
       
-      console.log('[DashboardPage] Fetching recent emails for tenant:', tenantId);
       
       const res = await apiGet(`/api/v1/dashboard/${tenantId}/recent-emails?limit=10`);
       
-      console.log('[DashboardPage] Recent emails response:', res.status, res.ok);
-      
       if (!res.ok) {
         const errorText = await res.text();
-        console.error('[DashboardPage] Failed to fetch emails:', errorText);
         throw new Error(`Failed to fetch emails: ${errorText}`);
       }
       
       const data = await res.json();
-      console.log('[DashboardPage] Recent emails data:', data);
       
       const emails = data.recent_emails || [];
-      console.log('[DashboardPage] Extracted emails array:', emails);
       
       return emails;
     },

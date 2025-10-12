@@ -16,10 +16,8 @@ export default function PostLoginGate() {
         setError(null);
 
         console.log('[PostLoginGate] Starting account status check...');
-        console.log('[PostLoginGate] localStorage robotice-tenant-id:', localStorage.getItem("robotice-tenant-id"));
         
         const tenant = await getUserTenant();
-        console.log('[PostLoginGate] Successfully got tenant data:', tenant);
         // New flow: always go to dashboard; wizard is launched from there if user wants
         router.replace("/dashboard");
       } catch (e) {
