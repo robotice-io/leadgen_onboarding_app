@@ -14,12 +14,11 @@ export default function OnboardingPage() {
   const router = useRouter();
 
   useEffect(() => {
-    // Check if user is authenticated
-    if (!isAuthenticated()) {
-      console.log("[OnboardingPage] Not authenticated, redirecting to login");
-      router.push("/login");
-      return;
-    }
+        // Check if user is authenticated
+        if (!isAuthenticated()) {
+          router.push("/login");
+          return;
+        }
     // If already completed, route to dashboard
     (async () => {
       try {

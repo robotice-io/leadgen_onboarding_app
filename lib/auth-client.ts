@@ -136,7 +136,6 @@ export async function login(email: string, password: string): Promise<AuthTokens
   removeToken();
   removeRefreshToken();
   removeTenant();
-  console.log('[login] Cleared all stale data before login');
   
   const url = getRequestUrl("/api/v1/auth/login");
   const res = await fetch(url, {

@@ -10,17 +10,15 @@ export default function PostLoginGate() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const checkOnboardingStatus = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        console.log('[PostLoginGate] Starting account status check...');
-        
-        const tenant = await getUserTenant();
-        // New flow: always go to dashboard; wizard is launched from there if user wants
-        router.replace("/dashboard");
-      } catch (e) {
+        const checkOnboardingStatus = async () => {
+          try {
+            setLoading(true);
+            setError(null);
+            
+            const tenant = await getUserTenant();
+            // New flow: always go to dashboard; wizard is launched from there if user wants
+            router.replace("/dashboard");
+          } catch (e) {
         console.error("[PostLoginGate] Failed to check onboarding status:", e);
         console.error("[PostLoginGate] Error details:", e);
         setError(`Failed to check account status: ${e instanceof Error ? e.message : 'Unknown error'}`);

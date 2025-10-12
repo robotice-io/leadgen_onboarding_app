@@ -21,39 +21,35 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   useEffect(() => {
     // Give a brief moment for localStorage to be available
     const checkAuth = async () => {
-      if (!isAuthenticated()) {
-        console.log("[DashboardLayout] Not authenticated, redirecting to login");
-        window.location.href = "/login";
-        return;
-      }
-      
-      const userData = getUser();
-      if (!userData) {
-        console.log("[DashboardLayout] No user data found, redirecting to login");
-        window.location.href = "/login";
-        return;
-      }
-      
-      // Get tenant data from API
-      try {
-        const tenantData = await getUserTenant();
-        console.log("[DashboardLayout] Tenant data received:", tenantData);
-        console.log("[DashboardLayout] Auth successful, loading dashboard for user:", userData, "tenant:", tenantData);
-        setUser(userData);
-        setTenant(tenantData);
-      } catch (error) {
-        console.warn("[DashboardLayout] Failed to fetch tenant data:", error);
-        // Try to get tenant from localStorage as fallback
-        try {
-          const localTenant = getTenant();
-          setUser(userData);
-          setTenant(localTenant);
-        } catch (localError) {
-          console.warn("[DashboardLayout] No tenant data available:", localError);
-          setUser(userData);
-          setTenant(null);
+        if (!isAuthenticated()) {
+          window.location.href = "/login";
+          return;
         }
-      }
+        
+        const userData = getUser();
+        if (!userData) {
+          window.location.href = "/login";
+          return;
+        }
+      
+        // Get tenant data from API
+        try {
+          const tenantData = await getUserTenant();
+          setUser(userData);
+          setTenant(tenantData);
+        } catch (error) {
+          console.warn("[DashboardLayout] Failed to fetch tenant data:", error);
+          // Try to get tenant from localStorage as fallback
+          try {
+            const localTenant = getTenant();
+            setUser(userData);
+            setTenant(localTenant);
+          } catch (localError) {
+            console.warn("[DashboardLayout] No tenant data available:", localError);
+            setUser(userData);
+            setTenant(null);
+          }
+        }
       setLoading(false);
     };
     
