@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { User } from "@/types/types";
 import { useI18n } from "@/lib/i18n";
+import { OnboardingButton } from "./OnboardingButton";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -146,24 +147,7 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
 
           {/* Bottom Section */}
           <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
-            <Link
-              href="/onboarding"
-              className="flex items-center gap-3 p-3 rounded-lg bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 border border-blue-200 dark:border-blue-800 hover:from-blue-100 hover:to-indigo-100 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30 transition-all"
-            >
-              <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
-                <span className="text-xs font-medium text-white">
-                  {user?.first_name?.[0] || user?.email?.[0] || 'U'}
-                </span>
-              </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
-                        {t("dashboard.connectAccount")}
-                      </p>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
-                        {t("dashboard.setupGmail")}
-                      </p>
-                    </div>
-            </Link>
+            <OnboardingButton user={user} />
           </div>
         </div>
       </div>
@@ -226,6 +210,11 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
               </li>
             </ul>
           </nav>
+          
+          {/* Mobile Bottom Section */}
+          <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
+            <OnboardingButton user={user} />
+          </div>
         </div>
       </div>
     </>

@@ -171,6 +171,12 @@ const ES: Dictionary = {
   "settings.deletingConnection": "Eliminando conexión...",
   "settings.connectionDeleted": "Conexión eliminada exitosamente",
   "settings.confirmDeleteConnection": "¿Estás seguro de que quieres eliminar la conexión con Gmail? Esta acción no se puede deshacer.",
+  
+  // Onboarding button translations
+  "dashboard.connected": "Conectado",
+  "dashboard.gmailConnected": "Gmail conectado",
+  "dashboard.active": "Activo",
+  "dashboard.pending": "Pendiente",
 };
 
 const EN: Dictionary = {
@@ -338,6 +344,12 @@ const EN: Dictionary = {
   "settings.deletingConnection": "Deleting connection...",
   "settings.connectionDeleted": "Connection deleted successfully",
   "settings.confirmDeleteConnection": "Are you sure you want to delete the Gmail connection? This action cannot be undone.",
+  
+  // Onboarding button translations
+  "dashboard.connected": "Connected",
+  "dashboard.gmailConnected": "Gmail connected",
+  "dashboard.active": "Active",
+  "dashboard.pending": "Pending",
 };
 
 const DICTS: Record<SupportedLang, Dictionary> = { es: ES, en: EN };
