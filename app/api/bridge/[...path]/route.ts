@@ -20,7 +20,13 @@ async function proxy(req: NextRequest) {
   const url = new URL(req.url);
   const path = url.pathname.replace(/^\/api\/bridge/, "");
   const target = `${apiBase}${path}${url.search}`;
-  const headers = new Headers(req.headers);
+  // Build sanitized upstream headers (avoid hop-by-hop/forbidden headers)
+  const headers = new Headers();
+  const contentType = req.headers.get("content-type");
+  if (contentType) headers.set("Content-Type", contentType);
+  headers.set("Accept", req.headers.get("accept") ?? "application/json");
+  const tenantHeader = req.headers.get("x-tenant-id") || req.headers.get("X-Tenant-ID");
+  if (tenantHeader) headers.set("X-Tenant-ID", tenantHeader);
   
   // Always attach API key for every proxied request
   try {
