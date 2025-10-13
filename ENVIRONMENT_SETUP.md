@@ -18,7 +18,8 @@ Edit `.env.local` with your actual values:
 ```env
 # Backend API Configuration
 NEXT_PUBLIC_API_BASE_URL=http://192.241.157.92:8000
-NEXT_PUBLIC_API_KEY=your-actual-api-key-here
+# Server-side only (do NOT prefix with NEXT_PUBLIC_)
+API_KEY=your-actual-api-key-here
 
 # App Configuration
 NEXT_PUBLIC_APP_BASE_URL=http://localhost:3000
@@ -65,9 +66,9 @@ The application should work without any hardcoded API keys.
 ## **🔍 Troubleshooting**
 
 ### **Error: "API key not configured"**
-- Ensure `.env.local` exists and contains `NEXT_PUBLIC_API_KEY`
+- Ensure `.env.local` exists and contains `API_KEY` (server-side only)
 - Restart your development server after adding environment variables
-- Check that the environment variable name is exactly `NEXT_PUBLIC_API_KEY`
+- Check that the environment variable name is exactly `API_KEY` (without NEXT_PUBLIC_)
 
 ### **Error: "Environment variable not found"**
 - Verify the variable name matches exactly (case-sensitive)
@@ -79,7 +80,7 @@ The application should work without any hardcoded API keys.
 | Variable | Description | Required | Example |
 |----------|-------------|----------|---------|
 | `NEXT_PUBLIC_API_BASE_URL` | Backend API base URL | Yes | `http://192.241.157.92:8000` |
-| `NEXT_PUBLIC_API_KEY` | API authentication key | Yes | `lk_...` |
+| `API_KEY` | API authentication key (server-side only) | Yes | `lk_...` |
 | `NEXT_PUBLIC_APP_BASE_URL` | Frontend app base URL | No | `http://localhost:3000` |
 | `STATE_SIGNING_KEY` | OAuth state signing key | No | `random-string` |
 | `NODE_ENV` | Environment mode | No | `development` |

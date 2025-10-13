@@ -9,7 +9,8 @@ const stateSigningKey = crypto.randomBytes(32).toString('hex');
 
 const envContent = `# API Configuration
 NEXT_PUBLIC_API_BASE_URL=http://192.241.157.92:8000
-API_KEY=lk_ad23ea53ecf1a7937b66d9a18fe30848056fc88a97eea7f7a2a7b1d9a1cc1175
+# Server-side only API key (do NOT expose on client)
+API_KEY=lk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 # State signing key for OAuth (auto-generated secure key)
 STATE_SIGNING_KEY=${stateSigningKey}

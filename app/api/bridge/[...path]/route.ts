@@ -8,9 +8,9 @@ function getApiBase() {
 }
 
 function getApiKey(): string {
-  const apiKey = process.env.NEXT_PUBLIC_API_KEY;
+  const apiKey = process.env.API_KEY;
   if (!apiKey) {
-    throw new Error("API key not configured. Please set NEXT_PUBLIC_API_KEY in your environment variables.");
+    throw new Error("API key not configured. Please set API_KEY in your environment variables (server-side only).");
   }
   return apiKey;
 }
@@ -25,6 +25,19 @@ async function proxy(req: NextRequest) {
   
   // Always attach API key for every proxied request
   headers.set("X-API-Key", getApiKey());
+  
+  // If X-Tenant-ID not present, try to infer it from cookie set by the app
+  const hasTenantHeader = headers.has("X-Tenant-ID") || headers.has("x-tenant-id");
+  if (!hasTenantHeader) {
+    try {
+      const tenantCookie = req.cookies.get("robotice-tenant-id")?.value;
+      if (tenantCookie) {
+        headers.set("X-Tenant-ID", tenantCookie);
+      }
+    } catch {
+      // ignore cookie parsing issues
+    }
+  }
   
   headers.delete("content-length");
   const init: RequestInit = {

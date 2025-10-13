@@ -4,7 +4,7 @@
 
 ### **Base URL**: `http://192.241.157.92:8000/api/v1`
 
-### **API Key Format**: `lk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` (Set via `NEXT_PUBLIC_API_KEY` environment variable)
+### **API Key Format**: `lk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` (Set via server-side `API_KEY` environment variable)
 
 ---
 

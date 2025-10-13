@@ -1,6 +1,6 @@
 "use client";
 
-import { getApiBaseUrl, getApiKey } from "./api";
+import { getApiBaseUrl } from "./api";
 
 export interface AuthTokens {
   access_token: string;
@@ -20,21 +20,15 @@ const REFRESH_TOKEN_KEY = "robotice_refresh_token";
 const TENANT_KEY = "robotice_tenant";
 
 // Check if we need to proxy requests through Next.js API routes
-function shouldUseProxy(apiBase: string): boolean {
-  if (typeof window === "undefined") return false;
-  try {
-    const isFrontendHttps = window.location.protocol === "https:";
-    const apiIsHttp = apiBase.startsWith("http://");
-    return isFrontendHttps && apiIsHttp;
-  } catch {
-    return false;
-  }
+function shouldUseProxy(): boolean {
+  // Siempre proxiar desde el cliente para no exponer la API key
+  return typeof window !== "undefined";
 }
 
 // Get the correct URL (either direct or through proxy)
 function getRequestUrl(path: string): string {
   const apiBase = getApiBaseUrl();
-  const useProxy = shouldUseProxy(apiBase);
+  const useProxy = shouldUseProxy();
   
   if (useProxy) {
     // Use Next.js API proxy to avoid mixed content errors
@@ -43,6 +37,11 @@ function getRequestUrl(path: string): string {
     // Direct connection to API
     return `${apiBase}${path}`;
   }
+}
+
+function getTenantIdFromStorage(): string | null {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("robotice-tenant-id");
 }
 
 export function getToken(): string | null {
@@ -142,7 +141,7 @@ export async function login(email: string, password: string): Promise<AuthTokens
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      "X-API-Key": getApiKey(),
+      ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
     },
     body: JSON.stringify({ email, password }),
   });
@@ -152,16 +151,13 @@ export async function login(email: string, password: string): Promise<AuthTokens
       throw new Error("[429] Too many attempts. Try again in a minute.");
     }
     const errorText = await res.text();
-    let errorMessage = errorText || "Login failed";
-    
-    // Try to parse JSON error response
+    let errorMessage = "Login failed";
     try {
       const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson.detail || errorJson.message || errorText;
+      errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
     } catch {
-      // If not JSON, use the text as is
+      // keep generic message to avoid leaking details
     }
-    
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
@@ -203,7 +199,7 @@ export async function register(
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      "X-API-Key": getApiKey(),
+      ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
     },
     body: JSON.stringify({ 
       email, 
@@ -218,15 +214,11 @@ export async function register(
       throw new Error("[429] Too many attempts. Try again in a minute.");
     }
     const errorText = await res.text();
-    let errorMessage = errorText || "Registration failed";
-    
+    let errorMessage = "Registration failed";
     try {
       const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson.detail || errorJson.message || errorText;
-    } catch {
-      // If not JSON, use the text as is
-    }
-    
+      errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
+    } catch {}
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
@@ -241,7 +233,7 @@ export async function verifyEmail(verificationCode: string): Promise<any> {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      "X-API-Key": getApiKey(),
+      ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
     },
     body: JSON.stringify({ verification_code: verificationCode }),
   });
@@ -251,15 +243,11 @@ export async function verifyEmail(verificationCode: string): Promise<any> {
       throw new Error("[429] Too many attempts. Try again in a minute.");
     }
     const errorText = await res.text();
-    let errorMessage = errorText || "Email verification failed";
-    
+    let errorMessage = "Email verification failed";
     try {
       const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson.detail || errorJson.message || errorText;
-    } catch {
-      // If not JSON, use the text as is
-    }
-    
+      errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
+    } catch {}
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
@@ -274,7 +262,7 @@ export async function forgotPassword(email: string): Promise<any> {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      "X-API-Key": getApiKey(),
+      ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
     },
     body: JSON.stringify({ email }),
   });
@@ -284,15 +272,11 @@ export async function forgotPassword(email: string): Promise<any> {
       throw new Error("[429] Too many attempts. Try again in a minute.");
     }
     const errorText = await res.text();
-    let errorMessage = errorText || "Failed to send reset email";
-    
+    let errorMessage = "Failed to send reset email";
     try {
       const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson.detail || errorJson.message || errorText;
-    } catch {
-      // If not JSON, use the text as is
-    }
-    
+      errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
+    } catch {}
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
@@ -307,7 +291,7 @@ export async function resetPassword(token: string, newPassword: string): Promise
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
-      "X-API-Key": getApiKey(),
+      ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
     },
     body: JSON.stringify({ token, new_password: newPassword }),
   });
@@ -317,15 +301,11 @@ export async function resetPassword(token: string, newPassword: string): Promise
       throw new Error("[429] Too many attempts. Try again in a minute.");
     }
     const errorText = await res.text();
-    let errorMessage = errorText || "Password reset failed";
-    
+    let errorMessage = "Password reset failed";
     try {
       const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson.detail || errorJson.message || errorText;
-    } catch {
-      // If not JSON, use the text as is
-    }
-    
+      errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
+    } catch {}
     throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
@@ -362,6 +342,6 @@ export async function logout(): Promise<void> {
 }
 
 export function isAuthenticated(): boolean {
-  // In API key mode, consider authenticated if API key is present
-  try { return !!getApiKey(); } catch { return false; }
+  // Consider authenticated if hay datos de usuario en localStorage
+  try { return !!getUser(); } catch { return false; }
 }
