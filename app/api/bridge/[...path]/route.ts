@@ -21,7 +21,6 @@ async function proxy(req: NextRequest) {
   const path = url.pathname.replace(/^\/api\/bridge/, "");
   const target = `${apiBase}${path}${url.search}`;
   const headers = new Headers(req.headers);
-  headers.set("host", new URL(apiBase).host);
   
   // Always attach API key for every proxied request
   try {
@@ -53,7 +52,12 @@ async function proxy(req: NextRequest) {
   };
   const res = await fetch(target, init);
   const body = await res.arrayBuffer();
-  return new Response(body, { status: res.status, headers: res.headers });
+  // Sanitize response headers to avoid forbidden/hop-by-hop headers issues
+  const resHeaders = new Headers(res.headers);
+  resHeaders.delete("content-length");
+  resHeaders.delete("transfer-encoding");
+  resHeaders.delete("content-encoding");
+  return new Response(body, { status: res.status, headers: resHeaders });
 }
 
 export const GET = proxy;
