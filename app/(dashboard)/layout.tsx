@@ -2,14 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Poppins } from "next/font/google";
 import { isAuthenticated, getUser, getUserTenant, getTenant, logout } from "@/lib/auth-client";
 import { I18nProvider } from "@/lib/i18n";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
 import { DashboardHeader } from "@/components/dashboard/Header";
 import { User } from "@/types/types";
 
-const poppins = Poppins({ subsets: ["latin"], weight: ["400", "500", "600", "700"] });
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
@@ -64,7 +62,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center ${poppins.className}`}>
+      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center`}>
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -76,7 +74,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <I18nProvider>
-      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 ${poppins.className}`}>
+      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900`}>
         {/* Sidebar */}
         <DashboardSidebar 
           isOpen={sidebarOpen} 

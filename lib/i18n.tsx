@@ -177,6 +177,28 @@ const ES: Dictionary = {
   "dashboard.gmailConnected": "Gmail conectado",
   "dashboard.active": "Activo",
   "dashboard.pending": "Pendiente",
+  // Nav
+  "nav.dashboard": "Panel de Control",
+  "nav.campaigns": "Campañas",
+  "nav.analytics": "Analítica",
+  "nav.contacts": "Contactos",
+  "nav.settings": "Configuración",
+  // Labels
+  "dashboard.opensLabel": "Aperturas",
+  "dashboard.devicesLabel": "Dispositivos",
+  // Login
+  "login.welcomeBack": "Bienvenido de vuelta",
+  "login.signInSubtitle": "Inicia sesión en tu cuenta de Robotice",
+  "login.emailAddress": "Correo electrónico",
+  "login.password": "Contraseña",
+  "login.rememberMe": "Recuérdame",
+  "login.forgotPassword": "¿Olvidaste tu contraseña?",
+  "login.signIn": "Iniciar sesión",
+  "login.noAccount": "¿No tienes una cuenta?",
+  "login.signUp": "Regístrate",
+  "login.authFailed": "Autenticación fallida",
+  "login.success": "¡Inicio de sesión exitoso!",
+  "login.emailPlaceholder": "tu.email@empresa.com",
 };
 
 const EN: Dictionary = {
@@ -350,6 +372,28 @@ const EN: Dictionary = {
   "dashboard.gmailConnected": "Gmail connected",
   "dashboard.active": "Active",
   "dashboard.pending": "Pending",
+  // Nav
+  "nav.dashboard": "Dashboard",
+  "nav.campaigns": "Campaigns",
+  "nav.analytics": "Analytics",
+  "nav.contacts": "Contacts",
+  "nav.settings": "Settings",
+  // Labels
+  "dashboard.opensLabel": "Opens",
+  "dashboard.devicesLabel": "Devices",
+  // Login
+  "login.welcomeBack": "Welcome Back",
+  "login.signInSubtitle": "Sign in to your Robotice account",
+  "login.emailAddress": "Email Address",
+  "login.password": "Password",
+  "login.rememberMe": "Remember me",
+  "login.forgotPassword": "Forgot password?",
+  "login.signIn": "Sign In",
+  "login.noAccount": "Don't have an account?",
+  "login.signUp": "Sign up",
+  "login.authFailed": "Authentication Failed",
+  "login.success": "Login successful!",
+  "login.emailPlaceholder": "your.email@company.com",
 };
 
 const DICTS: Record<SupportedLang, Dictionary> = { es: ES, en: EN };

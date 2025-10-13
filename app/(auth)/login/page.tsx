@@ -8,9 +8,11 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { login } from "@/lib/auth-client";
+import { useI18n } from "@/lib/i18n";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -26,7 +28,7 @@ export default function LoginPage() {
 
     try {
       await login(email, password);
-      setToast({ message: "Login successful!", type: "success" });
+      setToast({ message: t("login.success"), type: "success" });
       
       // Small delay to show success message, then redirect
       setTimeout(() => {
@@ -42,9 +44,9 @@ export default function LoginPage() {
     <>
       <Card>
         <CardHeader>
-          <h1 className="text-2xl font-semibold text-center mb-2">Welcome Back</h1>
+          <h1 className="text-2xl font-semibold text-center mb-2">{t("login.welcomeBack")}</h1>
           <p className="text-sm text-black/60 dark:text-white/70 text-center">
-            Sign in to your Robotice account
+            {t("login.signInSubtitle")}
           </p>
         </CardHeader>
 
@@ -56,7 +58,7 @@ export default function LoginPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-red-600 dark:text-red-400">Authentication Failed</p>
+                  <p className="text-sm font-medium text-red-600 dark:text-red-400">{t("login.authFailed")}</p>
                   <p className="text-sm text-red-600 dark:text-red-400 mt-1">{error}</p>
                 </div>
               </div>
@@ -67,8 +69,8 @@ export default function LoginPage() {
             <Input
               name="email"
               type="email"
-              label="Email Address"
-              placeholder="your.email@company.com"
+              label={t("login.emailAddress")}
+              placeholder={t("login.emailPlaceholder")}
               required
               autoComplete="email"
             />
@@ -76,7 +78,7 @@ export default function LoginPage() {
             <Input
               name="password"
               type="password"
-              label="Password"
+              label={t("login.password")}
               placeholder="••••••••"
               required
               autoComplete="current-password"
@@ -89,27 +91,27 @@ export default function LoginPage() {
                   name="remember"
                   className="h-4 w-4 rounded border-black/25 dark:border-white/25 accent-blue-600"
                 />
-                <span className="text-black/70 dark:text-white/70">Remember me</span>
+                <span className="text-black/70 dark:text-white/70">{t("login.rememberMe")}</span>
               </label>
               <Link
                 href="/forgot-password"
                 className="text-blue-600 hover:text-blue-700 dark:text-blue-400"
               >
-                Forgot password?
+                {t("login.forgotPassword")}
               </Link>
             </div>
 
             <Button type="submit" fullWidth loading={loading}>
-              Sign In
+              {t("login.signIn")}
             </Button>
           </form>
         </CardBody>
 
         <CardFooter>
           <p className="text-sm text-center text-black/60 dark:text-white/70">
-            Don't have an account?{" "}
+            {t("login.noAccount")} {" "}
             <Link href="/register" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
-              Sign up
+              {t("login.signUp")}
             </Link>
           </p>
         </CardFooter>

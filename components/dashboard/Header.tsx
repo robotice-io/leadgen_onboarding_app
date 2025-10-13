@@ -77,6 +77,7 @@ export function DashboardHeader({ onMenuClick, user, tenant, onLogout }: HeaderP
           {/* Mobile Menu Button */}
           <button
             onClick={onMenuClick}
+            aria-label="Open menu"
             className="lg:hidden p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <Menu className="h-5 w-5" />
@@ -127,7 +128,7 @@ export function DashboardHeader({ onMenuClick, user, tenant, onLogout }: HeaderP
                     className="w-full px-4 py-2 text-left text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-3"
                   >
                     <LogOut className="h-4 w-4" />
-                    Sign out
+                    {t("dashboard.signOut")}
                   </button>
                 </div>
               </div>

@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, Poppins } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/lib/query-provider";
+import { I18nProvider } from "@/lib/i18n";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,7 +14,6 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const pop = Poppins({ subsets: ["latin"], weight: ["400", "600", "700"], variable: "--font-poppins" });
 
 export const metadata: Metadata = {
   title: "Robotice LeadGen Onboarding",
@@ -33,11 +33,13 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${pop.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <QueryProvider>
-          {children}
-        </QueryProvider>
+        <I18nProvider>
+          <QueryProvider>
+            {children}
+          </QueryProvider>
+        </I18nProvider>
       </body>
     </html>
   );

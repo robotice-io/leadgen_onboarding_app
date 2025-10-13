@@ -28,10 +28,11 @@ export function Toast({ message, type = "info", onClose, duration = 5000 }: Toas
       className={`
         fixed bottom-6 left-1/2 -translate-x-1/2 z-50
         text-white px-4 py-3 rounded-md shadow-lg
-        animate-in slide-in-from-bottom-5 fade-in
+        animate-toast-in
         ${styles[type]}
       `}
       role="status"
+      aria-live="polite"
     >
       <div className="flex items-center gap-3">
         <span className="text-sm font-medium">{message}</span>

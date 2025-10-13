@@ -1,13 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Poppins } from "next/font/google";
-
-const poppins = Poppins({ subsets: ["latin"], weight: ["400", "600", "700"] });
 
 export default function Home() {
   return (
     <main className="min-h-screen w-full flex items-center justify-center px-6">
-      <div className={`w-full max-w-2xl text-center ${poppins.className}`}>
+      <div className={`w-full max-w-2xl text-center`}>
         <div className="flex flex-col items-center gap-6">
           <div className="pt-6" />
           <Image

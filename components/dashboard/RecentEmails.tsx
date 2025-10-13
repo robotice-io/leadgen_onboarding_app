@@ -31,9 +31,12 @@ export function RecentEmails({ emails = [] }: RecentEmailsProps) {
   const safeEmails = Array.isArray(emails) ? emails : [];
 
   const filteredEmails = safeEmails.filter(email => {
-    const matchesSearch = email.subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         email.recipient.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === "all" || email.status === statusFilter;
+    const subject = (email?.subject || "").toString();
+    const recipient = (email?.recipient || "").toString();
+    const status = (email?.status || "").toString();
+    const matchesSearch = subject.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         recipient.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus = statusFilter === "all" || status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
@@ -141,20 +144,20 @@ export function RecentEmails({ emails = [] }: RecentEmailsProps) {
                 </div>
                 
                 <div className="flex items-center gap-6 ml-4">
-                  <div className="text-center">
+                  <div className="text-center" aria-label={t("dashboard.opensLabel")}> 
                     <div className="flex items-center gap-1 text-sm font-medium text-gray-900 dark:text-white">
                       <Eye className="h-4 w-4" />
                       {email.opens}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Opens</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{t("dashboard.opensLabel")}</div>
                   </div>
                   
-                  <div className="text-center">
+                  <div className="text-center" aria-label={t("dashboard.devicesLabel")}> 
                     <div className="flex items-center gap-1 text-sm font-medium text-gray-900 dark:text-white">
                       <Users className="h-4 w-4" />
                       {email.unique_devices}
                     </div>
-                    <div className="text-xs text-gray-500 dark:text-gray-400">Devices</div>
+                    <div className="text-xs text-gray-500 dark:text-gray-400">{t("dashboard.devicesLabel")}</div>
                   </div>
                   
                   <Link 

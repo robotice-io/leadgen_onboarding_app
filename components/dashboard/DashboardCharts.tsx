@@ -119,10 +119,10 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
               {t("dashboard.last7Days")}
             </p>
           </div>
-          <div className="flex items-center gap-4 text-sm">
+          <div className="flex items-center gap-4 text-sm" aria-label={t("dashboard.openRate")}> 
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
-              <span className="text-gray-600 dark:text-gray-400">Open Rate</span>
+              <span className="text-gray-600 dark:text-gray-400">{t("dashboard.openRate")}</span>
             </div>
           </div>
         </div>
@@ -149,7 +149,7 @@ export function DashboardCharts({ tenantId }: DashboardChartsProps) {
               }}
               formatter={(value: number, name: string) => [
                 name === 'rate' ? `${value}%` : value,
-                name === 'rate' ? 'Open Rate' : 'Emails Sent'
+                name === 'rate' ? t("dashboard.openRate") : t("dashboard.emailsSentToday")
               ]}
               labelFormatter={(label: any, payload: any) => {
                 if (payload && payload[0]) {

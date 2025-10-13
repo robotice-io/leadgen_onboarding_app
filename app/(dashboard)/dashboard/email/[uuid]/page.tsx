@@ -263,10 +263,14 @@ export default function EmailAnalyticsPage() {
                 <p className="text-sm text-gray-600 dark:text-gray-400">Last Opened</p>
               </div>
               
-              <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
-                <div className="flex items-center justify-center gap-2 text-orange-600 dark:text-orange-400 mb-2">
-                  <span className="text-2xl font-bold">{Math.round(emailData.opens / emailData.unique_devices * 100) / 100}</span>
-                </div>
+                <div className="text-center p-4 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                  <div className="flex items-center justify-center gap-2 text-orange-600 dark:text-orange-400 mb-2">
+                    {(() => {
+                      const denom = emailData.unique_devices || 0;
+                      const avg = denom > 0 ? emailData.opens / denom : 0;
+                      return <span className="text-2xl font-bold">{avg.toFixed(2)}</span>;
+                    })()}
+                  </div>
                 <p className="text-sm text-gray-600 dark:text-gray-400">Avg Opens/Device</p>
               </div>
             </div>

@@ -65,11 +65,11 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
   };
 
   const navigation = [
-    { name: t("dashboard.title"), href: "/dashboard", icon: BarChart3 },
-    { name: "Campaigns", href: "/dashboard/campaigns", icon: Mail },
-    { name: "Analytics", href: "/dashboard/analytics", icon: TrendingUp },
-    { name: "Contacts", href: "/dashboard/contacts", icon: Users },
-    { name: "Settings", href: "/dashboard/settings", icon: Settings },
+    { name: t("nav.dashboard"), href: "/dashboard", icon: BarChart3 },
+    { name: t("nav.campaigns"), href: "/dashboard/campaigns", icon: Mail },
+    { name: t("nav.analytics"), href: "/dashboard/analytics", icon: TrendingUp },
+    { name: t("nav.contacts"), href: "/dashboard/contacts", icon: Users },
+    { name: t("nav.settings"), href: "/dashboard/settings", icon: Settings },
   ];
 
   return (
@@ -117,11 +117,14 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
                   {navigation.map((item) => {
-                    const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                    const isActive = item.href === '/dashboard'
+                      ? pathname === item.href
+                      : (pathname === item.href || pathname.startsWith(item.href + '/'));
                     return (
                       <li key={item.name}>
                         <Link
                           href={item.href}
+                          aria-current={isActive ? "page" : undefined}
                           className={`
                             group flex gap-x-3 rounded-md p-3 text-sm font-medium transition-all
                             ${isActive
@@ -182,7 +185,9 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
               <li>
                 <ul role="list" className="-mx-2 space-y-1">
                   {navigation.map((item) => {
-                    const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                    const isActive = item.href === '/dashboard'
+                      ? pathname === item.href
+                      : (pathname === item.href || pathname.startsWith(item.href + '/'));
                     return (
                       <li key={item.name}>
                         <Link

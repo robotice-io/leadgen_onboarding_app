@@ -53,6 +53,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       changeType: emailsChange.changeType,
       icon: Mail,
       color: "blue" as const,
+      type: "count" as const,
     },
     {
       name: t("dashboard.opensToday"),
@@ -61,6 +62,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       changeType: opensChange.changeType,
       icon: Eye,
       color: "green" as const,
+      type: "count" as const,
     },
     {
       name: t("dashboard.openRate"),
@@ -69,6 +71,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       changeType: openRateChange.changeType,
       icon: TrendingUp,
       color: "purple" as const,
+      type: "rate" as const,
     },
     {
       name: t("dashboard.uniqueDevices"),
@@ -77,6 +80,7 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       changeType: devicesChange.changeType,
       icon: Users,
       color: "orange" as const,
+      type: "count" as const,
     },
   ];
 
@@ -85,21 +89,25 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
       bg: "bg-blue-50 dark:bg-blue-900/20",
       icon: "text-blue-600 dark:text-blue-400",
       border: "border-blue-200 dark:border-blue-800",
+      bar: "bg-blue-600 dark:bg-blue-400",
     },
     green: {
       bg: "bg-green-50 dark:bg-green-900/20",
       icon: "text-green-600 dark:text-green-400",
       border: "border-green-200 dark:border-green-800",
+      bar: "bg-green-600 dark:bg-green-400",
     },
     purple: {
       bg: "bg-purple-50 dark:bg-purple-900/20",
       icon: "text-purple-600 dark:text-purple-400",
       border: "border-purple-200 dark:border-purple-800",
+      bar: "bg-purple-600 dark:bg-purple-400",
     },
     orange: {
       bg: "bg-orange-50 dark:bg-orange-900/20",
       icon: "text-orange-600 dark:text-orange-400",
       border: "border-orange-200 dark:border-orange-800",
+      bar: "bg-orange-600 dark:bg-orange-400",
     },
   };
 
@@ -139,15 +147,17 @@ export function MetricsGrid({ stats }: MetricsGridProps) {
               </p>
             </div>
 
-            {/* Progress bar for visual appeal */}
-            <div className="mt-4">
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1">
-                <div 
-                  className={`h-1 rounded-full ${colors.icon.replace('text-', 'bg-')}`}
-                  style={{ width: `${Math.min(stats.open_rate_today * 100, 100)}%` }}
-                ></div>
+            {/* Progress bar: solo para Open Rate */}
+            {metric.type === 'rate' && (
+              <div className="mt-4">
+                <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-1">
+                  <div 
+                    className={`h-1 rounded-full ${colors.bar}`}
+                    style={{ width: `${Math.min(stats.open_rate_today * 100, 100)}%` }}
+                  ></div>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         );
       })}
