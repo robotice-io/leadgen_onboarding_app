@@ -50,14 +50,31 @@ async function proxy(req: NextRequest) {
     headers,
     body: req.method === "GET" || req.method === "HEAD" ? undefined : await req.text(),
   };
-  const res = await fetch(target, init);
-  const body = await res.arrayBuffer();
-  // Sanitize response headers to avoid forbidden/hop-by-hop headers issues
-  const resHeaders = new Headers(res.headers);
-  resHeaders.delete("content-length");
-  resHeaders.delete("transfer-encoding");
-  resHeaders.delete("content-encoding");
-  return new Response(body, { status: res.status, headers: resHeaders });
+
+  // Add a timeout to avoid hanging requests
+  const ac = new AbortController();
+  const timeout = setTimeout(() => ac.abort(), 15000);
+  try {
+    const res = await fetch(target, { ...init, signal: ac.signal });
+    const body = await res.arrayBuffer();
+    // Sanitize response headers to avoid forbidden/hop-by-hop headers issues
+    const resHeaders = new Headers(res.headers);
+    resHeaders.delete("content-length");
+    resHeaders.delete("transfer-encoding");
+    resHeaders.delete("content-encoding");
+    return new Response(body, { status: res.status, headers: resHeaders });
+  } catch (err: any) {
+    const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+    const payload = {
+      error: "Upstream fetch failed",
+      code: err?.name || "FETCH_ERROR",
+      message: isProd ? undefined : (err?.message || String(err)),
+      target: isProd ? undefined : target,
+    };
+    return new Response(JSON.stringify(payload), { status: 502, headers: { "content-type": "application/json" } });
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 export const GET = proxy;
