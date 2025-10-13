@@ -24,7 +24,13 @@ async function proxy(req: NextRequest) {
   headers.set("host", new URL(apiBase).host);
   
   // Always attach API key for every proxied request
-  headers.set("X-API-Key", getApiKey());
+  try {
+    headers.set("X-API-Key", getApiKey());
+  } catch (e) {
+    const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+    const message = isProd ? "Internal Server Error" : "Server misconfiguration: missing API_KEY on server";
+    return new Response(JSON.stringify({ error: message }), { status: 500, headers: { "content-type": "application/json" } });
+  }
   
   // If X-Tenant-ID not present, try to infer it from cookie set by the app
   const hasTenantHeader = headers.has("X-Tenant-ID") || headers.has("x-tenant-id");

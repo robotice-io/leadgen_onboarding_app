@@ -141,6 +141,7 @@ export async function login(email: string, password: string): Promise<AuthTokens
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
+      Accept: "application/json",
       ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
     },
     body: JSON.stringify({ email, password }),
@@ -199,6 +200,7 @@ export async function register(
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
+      Accept: "application/json",
       ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
     },
     body: JSON.stringify({ 
@@ -233,6 +235,7 @@ export async function verifyEmail(verificationCode: string): Promise<any> {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
+      Accept: "application/json",
       ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
     },
     body: JSON.stringify({ verification_code: verificationCode }),
@@ -262,6 +265,7 @@ export async function forgotPassword(email: string): Promise<any> {
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
+      Accept: "application/json",
       ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
     },
     body: JSON.stringify({ email }),
@@ -291,6 +295,7 @@ export async function resetPassword(token: string, newPassword: string): Promise
     method: "POST",
     headers: { 
       "Content-Type": "application/json",
+      Accept: "application/json",
       ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
     },
     body: JSON.stringify({ token, new_password: newPassword }),
