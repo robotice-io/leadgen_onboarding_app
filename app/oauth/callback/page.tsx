@@ -26,7 +26,10 @@ export default function OAuthCallbackPage() {
         if (!resCb.ok) throw new Error(await resCb.text());
         const data = await resCb.json();
         if (data?.status !== "ok") throw new Error("Invalid callback");
-        const resRefresh = await apiPost("/api/v1/oauth/refresh", {});
+  // Include tenant_id if available per API reference
+  const tenantId = (() => { try { return localStorage.getItem("robotice-tenant-id") || ""; } catch { return ""; } })();
+  const refreshPath = tenantId ? `/api/v1/oauth/refresh?tenant_id=${encodeURIComponent(tenantId)}` : "/api/v1/oauth/refresh";
+  const resRefresh = await apiPost(refreshPath, {});
         if (!resRefresh.ok && resRefresh.status !== 404) throw new Error(await resRefresh.text());
         setStatus("ok");
       } catch (e: unknown) {

@@ -29,14 +29,10 @@ function shouldUseProxy(): boolean {
 function getRequestUrl(path: string): string {
   const apiBase = getApiBaseUrl();
   const useProxy = shouldUseProxy();
-  
-  if (useProxy) {
-    // Use Next.js API proxy to avoid mixed content errors
-    return `/api/bridge${path}`;
-  } else {
-    // Direct connection to API
-    return `${apiBase}${path}`;
-  }
+  // For login, use dedicated server route to bypass generic proxy
+  if (path === "/api/v1/auth/login") return "/api/auth/login";
+  if (useProxy) return `/api/bridge${path}`;
+  return `${apiBase}${path}`;
 }
 
 function getTenantIdFromStorage(): string | null {
