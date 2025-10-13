@@ -1,8 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import dynamic from "next/dynamic";
-
-const LanguageToggle = dynamic(() => import("@/components/ui/LanguageToggle"), { ssr: false });
+import LanguageToggle from "@/components/ui/LanguageToggle";
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
