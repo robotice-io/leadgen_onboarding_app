@@ -6,8 +6,8 @@ export function getApiBaseUrl(): string {
     const v = (window as any).ENV_API_BASE_URL as string | undefined;
     if (v) return v;
   }
-  // Default to provided server IP
-  return "http://192.241.157.92:8000";
+  // Default to HTTPS backend URL
+  return "https://lead-gen.robotice.io";
 }
 
 // Get API key from public env (temporary for debugging)

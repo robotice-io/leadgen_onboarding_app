@@ -156,9 +156,10 @@ export async function login(email: string, password: string): Promise<AuthTokens
   removeTenant();
   
   const url = getRequestUrl("/api/v1/auth/login");
+  // Login endpoint does NOT require API key per backend specification
   const res = await fetch(url, {
     method: "POST",
-    headers: buildHeaders(true),
+    headers: buildHeaders(false), // No API key for login
     body: JSON.stringify({ email, password }),
   });
 

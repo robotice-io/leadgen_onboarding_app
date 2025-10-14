@@ -20,18 +20,8 @@ function json(data: any, status = 200) {
 export async function GET(req: NextRequest) {
   const base = getApiBase();
 
-  // Tenant ID puede venir por query, header o cookie
-  const url = new URL(req.url);
-  const qTenant = url.searchParams.get("tenant_id");
-  const hTenant = req.headers.get("x-tenant-id") || req.headers.get("X-Tenant-ID");
-  const cTenant = req.cookies.get("robotice-tenant-id")?.value;
-  const tenantId = qTenant || hTenant || cTenant;
-
-  if (!tenantId) {
-    return json({ status: "error", error: "Missing tenant_id (query/header/cookie)" }, 400);
-  }
-
-  const target = `${base}/api/v1/dashboard/${encodeURIComponent(String(tenantId))}/health`;
+  // Health check no requiere tenant_id, es un endpoint global
+  const target = `${base}/healthz`;
 
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 10000);
