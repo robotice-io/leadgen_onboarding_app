@@ -46,7 +46,7 @@ const cards = [
 export function HowItWorks() {
   const { t } = useI18n();
   return (
-    <section className="relative py-24 md:py-32 bg-gradient-to-b from-[#0f172a] to-[#111827] overflow-hidden">
+    <section id="como-funciona" className="relative py-24 md:py-32 bg-gradient-to-b from-[#0f172a] to-[#111827] overflow-hidden">
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_20%_10%,rgba(59,130,246,0.15),transparent_60%)]" />
       <div className="container mx-auto px-6 relative">
         <motion.div
