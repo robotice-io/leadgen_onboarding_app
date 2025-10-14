@@ -10,32 +10,30 @@ export function getApiBaseUrl(): string {
   return "http://192.241.157.92:8000";
 }
 
-// Server-only: API key debe permanecer privada
-function getServerApiKey(): string {
-  const key = typeof process !== "undefined" ? process.env.API_KEY : undefined;
-  return key ? String(key) : "";
-}
-
-// En cliente siempre usamos el proxy de Next para no exponer la API key
-function shouldProxyToNext(): boolean {
-  return typeof window !== "undefined";
+// Get API key from public env (temporary for debugging)
+function getApiKey(): string {
+  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_KEY) {
+    return String(process.env.NEXT_PUBLIC_API_KEY);
+  }
+  if (typeof window !== "undefined" && (window as any).ENV_API_KEY) {
+    return String((window as any).ENV_API_KEY);
+  }
+  return "";
 }
 
 export async function apiGet(path: string, init?: RequestInit): Promise<Response> {
   const base = getApiBaseUrl().replace(/\/$/, "");
-  const useProxy = shouldProxyToNext();
   const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
-  const url = useProxy ? `/api/bridge${fullPath}` : `${base}${fullPath}`;
+  const url = `${base}${fullPath}`;
   
   const headers: Record<string, string> = {
     ...(init?.headers as Record<string, string> || {}),
     Accept: "application/json",
   };
 
-  // Sólo en servidor adjuntamos la API key
-  if (!useProxy) {
-    const k = getServerApiKey();
-    if (k) headers["X-API-Key"] = k;
+  const apiKey = getApiKey();
+  if (apiKey) {
+    headers["X-API-Key"] = apiKey;
   }
   
   return fetch(url, { 
@@ -47,9 +45,8 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
 
 export async function apiPost(path: string, body: unknown, init?: RequestInit): Promise<Response> {
   const base = getApiBaseUrl().replace(/\/$/, "");
-  const useProxy = shouldProxyToNext();
   const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
-  const url = useProxy ? `/api/bridge${fullPath}` : `${base}${fullPath}`;
+  const url = `${base}${fullPath}`;
   
   const headers: Record<string, string> = {
     "Content-Type": "application/json", 
@@ -57,10 +54,9 @@ export async function apiPost(path: string, body: unknown, init?: RequestInit): 
     ...(init?.headers as Record<string, string> || {})
   };
 
-  // Sólo en servidor adjuntamos la API key
-  if (!useProxy) {
-    const k = getServerApiKey();
-    if (k) headers["X-API-Key"] = k;
+  const apiKey = getApiKey();
+  if (apiKey) {
+    headers["X-API-Key"] = apiKey;
   }
   
   return fetch(url, {

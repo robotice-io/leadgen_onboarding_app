@@ -19,25 +19,48 @@ const USER_KEY = "robotice_user";
 const REFRESH_TOKEN_KEY = "robotice_refresh_token";
 const TENANT_KEY = "robotice_tenant";
 
-// Check if we need to proxy requests through Next.js API routes
-function shouldUseProxy(): boolean {
-  // Siempre proxiar desde el cliente para no exponer la API key
-  return typeof window !== "undefined";
-}
-
-// Get the correct URL (either direct or through proxy)
+// Get the correct URL (direct to backend)
 function getRequestUrl(path: string): string {
   const apiBase = getApiBaseUrl();
-  const useProxy = shouldUseProxy();
-  // For login, use dedicated server route to bypass generic proxy
-  if (path === "/api/v1/auth/login") return "/api/auth/login";
-  if (useProxy) return `/api/bridge${path}`;
   return `${apiBase}${path}`;
 }
 
 function getTenantIdFromStorage(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("robotice-tenant-id");
+}
+
+// Get API key from public env (temporary for debugging)
+function getApiKey(): string {
+  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_KEY) {
+    return String(process.env.NEXT_PUBLIC_API_KEY);
+  }
+  if (typeof window !== "undefined" && (window as any).ENV_API_KEY) {
+    return String((window as any).ENV_API_KEY);
+  }
+  return "";
+}
+
+// Helper to build headers with API key and tenant
+function buildHeaders(includeApiKey = true): Record<string, string> {
+  const headers: Record<string, string> = {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  };
+  
+  const tenantId = getTenantIdFromStorage();
+  if (tenantId) {
+    headers["X-Tenant-ID"] = String(tenantId);
+  }
+  
+  if (includeApiKey) {
+    const apiKey = getApiKey();
+    if (apiKey) {
+      headers["X-API-Key"] = apiKey;
+    }
+  }
+  
+  return headers;
 }
 
 export function getToken(): string | null {
@@ -135,11 +158,7 @@ export async function login(email: string, password: string): Promise<AuthTokens
   const url = getRequestUrl("/api/v1/auth/login");
   const res = await fetch(url, {
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
-    },
+    headers: buildHeaders(true),
     body: JSON.stringify({ email, password }),
   });
 
@@ -194,11 +213,7 @@ export async function register(
   const url = getRequestUrl("/api/v1/auth/register");
   const res = await fetch(url, {
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
-    },
+    headers: buildHeaders(true),
     body: JSON.stringify({ 
       email, 
       password,
@@ -229,11 +244,7 @@ export async function verifyEmail(verificationCode: string): Promise<any> {
   const url = getRequestUrl("/api/v1/auth/verify-email");
   const res = await fetch(url, {
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
-    },
+    headers: buildHeaders(true),
     body: JSON.stringify({ verification_code: verificationCode }),
   });
 
@@ -259,11 +270,7 @@ export async function forgotPassword(email: string): Promise<any> {
   const url = getRequestUrl("/api/v1/auth/forgot-password");
   const res = await fetch(url, {
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
-    },
+    headers: buildHeaders(true),
     body: JSON.stringify({ email }),
   });
 
@@ -289,11 +296,7 @@ export async function resetPassword(token: string, newPassword: string): Promise
   const url = getRequestUrl("/api/v1/auth/reset-password");
   const res = await fetch(url, {
     method: "POST",
-    headers: { 
-      "Content-Type": "application/json",
-      Accept: "application/json",
-      ...(getTenantIdFromStorage() ? { "X-Tenant-ID": String(getTenantIdFromStorage()) } : {}),
-    },
+    headers: buildHeaders(true),
     body: JSON.stringify({ token, new_password: newPassword }),
   });
 

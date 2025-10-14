@@ -1,7 +1,10 @@
 # 🔒 Environment Variables Setup
 
+## **⚠️ TEMPORARY DEBUGGING MODE**
+This configuration exposes the API key to the client for debugging purposes only. This is a temporary measure to isolate connectivity issues.
+
 ## **Security Notice**
-API keys and sensitive configuration should NEVER be hardcoded in the application. This guide shows how to properly configure environment variables.
+**IMPORTANT**: The current configuration exposes the API key in the browser. This should be reverted to server-side only after debugging is complete.
 
 ## **Setup Instructions**
 
@@ -18,8 +21,9 @@ Edit `.env.local` with your actual values:
 ```env
 # Backend API Configuration
 NEXT_PUBLIC_API_BASE_URL=http://192.241.157.92:8000
-# Server-side only (do NOT prefix with NEXT_PUBLIC_)
-API_KEY=your-actual-api-key-here
+
+# API Key - TEMPORARY: exposed to client for debugging
+NEXT_PUBLIC_API_KEY=your-actual-api-key-here
 
 # App Configuration
 NEXT_PUBLIC_APP_BASE_URL=http://localhost:3000
