@@ -26,37 +26,67 @@ export default function DashboardPage() {
     queryFn: async () => {
       if (!tenantId) throw new Error('No tenant ID available');
       
-      
-      // Fetch both current and previous day stats for comparison
-      const [currentRes, previousRes] = await Promise.all([
-        apiGet(`/api/v1/dashboard/${tenantId}/quick-stats`),
-        apiGet(`/api/v1/dashboard/${tenantId}/quick-stats?period=yesterday`)
-      ]);
-      
-      if (!currentRes.ok) {
-        const errorText = await currentRes.text();
-        throw new Error(`Failed to fetch current stats: ${errorText}`);
+      try {
+        // Fetch both current and previous day stats for comparison
+        const [currentRes, previousRes] = await Promise.all([
+          apiGet(`/api/v1/dashboard/${tenantId}/quick-stats`),
+          apiGet(`/api/v1/dashboard/${tenantId}/quick-stats?period=yesterday`)
+        ]);
+        
+        if (!currentRes.ok) {
+          const errorText = await currentRes.text();
+          console.error('Dashboard stats error:', errorText);
+          // Return empty stats instead of throwing
+          return {
+            emails_sent_today: 0,
+            opens_today: 0,
+            open_rate_today: 0,
+            unique_devices_today: 0,
+            last_updated: new Date().toISOString(),
+            previous: null
+          };
+        }
+        
+        const currentStats = await currentRes.json();
+        
+        let previousStats = null;
+        
+        // Try to get previous day stats (optional - if not available, we'll show no change)
+        if (previousRes.ok) {
+          try {
+            previousStats = await previousRes.json();
+          } catch (e) {
+            console.warn('Could not parse previous stats:', e);
+          }
+        }
+        
+        const result = {
+          emails_sent_today: currentStats.emails_sent_today ?? 0,
+          opens_today: currentStats.opens_today ?? 0,
+          open_rate_today: currentStats.open_rate_today ?? 0,
+          unique_devices_today: currentStats.unique_devices_today ?? 0,
+          last_updated: currentStats.last_updated ?? new Date().toISOString(),
+          previous: previousStats
+        };
+        
+        return result;
+      } catch (error) {
+        console.error('Failed to fetch dashboard stats:', error);
+        // Return empty stats instead of throwing
+        return {
+          emails_sent_today: 0,
+          opens_today: 0,
+          open_rate_today: 0,
+          unique_devices_today: 0,
+          last_updated: new Date().toISOString(),
+          previous: null
+        };
       }
-      
-      const currentStats = await currentRes.json();
-      
-      let previousStats = null;
-      
-      // Try to get previous day stats (optional - if not available, we'll show no change)
-      if (previousRes.ok) {
-        previousStats = await previousRes.json();
-      }
-      
-      const result = {
-        ...currentStats,
-        previous: previousStats
-      };
-      
-      return result;
     },
     refetchInterval: 15000, // Poll every 15 seconds
     refetchIntervalInBackground: false,
     enabled: !!tenantId, // Only run if tenantId is available
+    retry: 1, // Only retry once
   });
 
   // Fetch recent emails
@@ -65,23 +95,45 @@ export default function DashboardPage() {
     queryFn: async () => {
       if (!tenantId) throw new Error('No tenant ID available');
       
-      
-      const res = await apiGet(`/api/v1/dashboard/${tenantId}/recent-emails?limit=10`);
-      
-      if (!res.ok) {
-        const errorText = await res.text();
-        throw new Error(`Failed to fetch emails: ${errorText}`);
+      try {
+        const res = await apiGet(`/api/v1/dashboard/${tenantId}/recent-emails?limit=10`);
+        
+        if (!res.ok) {
+          const errorText = await res.text();
+          console.error('Recent emails error:', errorText);
+          return []; // Return empty array instead of throwing
+        }
+        
+        const data = await res.json();
+        
+        const emails = data.recent_emails || [];
+        
+        return emails;
+      } catch (error) {
+        console.error('Failed to fetch recent emails:', error);
+        return []; // Return empty array on error
       }
-      
-      const data = await res.json();
-      
-      const emails = data.recent_emails || [];
-      
-      return emails;
     },
     refetchInterval: 30000, // Poll every 30 seconds
     enabled: !!tenantId, // Only run if tenantId is available
+    retry: 1, // Only retry once
   });
+
+  if (!tenantId) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">
+          <div className="text-yellow-500 mb-2">⚠️</div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+            {t("dashboard.noTenantId")}
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400">
+            {t("dashboard.pleaseLogin")}
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   if (statsError) {
     return (
@@ -92,7 +144,7 @@ export default function DashboardPage() {
             {t("dashboard.failedToLoad")}
           </h3>
           <p className="text-gray-500 dark:text-gray-400">
-            {t("dashboard.checkConnection")}
+            {statsError instanceof Error ? statsError.message : t("dashboard.checkConnection")}
           </p>
         </div>
       </div>
@@ -125,7 +177,25 @@ export default function DashboardPage() {
           ))}
         </div>
       ) : stats ? (
-        <MetricsGrid stats={stats} />
+        <>
+          <MetricsGrid stats={stats} />
+          {/* Show helpful message if no data */}
+          {stats.emails_sent_today === 0 && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-xl p-4">
+              <div className="flex items-start gap-3">
+                <div className="text-blue-600 dark:text-blue-400 text-xl">💡</div>
+                <div>
+                  <h4 className="text-sm font-medium text-blue-900 dark:text-blue-100 mb-1">
+                    {t("dashboard.noDataYet")}
+                  </h4>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
+                    {t("dashboard.sendFirstEmail")}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </>
       ) : null}
 
       {/* Charts Section */}

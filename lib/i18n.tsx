@@ -143,6 +143,10 @@ const ES: Dictionary = {
   "dashboard.signOut": "Cerrar sesión",
   "dashboard.failedToLoad": "Error al cargar el panel de control",
   "dashboard.checkConnection": "Por favor verifica tu conexión e inténtalo de nuevo",
+  "dashboard.noTenantId": "No se encontró ID de tenant",
+  "dashboard.pleaseLogin": "Por favor inicia sesión nuevamente",
+  "dashboard.noDataYet": "Aún no hay datos para mostrar",
+  "dashboard.sendFirstEmail": "Envía tu primer correo para empezar a ver estadísticas aquí",
   
   // Settings translations
   "settings.title": "Configuración",
@@ -338,6 +342,10 @@ const EN: Dictionary = {
   "dashboard.signOut": "Sign out",
   "dashboard.failedToLoad": "Failed to load dashboard",
   "dashboard.checkConnection": "Please check your connection and try again",
+  "dashboard.noTenantId": "No tenant ID found",
+  "dashboard.pleaseLogin": "Please log in again",
+  "dashboard.noDataYet": "No data to display yet",
+  "dashboard.sendFirstEmail": "Send your first email to start seeing stats here",
   
   // Settings translations
   "settings.title": "Settings",

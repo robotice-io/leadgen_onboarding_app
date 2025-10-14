@@ -78,13 +78,13 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
       <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
         <div className="flex grow flex-col gap-y-3 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 px-6 py-4">
           {/* Logo */}
-          <div className="flex h-24 shrink-0 items-center justify-center">
+          <div className="flex h-16 shrink-0 items-center justify-center py-2">
             <Link href="/" className="flex items-center justify-center">
               <Image
                 src="/landing_logo.png"
                 alt="Robotice"
-                width={140}
-                height={90}
+                width={120}
+                height={40}
                 className="rounded-lg hover:opacity-80 transition-opacity object-contain"
               />
             </Link>
