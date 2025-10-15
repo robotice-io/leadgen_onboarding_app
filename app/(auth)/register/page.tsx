@@ -8,8 +8,10 @@ import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { register } from "@/lib/auth-client";
+import { useI18n } from "@/lib/i18n";
 
 export default function RegisterPage() {
+  const { t } = useI18n();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -31,11 +33,11 @@ export default function RegisterPage() {
     const newErrors: Record<string, string> = {};
     
     if (password.length < 8) {
-      newErrors.password = "Password must be at least 8 characters";
+      newErrors.password = t("register.error.passwordMin" as any);
     }
     
     if (password !== confirmPassword) {
-      newErrors.confirmPassword = "Passwords do not match";
+      newErrors.confirmPassword = t("register.error.passwordsMismatch" as any);
     }
 
     if (Object.keys(newErrors).length > 0) {
@@ -48,7 +50,7 @@ export default function RegisterPage() {
       const response = await register(email, password, firstName, lastName);
       
       setToast({ 
-        message: response.message || "Registration successful! Please check your email to verify your account.", 
+        message: response.message || t("register.success" as any), 
         type: "success" 
       });
       
@@ -57,7 +59,7 @@ export default function RegisterPage() {
       }, 2000);
     } catch (err) {
       setToast({
-        message: err instanceof Error ? err.message : "Registration failed",
+        message: err instanceof Error ? err.message : t("register.failed" as any),
         type: "error"
       });
     } finally {
@@ -69,10 +71,8 @@ export default function RegisterPage() {
     <>
       <Card>
         <CardHeader>
-          <h1 className="text-2xl font-semibold text-center mb-2">Create Account</h1>
-          <p className="text-sm text-black/60 dark:text-white/70 text-center">
-            Get started with Robotice LeadGen
-          </p>
+          <h1 className="text-2xl font-semibold text-center mb-2">{t("register.title" as any)}</h1>
+          <p className="text-sm text-black/60 dark:text-white/70 text-center">{t("register.subtitle" as any)}</p>
         </CardHeader>
 
         <CardBody>
@@ -81,15 +81,15 @@ export default function RegisterPage() {
               <Input
                 name="firstName"
                 type="text"
-                label="First Name"
-                placeholder="John"
+                label={t("register.firstName" as any)}
+                placeholder={t("register.firstName.placeholder" as any)}
                 autoComplete="given-name"
               />
               <Input
                 name="lastName"
                 type="text"
-                label="Last Name"
-                placeholder="Doe"
+                label={t("register.lastName" as any)}
+                placeholder={t("register.lastName.placeholder" as any)}
                 autoComplete="family-name"
               />
             </div>
@@ -97,8 +97,8 @@ export default function RegisterPage() {
             <Input
               name="email"
               type="email"
-              label="Email Address"
-              placeholder="your.email@company.com"
+              label={t("emailAddress" as any)}
+              placeholder={t("login.emailPlaceholder" as any)}
               required
               autoComplete="email"
               error={errors.email}
@@ -107,18 +107,18 @@ export default function RegisterPage() {
             <Input
               name="password"
               type="password"
-              label="Password"
+              label={t("register.password" as any)}
               placeholder="••••••••"
               required
               autoComplete="new-password"
               error={errors.password}
-              helperText="At least 8 characters"
+              helperText={t("register.password.helper" as any)}
             />
 
             <Input
               name="confirmPassword"
               type="password"
-              label="Confirm Password"
+              label={t("register.confirmPassword" as any)}
               placeholder="••••••••"
               required
               autoComplete="new-password"
@@ -133,28 +133,28 @@ export default function RegisterPage() {
                 className="mt-1 h-4 w-4 rounded border-black/25 dark:border-white/25 accent-blue-600"
               />
               <label className="text-sm text-black/70 dark:text-white/70">
-                I agree to the{" "}
+                {t("register.terms.text" as any)}{" "}
                 <Link href="/terms" className="text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                  Terms of Service
+                  {t("register.terms.ofService" as any)}
                 </Link>{" "}
-                and{" "}
+                {t("register.terms.and" as any)}{" "}
                 <Link href="/privacy" className="text-blue-600 hover:text-blue-700 dark:text-blue-400">
-                  Privacy Policy
+                  {t("register.terms.privacy" as any)}
                 </Link>
               </label>
             </div>
 
             <Button type="submit" fullWidth loading={loading}>
-              Create Account
+              {t("register.cta" as any)}
             </Button>
           </form>
         </CardBody>
 
         <CardFooter>
           <p className="text-sm text-center text-black/60 dark:text-white/70">
-            Already have an account?{" "}
+            {t("register.haveAccount" as any)}{" "}
             <Link href="/login" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
-              Sign in
+              {t("register.signIn" as any)}
             </Link>
           </p>
         </CardFooter>

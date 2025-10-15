@@ -20,9 +20,13 @@ const REFRESH_TOKEN_KEY = "robotice_refresh_token";
 const TENANT_KEY = "robotice_tenant";
 
 // Get the correct URL (direct to backend)
-function getRequestUrl(path: string): string {
+function getRequestUrl(path: string, preferProxy = false): string {
   const apiBase = getApiBaseUrl();
-  return `${apiBase}${path}`;
+  const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
+  const k = getApiKey();
+  // If preferProxy or no public API key, route through server proxy which injects X-API-Key
+  if (preferProxy || !k) return `/api/bridge${fullPath}`;
+  return `${apiBase}${fullPath}`;
 }
 
 function getTenantIdFromStorage(): string | null {
@@ -55,9 +59,7 @@ function buildHeaders(includeApiKey = true): Record<string, string> {
   
   if (includeApiKey) {
     const apiKey = getApiKey();
-    if (apiKey) {
-      headers["X-API-Key"] = apiKey;
-    }
+    if (apiKey) headers["X-API-Key"] = apiKey;
   }
   
   return headers;
@@ -211,7 +213,8 @@ export async function register(
   firstName?: string,
   lastName?: string
 ): Promise<any> {
-  const url = getRequestUrl("/api/v1/auth/register");
+  // Force proxy for register to ensure server API key is used
+  const url = getRequestUrl("/api/v1/auth/register", true);
   const res = await fetch(url, {
     method: "POST",
     headers: buildHeaders(true),
@@ -242,7 +245,8 @@ export async function register(
 }
 
 export async function verifyEmail(verificationCode: string): Promise<any> {
-  const url = getRequestUrl("/api/v1/auth/verify-email");
+  // Force proxy for verify-email to ensure server API key is used
+  const url = getRequestUrl("/api/v1/auth/verify-email", true);
   const res = await fetch(url, {
     method: "POST",
     headers: buildHeaders(true),
@@ -268,7 +272,8 @@ export async function verifyEmail(verificationCode: string): Promise<any> {
 }
 
 export async function forgotPassword(email: string): Promise<any> {
-  const url = getRequestUrl("/api/v1/auth/forgot-password");
+  // Force proxy for forgot-password to ensure server API key is used
+  const url = getRequestUrl("/api/v1/auth/forgot-password", true);
   const res = await fetch(url, {
     method: "POST",
     headers: buildHeaders(true),
@@ -294,7 +299,8 @@ export async function forgotPassword(email: string): Promise<any> {
 }
 
 export async function resetPassword(token: string, newPassword: string): Promise<any> {
-  const url = getRequestUrl("/api/v1/auth/reset-password");
+  // Force proxy for reset-password to ensure server API key is used
+  const url = getRequestUrl("/api/v1/auth/reset-password", true);
   const res = await fetch(url, {
     method: "POST",
     headers: buildHeaders(true),

@@ -24,17 +24,14 @@ function getApiKey(): string {
 export async function apiGet(path: string, init?: RequestInit): Promise<Response> {
   const base = getApiBaseUrl().replace(/\/$/, "");
   const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
-  const url = `${base}${fullPath}`;
+  const apiKey = getApiKey();
+  const url = apiKey ? `${base}${fullPath}` : `/api/bridge${fullPath}`;
   
   const headers: Record<string, string> = {
     ...(init?.headers as Record<string, string> || {}),
     Accept: "application/json",
   };
-
-  const apiKey = getApiKey();
-  if (apiKey) {
-    headers["X-API-Key"] = apiKey;
-  }
+  if (apiKey) headers["X-API-Key"] = apiKey;
   
   return fetch(url, { 
     ...init, 
@@ -46,18 +43,15 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
 export async function apiPost(path: string, body: unknown, init?: RequestInit): Promise<Response> {
   const base = getApiBaseUrl().replace(/\/$/, "");
   const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
-  const url = `${base}${fullPath}`;
+  const apiKey = getApiKey();
+  const url = apiKey ? `${base}${fullPath}` : `/api/bridge${fullPath}`;
   
   const headers: Record<string, string> = {
-    "Content-Type": "application/json", 
-    Accept: "application/json", 
+    "Content-Type": "application/json",
+    Accept: "application/json",
     ...(init?.headers as Record<string, string> || {})
   };
-
-  const apiKey = getApiKey();
-  if (apiKey) {
-    headers["X-API-Key"] = apiKey;
-  }
+  if (apiKey) headers["X-API-Key"] = apiKey;
   
   return fetch(url, {
     ...init,

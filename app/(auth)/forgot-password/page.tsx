@@ -8,8 +8,10 @@ import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { KeyRound } from "lucide-react";
 import { forgotPassword } from "@/lib/auth-client";
+import { useI18n } from "@/lib/i18n";
 
 export default function ForgotPasswordPage() {
+  const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
@@ -26,12 +28,12 @@ export default function ForgotPasswordPage() {
       
       setSubmitted(true);
       setToast({ 
-        message: response.message || "Password reset link sent!", 
+        message: response.message || t("forgot.success" as any), 
         type: "success" 
       });
     } catch (err) {
       setToast({ 
-        message: err instanceof Error ? err.message : "Failed to send reset link", 
+        message: err instanceof Error ? err.message : t("forgot.failed" as any), 
         type: "error" 
       });
     } finally {
@@ -48,16 +50,14 @@ export default function ForgotPasswordPage() {
               <KeyRound className="h-8 w-8 text-green-600" />
             </div>
           </div>
-          <h1 className="text-2xl font-semibold text-center mb-2">Check Your Email</h1>
-          <p className="text-sm text-black/60 dark:text-white/70 text-center">
-            We've sent password reset instructions to your email
-          </p>
+          <h1 className="text-2xl font-semibold text-center mb-2">{t("forgot.sent.title" as any)}</h1>
+          <p className="text-sm text-black/60 dark:text-white/70 text-center">{t("forgot.sent.subtitle" as any)}</p>
         </CardHeader>
 
         <CardFooter>
           <p className="text-sm text-center text-black/60 dark:text-white/70">
             <Link href="/login" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
-              Back to Sign In
+              {t("forgot.backToSignIn" as any)}
             </Link>
           </p>
         </CardFooter>
@@ -69,10 +69,8 @@ export default function ForgotPasswordPage() {
     <>
       <Card>
         <CardHeader>
-          <h1 className="text-2xl font-semibold text-center mb-2">Reset Password</h1>
-          <p className="text-sm text-black/60 dark:text-white/70 text-center">
-            Enter your email and we'll send you a reset link
-          </p>
+          <h1 className="text-2xl font-semibold text-center mb-2">{t("forgot.title" as any)}</h1>
+          <p className="text-sm text-black/60 dark:text-white/70 text-center">{t("forgot.subtitle" as any)}</p>
         </CardHeader>
 
         <CardBody>
@@ -80,23 +78,23 @@ export default function ForgotPasswordPage() {
             <Input
               name="email"
               type="email"
-              label="Email Address"
-              placeholder="your.email@company.com"
+              label={t("forgot.email.label" as any)}
+              placeholder={t("forgot.email.placeholder" as any)}
               required
               autoComplete="email"
             />
 
             <Button type="submit" fullWidth loading={loading}>
-              Send Reset Link
+              {t("forgot.cta" as any)}
             </Button>
           </form>
         </CardBody>
 
         <CardFooter>
           <p className="text-sm text-center text-black/60 dark:text-white/70">
-            Remember your password?{" "}
+            {t("forgot.remember" as any)}{" "}
             <Link href="/login" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
-              Sign in
+              {t("register.signIn" as any)}
             </Link>
           </p>
         </CardFooter>
