@@ -252,10 +252,11 @@ export function GrowthWizard() {
     return (
       <motion.div
         key={step}
-        initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
         transition={{ type: "spring", stiffness: 260, damping: 24 }}
+        className="absolute inset-0"
         role="group"
         aria-label={t(q.title as any)}
       >
@@ -277,7 +278,11 @@ export function GrowthWizard() {
                 setSelectedIdx(i);
                 // Micro vibración en móviles si está disponible
                 try { if (navigator.vibrate) navigator.vibrate(8); } catch {}
-                setTimeout(() => handleAnswer(opt.value), 170);
+                setTimeout(() => {
+                  handleAnswer(opt.value);
+                  // limpiar seleccionado para evitar animación fantasma al render del siguiente paso
+                  setSelectedIdx(null);
+                }, 140);
               }}
               whileHover={{ scale: 1.01 }}
               whileTap={{ scale: 0.995 }}
@@ -319,11 +324,11 @@ export function GrowthWizard() {
     return (
       <motion.div
         key="result"
-        initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
-        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-        exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={{ opacity: 0, y: -10 }}
         transition={{ type: "spring", stiffness: 240, damping: 22 }}
-        className="text-center"
+        className="text-center absolute inset-0"
       >
         <div className="flex items-center justify-center gap-2 mb-3">
           <Icon className={`w-7 h-7 ${COLOR_MAP[plan.color].text}`} />
@@ -373,8 +378,8 @@ export function GrowthWizard() {
           <Stepper />
           <div className="relative overflow-hidden mt-6">
             {/* Card estática con altura estable; respeta reduce motion por defecto de framer */}
-            <div className="bg-slate-800/30 border border-slate-700/40 rounded-2xl p-8 md:p-10 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] min-h-[380px]">
-              <AnimatePresence mode="wait" initial={false}>
+            <div className="relative bg-slate-800/30 border border-slate-700/40 rounded-2xl p-8 md:p-10 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] min-h-[380px]">
+              <AnimatePresence mode="sync" initial={false}>
                 {result ? <ResultContent /> : <QuestionContent />}
               </AnimatePresence>
             </div>
