@@ -10,49 +10,45 @@ export function getApiBaseUrl(): string {
   return "https://lead-gen-service.robotice.io";
 }
 
-// Get API key from public env (temporary for debugging)
-function getApiKey(): string {
-  if (typeof process !== "undefined" && process.env.NEXT_PUBLIC_API_KEY) {
-    return String(process.env.NEXT_PUBLIC_API_KEY);
+function getTenantIdFromStorage(): string | null {
+  if (typeof window === "undefined") return null;
+  try {
+    return localStorage.getItem("robotice-tenant-id");
+  } catch {
+    return null;
   }
-  if (typeof window !== "undefined" && (window as any).ENV_API_KEY) {
-    return String((window as any).ENV_API_KEY);
-  }
-  return "";
 }
 
 export async function apiGet(path: string, init?: RequestInit): Promise<Response> {
-  const base = getApiBaseUrl().replace(/\/$/, "");
   const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
-  const apiKey = getApiKey();
-  const url = apiKey ? `${base}${fullPath}` : `/api/bridge${fullPath}`;
-  
+  const url = `/api/bridge${fullPath}`;
+
   const headers: Record<string, string> = {
-    ...(init?.headers as Record<string, string> || {}),
     Accept: "application/json",
+    ...(init?.headers as Record<string, string> || {}),
   };
-  if (apiKey) headers["X-API-Key"] = apiKey;
-  
-  return fetch(url, { 
-    ...init, 
-    method: "GET", 
-    headers
+  const tenantId = getTenantIdFromStorage();
+  if (tenantId && !headers["X-Tenant-ID"]) headers["X-Tenant-ID"] = String(tenantId);
+
+  return fetch(url, {
+    ...init,
+    method: "GET",
+    headers,
   });
 }
 
 export async function apiPost(path: string, body: unknown, init?: RequestInit): Promise<Response> {
-  const base = getApiBaseUrl().replace(/\/$/, "");
   const fullPath = path.startsWith('/api/v1') ? path : `/api/v1${path}`;
-  const apiKey = getApiKey();
-  const url = apiKey ? `${base}${fullPath}` : `/api/bridge${fullPath}`;
-  
+  const url = `/api/bridge${fullPath}`;
+
   const headers: Record<string, string> = {
     "Content-Type": "application/json",
     Accept: "application/json",
-    ...(init?.headers as Record<string, string> || {})
+    ...(init?.headers as Record<string, string> || {}),
   };
-  if (apiKey) headers["X-API-Key"] = apiKey;
-  
+  const tenantId = getTenantIdFromStorage();
+  if (tenantId && !headers["X-Tenant-ID"]) headers["X-Tenant-ID"] = String(tenantId);
+
   return fetch(url, {
     ...init,
     method: "POST",
