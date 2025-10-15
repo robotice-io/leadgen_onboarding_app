@@ -2,7 +2,7 @@
 
 ## 🔐 **Authentication & Authorization**
 
-### **Base URL**: `http://192.241.157.92:8000/api/v1`
+### **Base URL**: `https://lead-gen-service.robotice.io/api/v1`
 
 ### **API Key Format**: `lk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` (Set via server-side `API_KEY` environment variable)
 
@@ -347,7 +347,7 @@ Content-Type: application/json
 1. **API Key Format**: Always starts with `lk_` followed by 64-character hash
 2. **Tenant ID**: Required for multi-tenant endpoints via `X-Tenant-ID` header
 3. **Content-Type**: Always use `application/json` for JSON requests
-4. **Base URL**: `http://192.241.157.92:8000/api/v1`
+4. **Base URL**: `https://lead-gen-service.robotice.io/api/v1`
 5. **Rate Limiting**: No explicit rate limits implemented
 6. **CORS**: Configured for frontend domains
 7. **Error Responses**: Standard HTTP status codes with JSON error details

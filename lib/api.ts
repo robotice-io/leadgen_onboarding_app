@@ -7,7 +7,7 @@ export function getApiBaseUrl(): string {
     if (v) return v;
   }
   // Default to HTTPS backend URL
-  return "https://lead-gen.robotice.io";
+  return "https://lead-gen-service.robotice.io";
 }
 
 // Get API key from public env (temporary for debugging)

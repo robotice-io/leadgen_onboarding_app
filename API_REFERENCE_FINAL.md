@@ -489,7 +489,7 @@ X-API-Key: your_api_key_here
 ## Base URL
 
 ```
-https://lead-gen.robotice.io
+https://lead-gen-service.robotice.io
 ```
 
 **Note:** The API is now accessible via HTTPS with SSL certificate. HTTP requests will automatically redirect to HTTPS.
@@ -497,7 +497,7 @@ https://lead-gen.robotice.io
 ## HTTPS & SSL Configuration
 
 ### SSL Certificate
-- **Domain**: lead-gen.robotice.io
+- **Domain**: lead-gen-service.robotice.io
 - **Certificate Authority**: Let's Encrypt
 - **Expiry**: 2026-01-11 (auto-renewal enabled)
 - **Protocols**: TLS 1.2, TLS 1.3
@@ -512,10 +512,10 @@ https://lead-gen.robotice.io
 ### Testing SSL
 ```bash
 # Test SSL certificate
-openssl s_client -connect lead-gen.robotice.io:443 -servername lead-gen.robotice.io
+openssl s_client -connect lead-gen-service.robotice.io:443 -servername lead-gen-service.robotice.io
 
 # Test HTTPS endpoint
-curl -I https://lead-gen.robotice.io/healthz
+curl -I https://lead-gen-service.robotice.io/healthz
 ```
 
 ## Rate Limits
@@ -529,20 +529,20 @@ curl -I https://lead-gen.robotice.io/healthz
 Update your frontend API base URL from:
 ```javascript
 // OLD
-const API_BASE_URL = 'http://192.241.157.92:8000';
+const API_BASE_URL = 'https://lead-gen-service.robotice.io';
 
 // NEW
-const API_BASE_URL = 'https://lead-gen.robotice.io';
+const API_BASE_URL = 'https://lead-gen-service.robotice.io';
 ```
 
 ### Environment Variables
 Update environment variables:
 ```bash
 # OLD
-NEXT_PUBLIC_API_BASE_URL=http://192.241.157.92:8000
+NEXT_PUBLIC_API_BASE_URL=https://lead-gen-service.robotice.io
 
 # NEW
-NEXT_PUBLIC_API_BASE_URL=https://lead-gen.robotice.io
+NEXT_PUBLIC_API_BASE_URL=https://lead-gen-service.robotice.io
 ```
 
 ## Known Issues
@@ -569,7 +569,7 @@ NEXT_PUBLIC_API_BASE_URL=https://lead-gen.robotice.io
 
 ### Base URL
 ```
-https://lead-gen.robotice.io
+https://lead-gen-service.robotice.io
 ```
 
 ### Authentication Headers
@@ -594,12 +594,12 @@ X-Tenant-ID: your_tenant_id
 ### Test Commands
 ```bash
 # Test HTTPS endpoint (login - no API key required)
-curl -X POST "https://lead-gen.robotice.io/api/v1/auth/login" \
+curl -X POST "https://lead-gen-service.robotice.io/api/v1/auth/login" \
   -H "Content-Type: application/json" \
   -d '{"email":"your@email.com","password":"yourpassword"}'
 
 # Test API key endpoint
-curl -X GET "https://lead-gen.robotice.io/api/v1/auth/user-info" \
+curl -X GET "https://lead-gen-service.robotice.io/api/v1/auth/user-info" \
   -H "X-API-Key: your_api_key" \
   -H "X-Tenant-ID: your_tenant_id"
 ```
@@ -613,7 +613,7 @@ curl -X GET "https://lead-gen.robotice.io/api/v1/auth/user-info" \
 **Architecture Pattern:** Direct client-to-backend HTTPS calls (temporary debugging mode)
 
 **Environment Variables:**
-- `NEXT_PUBLIC_API_BASE_URL`: https://lead-gen.robotice.io
+- `NEXT_PUBLIC_API_BASE_URL`: https://lead-gen-service.robotice.io
 - `NEXT_PUBLIC_API_KEY`: ⚠️ Exposed for debugging (temporary)
 
 **Files Modified:**

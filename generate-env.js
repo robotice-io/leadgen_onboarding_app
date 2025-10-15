@@ -8,7 +8,7 @@ const path = require('path');
 const stateSigningKey = crypto.randomBytes(32).toString('hex');
 
 const envContent = `# API Configuration
-NEXT_PUBLIC_API_BASE_URL=http://192.241.157.92:8000
+NEXT_PUBLIC_API_BASE_URL=https://lead-gen-service.robotice.io
 # Server-side only API key (do NOT expose on client)
 API_KEY=lk_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 

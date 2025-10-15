@@ -20,7 +20,7 @@ Edit `.env.local` with your actual values:
 
 ```env
 # Backend API Configuration
-NEXT_PUBLIC_API_BASE_URL=https://lead-gen.robotice.io
+NEXT_PUBLIC_API_BASE_URL=https://lead-gen-service.robotice.io
 
 # API Key - TEMPORARY: exposed to client for debugging
 NEXT_PUBLIC_API_KEY=your-actual-api-key-here
@@ -83,7 +83,7 @@ The application should work without any hardcoded API keys.
 
 | Variable | Description | Required | Example |
 |----------|-------------|----------|---------|
-| `NEXT_PUBLIC_API_BASE_URL` | Backend API base URL | Yes | `http://192.241.157.92:8000` |
+| `NEXT_PUBLIC_API_BASE_URL` | Backend API base URL | Yes | `https://lead-gen-service.robotice.io` |
 | `API_KEY` | API authentication key (server-side only) | Yes | `lk_...` |
 | `NEXT_PUBLIC_APP_BASE_URL` | Frontend app base URL | No | `http://localhost:3000` |
 | `STATE_SIGNING_KEY` | OAuth state signing key | No | `random-string` |
