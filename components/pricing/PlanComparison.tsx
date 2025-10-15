@@ -41,6 +41,19 @@ export function PlanComparison() {
 
   const ctaLabel = (key: PlanKey) => t(`landing.plans.card.${key}.cta` as any);
 
+  // Tooltip helper for technical features (ES/EN)
+  const tooltipFor = (label: string) => {
+    const isSLA = label.includes("SLA");
+    const isMulti = label.includes("Multicanal") || label.includes("Multichannel");
+    if (isSLA) {
+      return lang === "es" ? "Tiempos de respuesta garantizados por contrato" : "Contractual response time guarantees";
+    }
+    if (isMulti) {
+      return lang === "es" ? "Email + LinkedIn + otros canales" : "Email + LinkedIn + other channels";
+    }
+    return undefined;
+  };
+
   // Desktop grid comparative
   const DesktopGrid = () => (
     <div className="hidden md:block overflow-x-auto pb-4 mx-auto md:w-3/4">
@@ -72,19 +85,35 @@ export function PlanComparison() {
 
         {/* Feature rows */}
         {features.map((f, i) => (
-          <>
+          <div key={`row-${i}`} className="contents group">
             <div
-              key={`label-${i}`}
-              className={`px-3 py-2.5 min-h-[44px] ${i % 2 === 0 ? "bg-slate-800/40" : ""} border-t border-slate-700/20 text-white text-sm font-semibold hover:bg-slate-700/10 transition-colors`}
-              title={f.label.includes("SLA") ? (lang === "es" ? "Tiempos de respuesta garantizados por contrato" : "Contractual response time guarantees") : f.label.includes("Multicanal") ? (lang === "es" ? "Email + LinkedIn + otros canales" : "Email + LinkedIn + other channels") : undefined}
+              className={`relative px-3 py-2.5 min-h-[44px] ${i % 2 === 0 ? "bg-slate-800/40" : ""} border-t border-slate-700/20 text-white text-sm font-semibold transition-colors duration-200 group-hover:bg-slate-700/15`}
             >
-              {f.label}
+              <span className="inline-flex items-center">
+                {f.label}
+                {tooltipFor(f.label) && (
+                  <>
+                    <button
+                      type="button"
+                      aria-label={tooltipFor(f.label)}
+                      className="ml-1 -mt-0.5 text-emerald-400/80 hover:text-emerald-300 align-baseline leading-none rounded focus:outline-none focus:ring-1 focus:ring-emerald-500/40 peer cursor-help"
+                    >
+                      <span className="inline-block animate-pulse">*</span>
+                    </button>
+                    <div
+                      role="tooltip"
+                      className="absolute left-2 top-full mt-1 w-max max-w-[240px] rounded-md border border-slate-700/60 bg-slate-900/95 text-slate-100 text-xs font-normal px-2.5 py-1.5 shadow-lg backdrop-blur-sm invisible opacity-0 translate-y-1 transition-all duration-150 ease-out peer-hover:visible peer-hover:opacity-100 peer-hover:translate-y-0 peer-focus:visible peer-focus:opacity-100 peer-focus:translate-y-0"
+                    >
+                      {tooltipFor(f.label)}
+                    </div>
+                  </>
+                )}
+              </span>
             </div>
             {plans.map((p) => (
               <div
                 key={`cell-${i}-${p.key}`}
-                className={`px-3 py-2.5 min-h-[44px] text-center ${i % 2 === 0 ? "bg-slate-800/40" : ""} border-t border-l border-slate-700/20 hover:bg-slate-700/10 transition-colors`}
-                title={typeof (f.values as any)[p.key] === "boolean" ? undefined : (f.label.includes("SLA") ? (lang === "es" ? "Tiempos de respuesta garantizados por contrato" : "Contractual response time guarantees") : f.label.includes("Multicanal") ? (lang === "es" ? "Email + LinkedIn + otros canales" : "Email + LinkedIn + other channels") : undefined)}
+                className={`px-3 py-2.5 min-h-[44px] text-center ${i % 2 === 0 ? "bg-slate-800/40" : ""} border-t border-l border-slate-700/20 transition-colors duration-200 group-hover:bg-slate-700/15`}
               >
                 {typeof (f.values as any)[p.key] === "boolean" ? (
                   (f.values as any)[p.key] ? (
@@ -99,7 +128,7 @@ export function PlanComparison() {
                 )}
               </div>
             ))}
-          </>
+          </div>
         ))}
 
         {/* CTA row */}
@@ -153,7 +182,26 @@ export function PlanComparison() {
           <div className="p-5">
             {features.map((f, i) => (
               <div key={`m-${i}`} className="py-3 border-t border-slate-700/40 flex items-center justify-between">
-                <span className="text-white text-sm font-semibold">{f.label}</span>
+                <span className="relative inline-flex items-center text-white text-sm font-semibold">
+                  {f.label}
+                  {tooltipFor(f.label) && (
+                    <>
+                      <button
+                        type="button"
+                        aria-label={tooltipFor(f.label)}
+                        className="ml-1 -mt-0.5 text-emerald-400/80 hover:text-emerald-300 align-baseline leading-none rounded focus:outline-none focus:ring-1 focus:ring-emerald-500/40 peer cursor-help"
+                      >
+                        <span className="inline-block animate-pulse">*</span>
+                      </button>
+                      <div
+                        role="tooltip"
+                        className="absolute left-0 top-full mt-1 w-max max-w-[240px] rounded-md border border-slate-700/60 bg-slate-900/95 text-slate-100 text-xs font-normal px-2.5 py-1.5 shadow-lg backdrop-blur-sm invisible opacity-0 translate-y-1 transition-all duration-150 ease-out peer-hover:visible peer-hover:opacity-100 peer-hover:translate-y-0 peer-focus:visible peer-focus:opacity-100 peer-focus:translate-y-0 z-20"
+                      >
+                        {tooltipFor(f.label)}
+                      </div>
+                    </>
+                  )}
+                </span>
                 <span className="ml-4">
                   {typeof (f.values as any)[p.key] === "boolean" ? (
                     (f.values as any)[p.key] ? (
