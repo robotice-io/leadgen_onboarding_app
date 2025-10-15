@@ -115,11 +115,23 @@ export function PlanComparison() {
           <h2 className="text-3xl md:text-4xl font-bold">{t("pricing.comparison.heading")}</h2>
           <p className="text-slate-300 mt-2">{t("pricing.comparison.subtitle")}</p>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <PlanCard plan="starter" />
-          <PlanCard plan="core" />
-          <PlanCard plan="pro" />
-          <PlanCard plan="enterprise" />
+        {/*
+          En móvil: carrusel horizontal con snap y overflow-x, para evitar cards apiladas verticalmente.
+          En md+: mantener disposición en grilla (2 y 4 columnas).
+        */}
+        <div className="flex md:grid md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 overflow-x-auto md:overflow-visible snap-x snap-mandatory -mx-4 px-4 md:mx-0 md:px-0">
+          <div className="snap-start shrink-0 min-w-[280px] w-[85%] sm:w-[65%] md:w-auto">
+            <PlanCard plan="starter" />
+          </div>
+          <div className="snap-start shrink-0 min-w-[280px] w-[85%] sm:w-[65%] md:w-auto">
+            <PlanCard plan="core" />
+          </div>
+          <div className="snap-start shrink-0 min-w-[280px] w-[85%] sm:w-[65%] md:w-auto">
+            <PlanCard plan="pro" />
+          </div>
+          <div className="snap-start shrink-0 min-w-[280px] w-[85%] sm:w-[65%] md:w-auto">
+            <PlanCard plan="enterprise" />
+          </div>
         </div>
       </div>
     </section>
