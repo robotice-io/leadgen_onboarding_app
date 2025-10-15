@@ -262,7 +262,7 @@ export function GrowthWizard() {
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Icon className={`w-5 h-5 ${COLOR_MAP["blue"].text}`} />
-            <span className="text-sm text-slate-300">{lang === "es" ? "Paso" : "Step"} {step + 1} {lang === "es" ? "de" : "of"} {totalSteps}</span>
+            <span className="text-sm text-slate-300">{t("wizard.step" as any)} {step + 1} {t("wizard.of" as any)} {totalSteps}</span>
           </div>
           <button onClick={goBack} className="inline-flex items-center gap-1 text-slate-300/90 hover:text-white transition disabled:opacity-40" disabled={atFirst} aria-label={t("wizard.action.back" as any)}>
             <ChevronLeft className="w-4 h-4" /> {t("wizard.action.back" as any)}
@@ -275,6 +275,8 @@ export function GrowthWizard() {
               key={i}
               onClick={() => {
                 setSelectedIdx(i);
+                // Micro vibración en móviles si está disponible
+                try { if (navigator.vibrate) navigator.vibrate(8); } catch {}
                 setTimeout(() => handleAnswer(opt.value), 170);
               }}
               whileHover={{ scale: 1.01 }}
@@ -297,10 +299,14 @@ export function GrowthWizard() {
           ))}
         </div>
         <div className="flex items-center justify-end mt-6">
-          <div className="flex items-center gap-2 text-slate-400 text-sm">
+          <motion.div
+            className="flex items-center gap-2 text-slate-400 text-sm"
+            animate={{ x: selectedIdx !== null ? 4 : 0 }}
+            transition={{ type: "spring", stiffness: 300, damping: 20 }}
+          >
             {t("wizard.action.next" as any)}
             <ChevronRight className="w-4 h-4" />
-          </div>
+          </motion.div>
         </div>
       </motion.div>
     );
@@ -366,8 +372,8 @@ export function GrowthWizard() {
           <ProgressBar />
           <Stepper />
           <div className="relative overflow-hidden mt-6">
-            {/* Card estática */}
-            <div className="bg-slate-800/30 border border-slate-700/40 rounded-2xl p-8 md:p-10 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] min-h-[360px]">
+            {/* Card estática con altura estable; respeta reduce motion por defecto de framer */}
+            <div className="bg-slate-800/30 border border-slate-700/40 rounded-2xl p-8 md:p-10 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] min-h-[380px]">
               <AnimatePresence mode="wait" initial={false}>
                 {result ? <ResultContent /> : <QuestionContent />}
               </AnimatePresence>

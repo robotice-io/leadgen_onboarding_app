@@ -357,6 +357,67 @@ const ES: Dictionary = {
   "pricing.finalCta.subtitle": "Conecta tu cuenta, elige tu plan y empieza a ver resultados esta semana.",
   "pricing.finalCta.primary": "Empezar con Starter",
   "pricing.finalCta.secondary": "Agendar demo",
+  
+  // Wizard – Growth plan advisor
+  "wizard.title": "Encuentra tu nivel de prospección",
+  "wizard.subtitle": "Un asistente rápido para recomendarte el plan ideal según tu negocio.",
+  "wizard.action.back": "Volver",
+  "wizard.action.next": "Siguiente",
+  "wizard.action.restart": "Rehacer quiz",
+  "wizard.result.titlePrefix": "Tu plan ideal es",
+  "wizard.cta.details": "Ver detalles del plan",
+  "wizard.cta.demo": "Agendar una demo",
+  "wizard.step": "Paso",
+  "wizard.of": "de",
+
+  // Step 1
+  "wizard.step1.title": "Volumen de contactos",
+  "wizard.step1.question": "¿Cuántos leads B2B quieres contactar cada mes?",
+  "wizard.step1.opt1": "Menos de 3.000 (validando mercado)",
+  "wizard.step1.opt2": "3.000–6.000 (pipeline activo)",
+  "wizard.step1.opt3": "6.000–12.000 (equipo en crecimiento)",
+  "wizard.step1.opt4": "Más de 12.000 (escala o múltiples equipos)",
+
+  // Step 2
+  "wizard.step2.title": "Canales y remitentes",
+  "wizard.step2.question": "¿Desde cuántas cuentas o canales de e-mail trabajas?",
+  "wizard.step2.opt1": "1 cuenta personal o marca",
+  "wizard.step2.opt2": "2–3 cuentas de equipo",
+  "wizard.step2.opt3": "Más de 3 remitentes",
+  "wizard.step2.opt4": "Multicanal (e-mail, LinkedIn, WhatsApp…)",
+
+  // Step 3
+  "wizard.step3.title": "Reporting y soporte",
+  "wizard.step3.question": "¿Qué nivel de seguimiento necesitas?",
+  "wizard.step3.opt1": "Solo métricas básicas",
+  "wizard.step3.opt2": "Dashboard con KPIs",
+  "wizard.step3.opt3": "Reportes PDF + CRM",
+  "wizard.step3.opt4": "SLA y métricas avanzadas",
+
+  // Plans
+  "wizard.plan.startup.title": "Startup",
+  "wizard.plan.startup.desc": "Para validar mercado con bajo volumen.",
+  "wizard.plan.startup.f1": "3 000 leads verificados",
+  "wizard.plan.startup.f2": "1 remitente",
+  "wizard.plan.startup.f3": "Campañas IA básicas",
+
+  "wizard.plan.pyme.title": "PyME",
+  "wizard.plan.pyme.desc": "Para equipos pequeños que quieren mantener su pipeline activo.",
+  "wizard.plan.pyme.f1": "5 000 leads",
+  "wizard.plan.pyme.f2": "Hasta 3 remitentes",
+  "wizard.plan.pyme.f3": "Dashboard avanzado",
+
+  "wizard.plan.empresa.title": "Empresa",
+  "wizard.plan.empresa.desc": "Para escalar campañas con reporting e integraciones CRM.",
+  "wizard.plan.empresa.f1": "8 000–12 000 leads",
+  "wizard.plan.empresa.f2": "Reporting PDF",
+  "wizard.plan.empresa.f3": "Integraciones CRM",
+
+  "wizard.plan.enterprise.title": "Enterprise",
+  "wizard.plan.enterprise.desc": "Grandes equipos, soporte garantizado e integraciones multicanal.",
+  "wizard.plan.enterprise.f1": "Volumen alto",
+  "wizard.plan.enterprise.f2": "SLA garantizado",
+  "wizard.plan.enterprise.f3": "APIs personalizadas",
 };
 
 const EN: Dictionary = {
@@ -710,6 +771,67 @@ const EN: Dictionary = {
   "pricing.finalCta.subtitle": "Connect your account, pick a plan and start seeing results this week.",
   "pricing.finalCta.primary": "Start with Starter",
   "pricing.finalCta.secondary": "Book a demo",
+  
+  // Wizard – Growth plan advisor
+  "wizard.title": "Find your prospecting level",
+  "wizard.subtitle": "A quick assistant to recommend the ideal plan for your business.",
+  "wizard.action.back": "Back",
+  "wizard.action.next": "Next",
+  "wizard.action.restart": "Restart quiz",
+  "wizard.result.titlePrefix": "Your ideal plan is",
+  "wizard.cta.details": "See plan details",
+  "wizard.cta.demo": "Book a demo",
+  "wizard.step": "Step",
+  "wizard.of": "of",
+
+  // Step 1
+  "wizard.step1.title": "Contact volume",
+  "wizard.step1.question": "How many B2B leads do you want to contact each month?",
+  "wizard.step1.opt1": "Less than 3,000 (validating market)",
+  "wizard.step1.opt2": "3,000–6,000 (active pipeline)",
+  "wizard.step1.opt3": "6,000–12,000 (growing team)",
+  "wizard.step1.opt4": "More than 12,000 (scale or multiple teams)",
+
+  // Step 2
+  "wizard.step2.title": "Channels & senders",
+  "wizard.step2.question": "How many email accounts or channels do you use?",
+  "wizard.step2.opt1": "Single account (personal or brand)",
+  "wizard.step2.opt2": "2–3 team accounts",
+  "wizard.step2.opt3": "More than 3 senders",
+  "wizard.step2.opt4": "Multichannel (email, LinkedIn, WhatsApp…)",
+
+  // Step 3
+  "wizard.step3.title": "Reporting & support",
+  "wizard.step3.question": "What level of campaign tracking do you need?",
+  "wizard.step3.opt1": "Basic metrics only",
+  "wizard.step3.opt2": "Dashboard with KPIs",
+  "wizard.step3.opt3": "PDF reports + CRM",
+  "wizard.step3.opt4": "SLA and advanced per‑user metrics",
+
+  // Plans
+  "wizard.plan.startup.title": "Startup",
+  "wizard.plan.startup.desc": "For validating the market with low volume.",
+  "wizard.plan.startup.f1": "3,000 verified leads",
+  "wizard.plan.startup.f2": "1 sender",
+  "wizard.plan.startup.f3": "Basic AI campaigns",
+
+  "wizard.plan.pyme.title": "SMB",
+  "wizard.plan.pyme.desc": "For small teams that want to keep their pipeline active.",
+  "wizard.plan.pyme.f1": "5,000 leads",
+  "wizard.plan.pyme.f2": "Up to 3 senders",
+  "wizard.plan.pyme.f3": "Advanced dashboard",
+
+  "wizard.plan.empresa.title": "Company",
+  "wizard.plan.empresa.desc": "To scale campaigns with reporting and CRM integrations.",
+  "wizard.plan.empresa.f1": "8,000–12,000 leads",
+  "wizard.plan.empresa.f2": "PDF reporting",
+  "wizard.plan.empresa.f3": "CRM integrations",
+
+  "wizard.plan.enterprise.title": "Enterprise",
+  "wizard.plan.enterprise.desc": "Large teams, guaranteed support and multichannel integrations.",
+  "wizard.plan.enterprise.f1": "High volume",
+  "wizard.plan.enterprise.f2": "Guaranteed SLA",
+  "wizard.plan.enterprise.f3": "Custom APIs",
 };
 
 const DICTS: Record<SupportedLang, Dictionary> = { es: ES, en: EN };
