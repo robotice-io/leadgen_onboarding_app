@@ -4,7 +4,9 @@ export const runtime = "nodejs";
 
 function getApiBase() {
   const env = process.env.NEXT_PUBLIC_API_BASE_URL;
-  return (env && env.replace(/\/$/, "")) || "https://lead-gen-service.robotice.io";
+  const base = (env && env.replace(/\/$/, "")) || "https://lead-gen-service.robotice.io";
+  // Normalize: if env incorrectly includes '/api/v1' suffix, strip it to avoid '/api/v1/api/v1'
+  return base.replace(/\/api\/v1\/?$/, "");
 }
 
 function getApiKey(): string {
@@ -65,13 +67,31 @@ async function proxy(req: NextRequest) {
   const ac = new AbortController();
   const timeout = setTimeout(() => ac.abort(), 15000);
   try {
-    const res = await fetch(target, { ...init, signal: ac.signal });
+    let res = await fetch(target, { ...init, signal: ac.signal });
+    // If upstream returns 404 and path included '/api/v1', retry once stripping the prefix
+    if (res.status === 404 && path.startsWith('/api/v1/')) {
+      const altTarget = `${apiBase}${path.replace(/^\/api\/v1/, '')}${url.search}`;
+      try {
+        res = await fetch(altTarget, { ...init, signal: ac.signal });
+        // Replace target for debug header if fallback used
+        (global as any).__proxyLastTarget = altTarget;
+      } catch (e) {
+        // keep original res if fallback fetch fails at network level
+      }
+    } else {
+      (global as any).__proxyLastTarget = target;
+    }
     const body = await res.arrayBuffer();
     // Sanitize response headers to avoid forbidden/hop-by-hop headers issues
     const resHeaders = new Headers(res.headers);
     resHeaders.delete("content-length");
     resHeaders.delete("transfer-encoding");
     resHeaders.delete("content-encoding");
+    // Add debug header in non-production to see upstream target
+    const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+    if (!isProd) {
+      resHeaders.set("X-Proxy-Target", String((global as any).__proxyLastTarget || target));
+    }
     return new Response(body, { status: res.status, headers: resHeaders });
   } catch (err: any) {
     const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
