@@ -19,26 +19,46 @@ export function Navbar() {
   const lastY = useRef(0);
   const [mobileOpen, setMobileOpen] = useState(false);
   const [activeHash, setActiveHash] = useState<string>("");
+  const latestY = useRef(0);
+  const ticking = useRef(false);
+  const hideTimer = useRef<number | null>(null);
 
   useEffect(() => {
     try { setAuthed(isAuthenticated()); } catch { setAuthed(false); }
   }, []);
 
   useEffect(() => {
-    function onScroll() {
-      const y = window.scrollY || 0;
+    function update() {
+      const y = latestY.current;
       setScrolled(y > 8);
       const delta = y - lastY.current;
       const threshold = 6;
+      const hideDelay = 120; // ms delay to avoid flicker
       if (y > 24 && delta > threshold) {
-        setHidden(true);
+        if (hideTimer.current) window.clearTimeout(hideTimer.current);
+        hideTimer.current = window.setTimeout(() => setHidden(true), hideDelay) as unknown as number;
       } else if (delta < -threshold) {
+        if (hideTimer.current) {
+          window.clearTimeout(hideTimer.current);
+          hideTimer.current = null;
+        }
         setHidden(false);
       }
       lastY.current = y;
+      ticking.current = false;
+    }
+    function onScroll() {
+      latestY.current = window.scrollY || 0;
+      if (!ticking.current) {
+        ticking.current = true;
+        window.requestAnimationFrame(update);
+      }
     }
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll as any);
+    return () => {
+      window.removeEventListener("scroll", onScroll as any);
+      if (hideTimer.current) window.clearTimeout(hideTimer.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -59,8 +79,8 @@ export function Navbar() {
   }, []);
 
   const containerClasses = [
-    "fixed top-0 inset-x-0 z-40 transition-transform duration-300",
-    hidden ? "-translate-y-full" : "translate-y-0",
+    "fixed top-0 inset-x-0 z-40 transition-transform transition-opacity duration-300",
+    hidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
   ].join(" ");
 
   const shellClasses = [

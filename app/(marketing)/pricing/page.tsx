@@ -7,14 +7,14 @@ import { PricingFAQ } from "@/components/pricing/PricingFAQ";
 import { PricingFinalCTA } from "@/components/pricing/PricingFinalCTA";
 
 export default function PricingPage() {
-  return (
-    <main className="min-h-screen w-full bg-[#0b1120] text-white">
-      <PricingHero />
-      <PlanAdvisor />
-      <PlanComparison />
-      <SharedBenefits />
-      <PricingFAQ />
-      <PricingFinalCTA />
-    </main>
-  );
+	return (
+		<main className="min-h-screen w-full bg-[#0b1120] text-white">
+			<PricingHero />
+			<PlanAdvisor />
+			<PlanComparison />
+			<SharedBenefits />
+			<PricingFAQ />
+			<PricingFinalCTA />
+		</main>
+	);
 }
