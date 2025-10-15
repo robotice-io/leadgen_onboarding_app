@@ -153,6 +153,7 @@ export function GrowthWizard() {
   const [answers, setAnswers] = useState<number[]>([]);
   const [result, setResult] = useState<PlanKey | null>(null);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
+  const [dir, setDir] = useState<"fwd" | "back">("fwd");
 
   const atFirst = step === 0 && !result;
   const barPercent = ((result ? totalSteps : step) / totalSteps) * 100;
@@ -169,6 +170,7 @@ export function GrowthWizard() {
       return;
     }
     if (step > 0) {
+      setDir("back");
       setAnswers((prev) => prev.slice(0, -1));
       setStep((s) => Math.max(0, s - 1));
     }
@@ -181,6 +183,7 @@ export function GrowthWizard() {
         const [v, c, r] = next;
         setResult(recommendPlan(v, c, r));
       } else {
+        setDir("fwd");
         setStep((s) => s + 1);
       }
       return next;
@@ -250,7 +253,7 @@ export function GrowthWizard() {
     return (
       <div
         key={step}
-        className="relative"
+        className={`relative ${dir === "fwd" ? "animate-fade-in-up" : "animate-fade-in-down"}`}
         role="group"
         aria-label={t(q.title as any)}
       >
@@ -306,7 +309,7 @@ export function GrowthWizard() {
     const plan = PLANS[result];
     const Icon = plan.icon;
     return (
-      <div key="result" className="text-center">
+      <div key="result" className="text-center animate-fade-in-up">
         <div className="flex items-center justify-center gap-2 mb-3">
           <Icon className={`w-7 h-7 ${COLOR_MAP[plan.color].text}`} />
           <Sparkles className="w-5 h-5 text-amber-300" />
