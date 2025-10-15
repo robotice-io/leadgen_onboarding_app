@@ -66,14 +66,17 @@ export function PlanComparison() {
             {p.priceMonthly ? (
               <>
                 <p className="text-white font-semibold text-lg leading-tight">
-                  ${formatNumber(billing === "monthly" ? p.priceMonthly : (p.priceYearly as number), lang)}
+                  ${formatNumber(billing === "monthly" ? p.priceMonthly : Math.round(p.priceMonthly * 0.8), lang)}
                 </p>
                 <p className="text-white/80 text-[11px] leading-tight font-semibold">
-                  {lang === "es" ? (billing === "monthly" ? "CLP/mes" : "CLP/año") : billing === "monthly" ? "CLP/mo" : "CLP/yr"}
+                  {lang === "es" ? "CLP/mes" : "CLP/mo"}
+                  {billing === "yearly" && (
+                    <span className="ml-1 text-white/60">{lang === "es" ? "· facturado anual" : "· billed annually"}</span>
+                  )}
                 </p>
                 {billing === "yearly" && (
                   <span className="inline-block mt-1 text-[10px] font-semibold text-emerald-400 bg-emerald-500/10 rounded px-1.5 py-0.5">
-                    {lang === "es" ? "Ahorra ~15%" : "Save ~15%"}
+                    {lang === "es" ? "Ahorra 20%" : "Save 20%"}
                   </span>
                 )}
               </>
@@ -170,14 +173,21 @@ export function PlanComparison() {
             <div className="text-white font-semibold text-2xl">
               {p.priceMonthly ? (
                 <>
-                  ${formatNumber(billing === "monthly" ? p.priceMonthly : (p.priceYearly as number), lang)}
-                  <span className="ml-2 align-middle text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 rounded px-1.5 py-0.5">
-                    {billing === "yearly" ? (lang === "es" ? "Ahorra ~15%" : "Save ~15%") : ""}
-                  </span>
+                  ${formatNumber(billing === "monthly" ? p.priceMonthly : Math.round(p.priceMonthly * 0.8), lang)}
+                  {billing === "yearly" && (
+                    <span className="ml-2 align-middle text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 rounded px-1.5 py-0.5">
+                      {lang === "es" ? "Ahorra 20%" : "Save 20%"}
+                    </span>
+                  )}
                 </>
               ) : (lang === "es" ? "A medida" : "Custom")}
             </div>
-            <div className="text-white text-xs font-semibold">{lang === "es" ? (billing === "monthly" ? "CLP/mes" : "CLP/año") : billing === "monthly" ? "CLP/mo" : "CLP/yr"}</div>
+            <div className="text-white text-xs font-semibold">
+              {lang === "es" ? "CLP/mes" : "CLP/mo"}
+              {billing === "yearly" && (
+                <span className="ml-1 text-white/60">{lang === "es" ? "· facturado anual" : "· billed annually"}</span>
+              )}
+            </div>
           </div>
           <div className="p-5">
             {features.map((f, i) => (
