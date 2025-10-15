@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useI18n } from "@/lib/i18n";
-import { getTenant, getUser } from "@/lib/auth-client";
+import { getTenant, getUser, changePassword } from "@/lib/auth-client";
 import { User, Mail, Building2, Key, Trash2, Save, Eye, EyeOff } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -19,13 +19,35 @@ export default function SettingsPage() {
   const tenant = getTenant();
   const user = getUser();
 
-  const handleChangePassword = () => {
+  const [currentPwd, setCurrentPwd] = useState("");
+  const [newPwd, setNewPwd] = useState("");
+  const [confirmPwd, setConfirmPwd] = useState("");
+
+  const handleChangePassword = async () => {
+    if (!currentPwd || !newPwd || !confirmPwd) {
+      alert(t("settings.fillAllFields"));
+      return;
+    }
+    if (newPwd.length < 8) {
+      alert(t("settings.passwordTooShort"));
+      return;
+    }
+    if (newPwd !== confirmPwd) {
+      alert(t("settings.passwordsDontMatch"));
+      return;
+    }
     setIsChangingPassword(true);
-    // Mockup - simulate API call
-    setTimeout(() => {
-      setIsChangingPassword(false);
+    try {
+      await changePassword(currentPwd, newPwd);
+      setCurrentPwd("");
+      setNewPwd("");
+      setConfirmPwd("");
       alert(t("settings.passwordChanged"));
-    }, 2000);
+    } catch (e: any) {
+      alert(e?.message || t("settings.changePasswordFailed"));
+    } finally {
+      setIsChangingPassword(false);
+    }
   };
 
   const handleDeleteConnection = () => {
@@ -139,6 +161,8 @@ export default function SettingsPage() {
                   type={showCurrentPassword ? "text" : "password"}
                   placeholder={t("settings.enterCurrentPassword")}
                   className="pr-10"
+                  value={currentPwd}
+                  onChange={(e) => setCurrentPwd(e.target.value)}
                 />
                 <button
                   type="button"
@@ -159,6 +183,8 @@ export default function SettingsPage() {
                   type={showNewPassword ? "text" : "password"}
                   placeholder={t("settings.enterNewPassword")}
                   className="pr-10"
+                  value={newPwd}
+                  onChange={(e) => setNewPwd(e.target.value)}
                 />
                 <button
                   type="button"
@@ -179,6 +205,8 @@ export default function SettingsPage() {
                   type={showConfirmPassword ? "text" : "password"}
                   placeholder={t("settings.confirmNewPassword")}
                   className="pr-10"
+                  value={confirmPwd}
+                  onChange={(e) => setConfirmPwd(e.target.value)}
                 />
                 <button
                   type="button"

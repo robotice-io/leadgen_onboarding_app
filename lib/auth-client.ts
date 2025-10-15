@@ -151,6 +151,32 @@ export function scheduleTokenRefresh(expiresInSeconds?: number): void {
   }
 }
 
+// Change password for logged-in user (settings)
+export async function changePassword(currentPassword: string, newPassword: string): Promise<any> {
+  // Force proxy to ensure server API key is used
+  const url = getRequestUrl("/api/v1/auth/change-password", true);
+  const res = await fetch(url, {
+    method: "POST",
+    headers: buildHeaders(true),
+    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
+  });
+
+  if (!res.ok) {
+    if (res.status === 429) {
+      throw new Error("[429] Too many attempts. Try again in a minute.");
+    }
+    const errorText = await res.text();
+    let errorMessage = "Change password failed";
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
+    } catch {}
+    throw new Error(`[${res.status}] ${errorMessage}`);
+  }
+
+  return res.json().catch(() => ({ ok: true }));
+}
+
 export async function login(email: string, password: string): Promise<AuthTokens> {
   // Clear any stale data before login
   removeToken();
