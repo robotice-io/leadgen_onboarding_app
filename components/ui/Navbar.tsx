@@ -83,9 +83,12 @@ export function Navbar() {
     hidden ? "-translate-y-full opacity-0" : "translate-y-0 opacity-100",
   ].join(" ");
 
+  const isGlass = scrolled || mobileOpen;
   const shellClasses = [
-    "mx-4 my-3 rounded-2xl border backdrop-blur-xl",
-    scrolled ? "bg-white/12 border-white/15" : "bg-white/7 border-white/10",
+    "mx-4 my-3 rounded-2xl border transition-colors duration-300",
+    isGlass
+      ? "backdrop-blur-xl bg-white/12 border-white/15 shadow-[0_8px_20px_-12px_rgba(0,0,0,0.5)]"
+      : "bg-transparent border-white/30 backdrop-blur-0 shadow-none",
   ].join(" ");
 
   const linkBase = "inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10";
@@ -104,13 +107,7 @@ export function Navbar() {
             <Link href="/" className="flex items-center gap-2">
               <Image src="/landing_logo.png" alt="Robotice" width={160} height={40} className="h-8 sm:h-9 w-auto" />
             </Link>
-            <div className="hidden md:flex items-center gap-1">
-              <Link href="/" className={[linkBase, homeActive ? activePill : ""].join(" ")}>{lang === "es" ? "Home" : "Home"}</Link>
-              <Link href="/#como-funciona" className={[linkBase, howActive ? activePill : ""].join(" ")}>{lang === "es" ? "Cómo funciona" : "How it works"}</Link>
-              <Link href="/pricing#comparison" className={[linkBase, pricingActive ? activePill : ""].join(" ")}>{lang === "es" ? "Planes" : "Pricing"}</Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 sm:gap-3">
+            {/* Mobile hamburger on the left for better balance */}
             <button
               className="md:hidden inline-flex items-center justify-center h-9 w-9 rounded-xl bg-white/10 border border-white/10"
               aria-label="Abrir menú"
@@ -118,18 +115,25 @@ export function Navbar() {
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <Link href="mailto:contact@robotice.io" className="hidden sm:inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10">
+            <div className="hidden md:flex items-center gap-1">
+              <Link href="/" className={[linkBase, homeActive ? activePill : ""].join(" ")}>{lang === "es" ? "Home" : "Home"}</Link>
+              <Link href="/#como-funciona" className={[linkBase, howActive ? activePill : ""].join(" ")}>{lang === "es" ? "Cómo funciona" : "How it works"}</Link>
+              <Link href="/pricing#comparison" className={[linkBase, pricingActive ? activePill : ""].join(" ")}>{lang === "es" ? "Planes" : "Pricing"}</Link>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 sm:gap-3">
+            <Link href="mailto:contact@robotice.io" className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10">
               {lang === "es" ? "Contacto" : "Contact"}
             </Link>
             {authed ? (
               <div ref={profileRef} className="relative">
-                <Link href="/dashboard" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/20 border border-white/20 mr-1">
+                <Link href="/dashboard" className="inline-flex items-center gap-2 h-9 px-4 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/20 border border-white/20 mr-1">
                   {t("nav.dashboard")}
                 </Link>
                 <button
                   aria-label="User menu"
                   onClick={() => setOpen((v) => !v)}
-                  className="h-8 w-8 rounded-full bg-gradient-to-br from-blue-500 to-fuchsia-500 shadow hover:opacity-90 focus:outline-none"
+                  className="h-9 w-9 rounded-full bg-gradient-to-br from-blue-500 to-fuchsia-500 shadow hover:opacity-90 focus:outline-none"
                 />
                 <AnimatePresence>
                   {open && (
@@ -159,7 +163,7 @@ export function Navbar() {
                 </AnimatePresence>
               </div>
             ) : (
-              <Link href="/login" className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-[0_8px_20px_-8px_rgba(37,99,235,0.7)]">
+              <Link href="/login" className="inline-flex items-center gap-2 h-9 px-4 rounded-xl text-sm font-semibold bg-blue-600 hover:bg-blue-500 text-white shadow-[0_8px_20px_-8px_rgba(37,99,235,0.7)]">
                 {lang === "es" ? "Login" : "Login"}
               </Link>
             )}
