@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useMemo, useState, useCallback } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Lightbulb,
   Mail,
@@ -225,10 +225,9 @@ export function GrowthWizard() {
 
   const ProgressBar = () => (
     <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
-      <motion.div
+      <div
         className={`h-2 ${COLOR_MAP[activeColor].bar}`}
-        animate={{ width: `${barPercent}%` }}
-        transition={{ type: "spring", stiffness: 180, damping: 24 }}
+        style={{ width: `${barPercent}%`, transition: "width 280ms ease" }}
       />
     </div>
   );
@@ -236,11 +235,10 @@ export function GrowthWizard() {
   const Stepper = () => (
     <div className="flex items-center justify-center gap-3 mt-4">
       {Array.from({ length: totalSteps }).map((_, i) => (
-        <motion.div
+        <div
           key={i}
-          className={`h-2 w-6 rounded-full ${i <= (result ? totalSteps - 1 : step) ? COLOR_MAP[activeColor].dot : "bg-slate-700"}`}
-          animate={{ scale: i === step && !result ? 1.1 : 1, opacity: 1 }}
-          transition={{ type: "spring", stiffness: 220, damping: 18 }}
+          className={`h-2 w-6 rounded-full transition-transform duration-200 ${i <= (result ? totalSteps - 1 : step) ? COLOR_MAP[activeColor].dot : "bg-slate-700"}`}
+          style={{ transform: i === step && !result ? "scale(1.06)" : "scale(1)" }}
         />
       ))}
     </div>
@@ -250,13 +248,9 @@ export function GrowthWizard() {
     const q = QUESTIONS[step];
     const Icon = q.icon;
     return (
-      <motion.div
+      <div
         key={step}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ type: "spring", stiffness: 260, damping: 24 }}
-        className="absolute inset-0"
+        className="relative"
         role="group"
         aria-label={t(q.title as any)}
       >
@@ -272,7 +266,7 @@ export function GrowthWizard() {
         <p className="text-lg font-medium text-white text-center mb-5">{t(q.question as any)}</p>
         <div className="grid gap-3 text-left">
           {q.options.map((opt, i) => (
-            <motion.button
+            <button
               key={i}
               onClick={() => {
                 setSelectedIdx(i);
@@ -284,36 +278,26 @@ export function GrowthWizard() {
                   setSelectedIdx(null);
                 }, 140);
               }}
-              whileHover={{ scale: 1.01 }}
-              whileTap={{ scale: 0.995 }}
               className={`rounded-xl px-4 py-3 text-slate-200 transition-colors duration-200 border ${selectedIdx === i ? `border-transparent ring-2 ${COLOR_MAP[opt.color].ring}` : "border-slate-700/40"} ${COLOR_MAP[opt.color].hoverBorder} ${COLOR_MAP[opt.color].hoverBg} focus:outline-none`}
             >
               <div className="flex items-center justify-between">
                 <span>{t(opt.label as any)}</span>
                 {selectedIdx === i && (
-                  <motion.span
-                    layoutId="selected-glow"
+                  <span
                     className={`ml-3 inline-block w-2.5 h-2.5 rounded-full ${COLOR_MAP[opt.color].dot}`}
-                    initial={{ scale: 0.6, opacity: 0.6 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    transition={{ type: "spring", stiffness: 280, damping: 18 }}
                   />
                 )}
               </div>
-            </motion.button>
+            </button>
           ))}
         </div>
         <div className="flex items-center justify-end mt-6">
-          <motion.div
-            className="flex items-center gap-2 text-slate-400 text-sm"
-            animate={{ x: selectedIdx !== null ? 4 : 0 }}
-            transition={{ type: "spring", stiffness: 300, damping: 20 }}
-          >
+          <div className="flex items-center gap-2 text-slate-400 text-sm">
             {t("wizard.action.next" as any)}
             <ChevronRight className="w-4 h-4" />
-          </motion.div>
+          </div>
         </div>
-      </motion.div>
+      </div>
     );
   };
 
@@ -322,14 +306,7 @@ export function GrowthWizard() {
     const plan = PLANS[result];
     const Icon = plan.icon;
     return (
-      <motion.div
-        key="result"
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ type: "spring", stiffness: 240, damping: 22 }}
-        className="text-center absolute inset-0"
-      >
+      <div key="result" className="text-center">
         <div className="flex items-center justify-center gap-2 mb-3">
           <Icon className={`w-7 h-7 ${COLOR_MAP[plan.color].text}`} />
           <Sparkles className="w-5 h-5 text-amber-300" />
@@ -361,7 +338,7 @@ export function GrowthWizard() {
             {t("wizard.action.restart" as any)}
           </button>
         </div>
-      </motion.div>
+      </div>
     );
   };
 
@@ -377,11 +354,8 @@ export function GrowthWizard() {
           <ProgressBar />
           <Stepper />
           <div className="relative overflow-hidden mt-6">
-            {/* Card estática con altura estable; respeta reduce motion por defecto de framer */}
-            <div className="relative bg-slate-800/30 border border-slate-700/40 rounded-2xl p-8 md:p-10 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] min-h-[380px]">
-              <AnimatePresence mode="sync" initial={false}>
-                {result ? <ResultContent /> : <QuestionContent />}
-              </AnimatePresence>
+            <div className="bg-slate-800/30 border border-slate-700/40 rounded-2xl p-8 md:p-10 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] min-h-[380px]">
+              {result ? <ResultContent /> : <QuestionContent />}
             </div>
           </div>
         </div>
