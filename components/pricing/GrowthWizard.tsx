@@ -154,6 +154,7 @@ export function GrowthWizard() {
   const [result, setResult] = useState<PlanKey | null>(null);
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [dir, setDir] = useState<"fwd" | "back">("fwd");
+  const [isFading, setIsFading] = useState<"none" | "out" | "in">("none");
 
   const atFirst = step === 0 && !result;
   const barPercent = ((result ? totalSteps : step) / totalSteps) * 100;
@@ -166,28 +167,40 @@ export function GrowthWizard() {
 
   const goBack = useCallback(() => {
     if (result) {
-      setResult(null);
+      setIsFading("out");
+      setTimeout(() => { setResult(null); setIsFading("in"); setTimeout(() => setIsFading("none"), 220); }, 180);
       return;
     }
     if (step > 0) {
       setDir("back");
-      setAnswers((prev) => prev.slice(0, -1));
-      setStep((s) => Math.max(0, s - 1));
+      setIsFading("out");
+      setTimeout(() => {
+        setAnswers((prev) => prev.slice(0, -1));
+        setStep((s) => Math.max(0, s - 1));
+        setIsFading("in");
+        setTimeout(() => setIsFading("none"), 220);
+      }, 180);
     }
   }, [result, step]);
 
   const handleAnswer = (value: number) => {
-    setAnswers((prev) => {
-      const next = [...prev, value];
-      if (next.length === totalSteps) {
-        const [v, c, r] = next;
-        setResult(recommendPlan(v, c, r));
-      } else {
-        setDir("fwd");
-        setStep((s) => s + 1);
-      }
-      return next;
-    });
+    setIsFading("out");
+    setTimeout(() => {
+      setAnswers((prev) => {
+        const next = [...prev, value];
+        if (next.length === totalSteps) {
+          const [v, c, r] = next;
+          setResult(recommendPlan(v, c, r));
+        } else {
+          setDir("fwd");
+          setStep((s) => s + 1);
+        }
+        return next;
+      });
+      setSelectedIdx(null);
+      setIsFading("in");
+      setTimeout(() => setIsFading("none"), 220);
+    }, 140);
   };
 
   useEffect(() => {
@@ -253,7 +266,7 @@ export function GrowthWizard() {
     return (
       <div
         key={step}
-        className={`relative ${dir === "fwd" ? "animate-fade-in-up" : "animate-fade-in-down"}`}
+        className={`relative ${isFading === "out" ? "animate-fade-out" : isFading === "in" ? "animate-fade-in" : ""}`}
         role="group"
         aria-label={t(q.title as any)}
       >
@@ -309,7 +322,7 @@ export function GrowthWizard() {
     const plan = PLANS[result];
     const Icon = plan.icon;
     return (
-      <div key="result" className="text-center animate-fade-in-up">
+  <div key="result" className={`text-center ${isFading === "out" ? "animate-fade-out" : isFading === "in" ? "animate-fade-in" : ""}`}>
         <div className="flex items-center justify-center gap-2 mb-3">
           <Icon className={`w-7 h-7 ${COLOR_MAP[plan.color].text}`} />
           <Sparkles className="w-5 h-5 text-amber-300" />

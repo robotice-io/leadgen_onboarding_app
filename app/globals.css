@@ -106,3 +106,21 @@ html {
 .animate-fade-in-down {
   animation: fade-in-down 240ms cubic-bezier(0.22, 1, 0.36, 1) both;
 }
+
+@keyframes fade-in-basic {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out-basic {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+.animate-fade-in {
+  animation: fade-in-basic 220ms ease-out both;
+}
+
+.animate-fade-out {
+  animation: fade-out-basic 200ms ease-in both;
+}
