@@ -3,7 +3,7 @@ import { PricingHero } from "@/components/pricing/PricingHero";
 import { PlanAdvisor } from "@/components/pricing/PlanAdvisor";
 import { PlanComparison } from "@/components/pricing/PlanComparison";
 import { SharedBenefits } from "@/components/pricing/SharedBenefits";
-import { PricingFAQ } from "@/components/pricing/PricingFAQ";
+import { FAQGrowthSection } from "@/components/pricing/FAQGrowthSection";
 import { PricingFinalCTA } from "@/components/pricing/PricingFinalCTA";
 
 export default function PricingPage() {
@@ -13,7 +13,7 @@ export default function PricingPage() {
 			<PlanAdvisor />
 			<PlanComparison />
 			<SharedBenefits />
-			<PricingFAQ />
+			<FAQGrowthSection />
 			<PricingFinalCTA />
 		</main>
 	);

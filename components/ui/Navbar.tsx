@@ -11,7 +11,14 @@ import { useI18n } from "@/lib/i18n";
 export function Navbar() {
   const { t, lang } = useI18n();
   const pathname = usePathname();
-  const [authed, setAuthed] = useState(false);
+  // Inicializa desde localStorage para evitar parpadeo/cambio brusco de layout
+  const [authed, setAuthed] = useState<boolean>(() => {
+    try {
+      return isAuthenticated();
+    } catch {
+      return false;
+    }
+  });
   const [open, setOpen] = useState(false);
   const [hidden, setHidden] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -119,32 +126,32 @@ export function Navbar() {
       transition={{ duration: hidden ? 0.55 : 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
       <div className={shellClasses}>
-        <nav className="flex items-center justify-between px-4 sm:px-6 py-3">
+  <nav className="flex items-center justify-between px-4 sm:px-6 py-3">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
               <Image src="/landing_logo.png" alt="Robotice" width={160} height={40} className="h-8 sm:h-9 w-auto" />
             </Link>
             {/* Mobile hamburger on the left for better balance */}
             <button
-              className="md:hidden inline-flex items-center justify-center h-9 w-9 rounded-xl bg-white/10 border border-white/10"
+              className="lg:hidden inline-flex items-center justify-center h-9 w-9 rounded-xl bg-white/10 border border-white/10"
               aria-label="Abrir menú"
               onClick={() => setMobileOpen((v) => !v)}
             >
               {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <div className="hidden md:flex items-center gap-1">
+            <div className="hidden lg:flex items-center gap-1">
               <Link href="/" className={[linkBase, homeActive ? activePill : ""].join(" ")}>{lang === "es" ? "Home" : "Home"}</Link>
               <Link href="/#como-funciona" className={[linkBase, howActive ? activePill : ""].join(" ")}>{lang === "es" ? "Cómo funciona" : "How it works"}</Link>
               <Link href="/pricing#comparison" className={[linkBase, pricingActive ? activePill : ""].join(" ")}>{lang === "es" ? "Planes" : "Pricing"}</Link>
             </div>
           </div>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <Link href="mailto:contact@robotice.io" className="hidden md:inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10">
+          <div className="flex items-center gap-2 sm:gap-3 whitespace-nowrap">
+            <Link href="mailto:contact@robotice.io" className="hidden lg:inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10">
               {lang === "es" ? "Contacto" : "Contact"}
             </Link>
             {authed ? (
-              <div ref={profileRef} className="relative">
-                <Link href="/dashboard" className="inline-flex items-center gap-2 h-9 px-4 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/20 border border-white/20 mr-1">
+              <div ref={profileRef} className="relative flex items-center gap-2">
+                <Link href="/dashboard" className="inline-flex items-center gap-2 h-9 px-4 rounded-xl text-sm font-semibold bg-white/10 hover:bg-white/20 border border-white/20">
                   {t("nav.dashboard")}
                 </Link>
                 <button
