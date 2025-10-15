@@ -41,22 +41,22 @@ export function PlanComparison() {
 
   // Desktop grid comparative
   const DesktopGrid = () => (
-    <div className="hidden md:block overflow-x-auto pb-4 -mx-4 md:mx-0">
+    <div className="hidden md:block overflow-x-auto pb-4 mx-auto md:w-3/4">
       <div className="min-w-[940px] grid grid-cols-[200px_repeat(4,1fr)] rounded-2xl border border-slate-700/40 bg-slate-800/30 backdrop-blur-md">
         {/* Header row (no sticky para ahorrar espacio visual) */}
         <div className="border-b border-slate-700/40"></div>
         {plans.map((p) => (
           <div key={p.key} className="border-b border-l border-slate-700/40 p-4 text-center">
-            <h3 className="text-base font-semibold mb-0.5 leading-tight">{p.name}</h3>
-            <p className="text-blue-400 font-bold text-lg leading-tight">{p.price}</p>
-            {p.note && <p className="text-slate-400 text-[11px] leading-tight">{p.note}</p>}
+            <h3 className="text-base font-semibold mb-0.5 leading-tight text-white">{p.name}</h3>
+            <p className="text-white font-semibold text-lg leading-tight">{p.price}</p>
+            {p.note && <p className="text-white text-[11px] leading-tight font-semibold">{p.note}</p>}
           </div>
         ))}
 
         {/* Feature rows */}
         {features.map((f, i) => (
           <>
-            <div key={`label-${i}`} className={`px-3 py-2.5 min-h-[44px] ${i % 2 === 0 ? "bg-slate-800/40" : ""} border-t border-slate-700/20 text-slate-300 text-sm`}>{f.label}</div>
+            <div key={`label-${i}`} className={`px-3 py-2.5 min-h-[44px] ${i % 2 === 0 ? "bg-slate-800/40" : ""} border-t border-slate-700/20 text-white text-sm font-semibold`}>{f.label}</div>
             {plans.map((p) => (
               <div
                 key={`cell-${i}-${p.key}`}
@@ -71,7 +71,7 @@ export function PlanComparison() {
                 ) : (f.values as any)[p.key] === "Custom" || (f.values as any)[p.key] === "Personalizado" ? (
                   <CircleDashed className="w-4 h-4 text-orange-400 mx-auto" />
                 ) : (
-                  <span className="text-slate-200 text-sm">{(f.values as any)[p.key]}</span>
+                  <span className="text-white text-sm font-semibold">{(f.values as any)[p.key]}</span>
                 )}
               </div>
             ))}
@@ -109,14 +109,14 @@ export function PlanComparison() {
       {plans.filter((p) => p.key === active).map((p) => (
         <div key={p.key} className="rounded-2xl border border-slate-700/40 bg-slate-800/30 backdrop-blur-md">
           <div className="p-5 border-b border-slate-700/40">
-            <div className="text-lg font-semibold">{p.name}</div>
-            <div className="text-blue-400 font-bold text-2xl">{p.price}</div>
-            {p.note && <div className="text-slate-400 text-xs">{p.note}</div>}
+            <div className="text-lg font-semibold text-white">{p.name}</div>
+            <div className="text-white font-semibold text-2xl">{p.price}</div>
+            {p.note && <div className="text-white text-xs font-semibold">{p.note}</div>}
           </div>
           <div className="p-5">
             {features.map((f, i) => (
               <div key={`m-${i}`} className="py-3 border-t border-slate-700/40 flex items-center justify-between">
-                <span className="text-slate-400 text-sm">{f.label}</span>
+                <span className="text-white text-sm font-semibold">{f.label}</span>
                 <span className="ml-4">
                   {typeof (f.values as any)[p.key] === "boolean" ? (
                     (f.values as any)[p.key] ? (
@@ -127,7 +127,7 @@ export function PlanComparison() {
                   ) : (f.values as any)[p.key] === "Custom" || (f.values as any)[p.key] === "Personalizado" ? (
                     <CircleDashed className="w-5 h-5 text-orange-400" />
                   ) : (
-                    <span className="text-slate-200 font-medium">{(f.values as any)[p.key]}</span>
+                    <span className="text-white font-semibold">{(f.values as any)[p.key]}</span>
                   )}
                 </span>
               </div>
