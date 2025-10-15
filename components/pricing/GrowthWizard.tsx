@@ -155,6 +155,8 @@ export function GrowthWizard() {
   const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
   const [dir, setDir] = useState<"fwd" | "back">("fwd");
   const [isFading, setIsFading] = useState<"none" | "out" | "in">("none");
+  const fadeOutMs = 180;
+  const fadeInMs = 220;
 
   const atFirst = step === 0 && !result;
   const barPercent = ((result ? totalSteps : step) / totalSteps) * 100;
@@ -168,7 +170,11 @@ export function GrowthWizard() {
   const goBack = useCallback(() => {
     if (result) {
       setIsFading("out");
-      setTimeout(() => { setResult(null); setIsFading("in"); setTimeout(() => setIsFading("none"), 220); }, 180);
+      setTimeout(() => {
+        setResult(null);
+        setIsFading("in");
+        setTimeout(() => { setIsFading("none"); setSelectedIdx(null); }, fadeInMs);
+      }, fadeOutMs);
       return;
     }
     if (step > 0) {
@@ -178,8 +184,8 @@ export function GrowthWizard() {
         setAnswers((prev) => prev.slice(0, -1));
         setStep((s) => Math.max(0, s - 1));
         setIsFading("in");
-        setTimeout(() => setIsFading("none"), 220);
-      }, 180);
+        setTimeout(() => { setIsFading("none"); setSelectedIdx(null); }, fadeInMs);
+      }, fadeOutMs);
     }
   }, [result, step]);
 
@@ -197,10 +203,9 @@ export function GrowthWizard() {
         }
         return next;
       });
-      setSelectedIdx(null);
       setIsFading("in");
-      setTimeout(() => setIsFading("none"), 220);
-    }, 140);
+      setTimeout(() => { setIsFading("none"); setSelectedIdx(null); }, fadeInMs);
+    }, Math.min(140, fadeOutMs));
   };
 
   useEffect(() => {
@@ -266,7 +271,7 @@ export function GrowthWizard() {
     return (
       <div
         key={step}
-        className={`relative ${isFading === "out" ? "animate-fade-out" : isFading === "in" ? "animate-fade-in" : ""}`}
+        className={`relative will-change-[opacity,transform] ${isFading === "out" ? "animate-fade-out" : isFading === "in" ? "animate-fade-in" : ""}`}
         role="group"
         aria-label={t(q.title as any)}
       >
@@ -280,7 +285,7 @@ export function GrowthWizard() {
           </button>
         </div>
         <p className="text-lg font-medium text-white text-center mb-5">{t(q.question as any)}</p>
-        <div className="grid gap-3 text-left">
+  <div className={`grid gap-3 text-left ${isFading !== "none" ? "pointer-events-none" : ""}`}>
           {q.options.map((opt, i) => (
             <button
               key={i}
@@ -322,7 +327,7 @@ export function GrowthWizard() {
     const plan = PLANS[result];
     const Icon = plan.icon;
     return (
-  <div key="result" className={`text-center ${isFading === "out" ? "animate-fade-out" : isFading === "in" ? "animate-fade-in" : ""}`}>
+      <div key="result" className={`text-center will-change-[opacity,transform] ${isFading === "out" ? "animate-fade-out" : isFading === "in" ? "animate-fade-in" : ""}`}>
         <div className="flex items-center justify-center gap-2 mb-3">
           <Icon className={`w-7 h-7 ${COLOR_MAP[plan.color].text}`} />
           <Sparkles className="w-5 h-5 text-amber-300" />
