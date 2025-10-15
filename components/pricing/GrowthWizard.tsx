@@ -11,6 +11,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { openCalendly } from "@/lib/calendly";
+import { useI18n } from "@/lib/i18n";
 
 type ColorKey = "emerald" | "blue" | "purple" | "orange";
 
@@ -53,37 +54,37 @@ const QUESTIONS = [
   {
     id: 1,
     icon: Lightbulb,
-    title: "Volumen de contactos",
-    question: "¿Cuántos leads B2B quieres contactar cada mes?",
+    title: "wizard.step1.title",
+    question: "wizard.step1.question",
     options: [
-      { label: "Menos de 3.000 (validando mercado)", value: 1, color: "emerald" as ColorKey },
-      { label: "3.000–6.000 (pipeline activo)", value: 2, color: "blue" as ColorKey },
-      { label: "6.000–12.000 (equipo en crecimiento)", value: 3, color: "purple" as ColorKey },
-      { label: "Más de 12.000 (escala o múltiples equipos)", value: 4, color: "orange" as ColorKey },
+      { label: "wizard.step1.opt1", value: 1, color: "emerald" as ColorKey },
+      { label: "wizard.step1.opt2", value: 2, color: "blue" as ColorKey },
+      { label: "wizard.step1.opt3", value: 3, color: "purple" as ColorKey },
+      { label: "wizard.step1.opt4", value: 4, color: "orange" as ColorKey },
     ],
   },
   {
     id: 2,
     icon: Mail,
-    title: "Canales y remitentes",
-    question: "¿Desde cuántas cuentas o canales de e-mail trabajas?",
+    title: "wizard.step2.title",
+    question: "wizard.step2.question",
     options: [
-      { label: "1 cuenta personal o marca", value: 1, color: "emerald" as ColorKey },
-      { label: "2–3 cuentas de equipo", value: 2, color: "blue" as ColorKey },
-      { label: "Más de 3 remitentes", value: 3, color: "purple" as ColorKey },
-      { label: "Multicanal (e-mail, LinkedIn, WhatsApp…)", value: 4, color: "orange" as ColorKey },
+      { label: "wizard.step2.opt1", value: 1, color: "emerald" as ColorKey },
+      { label: "wizard.step2.opt2", value: 2, color: "blue" as ColorKey },
+      { label: "wizard.step2.opt3", value: 3, color: "purple" as ColorKey },
+      { label: "wizard.step2.opt4", value: 4, color: "orange" as ColorKey },
     ],
   },
   {
     id: 3,
     icon: BarChart3,
-    title: "Reporting y soporte",
-    question: "¿Qué nivel de seguimiento necesitas?",
+    title: "wizard.step3.title",
+    question: "wizard.step3.question",
     options: [
-      { label: "Solo métricas básicas", value: 1, color: "emerald" as ColorKey },
-      { label: "Dashboard con KPIs", value: 2, color: "blue" as ColorKey },
-      { label: "Reportes PDF + CRM", value: 3, color: "purple" as ColorKey },
-      { label: "SLA y métricas avanzadas", value: 4, color: "orange" as ColorKey },
+      { label: "wizard.step3.opt1", value: 1, color: "emerald" as ColorKey },
+      { label: "wizard.step3.opt2", value: 2, color: "blue" as ColorKey },
+      { label: "wizard.step3.opt3", value: 3, color: "purple" as ColorKey },
+      { label: "wizard.step3.opt4", value: 4, color: "orange" as ColorKey },
     ],
   },
 ];
@@ -92,30 +93,46 @@ const PLANS = {
   Startup: {
     color: "emerald" as ColorKey,
     icon: Lightbulb,
-    title: "Startup",
-    desc: "Para validar mercado con bajo volumen.",
-    features: ["3 000 leads verificados", "1 remitente", "Campañas IA básicas"],
+    title: "wizard.plan.startup.title",
+    desc: "wizard.plan.startup.desc",
+    features: [
+      "wizard.plan.startup.f1",
+      "wizard.plan.startup.f2",
+      "wizard.plan.startup.f3",
+    ],
   },
   PyME: {
     color: "blue" as ColorKey,
     icon: Mail,
-    title: "PyME",
-    desc: "Para equipos pequeños que quieren mantener su pipeline activo.",
-    features: ["5 000 leads", "Hasta 3 remitentes", "Dashboard avanzado"],
+    title: "wizard.plan.pyme.title",
+    desc: "wizard.plan.pyme.desc",
+    features: [
+      "wizard.plan.pyme.f1",
+      "wizard.plan.pyme.f2",
+      "wizard.plan.pyme.f3",
+    ],
   },
   Empresa: {
     color: "purple" as ColorKey,
     icon: BarChart3,
-    title: "Empresa",
-    desc: "Para escalar campañas con reporting e integraciones CRM.",
-    features: ["8 000–12 000 leads", "Reporting PDF", "Integraciones CRM"],
+    title: "wizard.plan.empresa.title",
+    desc: "wizard.plan.empresa.desc",
+    features: [
+      "wizard.plan.empresa.f1",
+      "wizard.plan.empresa.f2",
+      "wizard.plan.empresa.f3",
+    ],
   },
   Enterprise: {
     color: "orange" as ColorKey,
     icon: Building,
-    title: "Enterprise",
-    desc: "Grandes equipos, soporte garantizado e integraciones multicanal.",
-    features: ["Volumen alto", "SLA garantizado", "APIs personalizadas"],
+    title: "wizard.plan.enterprise.title",
+    desc: "wizard.plan.enterprise.desc",
+    features: [
+      "wizard.plan.enterprise.f1",
+      "wizard.plan.enterprise.f2",
+      "wizard.plan.enterprise.f3",
+    ],
   },
 };
 
@@ -130,10 +147,12 @@ function recommendPlan(v: number, c: number, r: number): PlanKey {
 }
 
 export function GrowthWizard() {
+  const { t, lang } = useI18n();
   const totalSteps = QUESTIONS.length;
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
   const [result, setResult] = useState<PlanKey | null>(null);
+  const [selectedIdx, setSelectedIdx] = useState<number | null>(null);
 
   const atFirst = step === 0 && !result;
   const barPercent = ((result ? totalSteps : step) / totalSteps) * 100;
@@ -179,12 +198,37 @@ export function GrowthWizard() {
     return () => window.removeEventListener("keydown", onKey);
   }, [goBack]);
 
+  // Persist state in sessionStorage
+  useEffect(() => {
+    try {
+      const rawStep = sessionStorage.getItem("gw_step");
+      const rawAns = sessionStorage.getItem("gw_answers");
+      const rawRes = sessionStorage.getItem("gw_result");
+      if (rawStep) setStep(parseInt(rawStep, 10) || 0);
+      if (rawAns) setAnswers(JSON.parse(rawAns));
+      if (rawRes) setResult(rawRes as PlanKey);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    try { sessionStorage.setItem("gw_step", String(step)); } catch {}
+  }, [step]);
+  useEffect(() => {
+    try { sessionStorage.setItem("gw_answers", JSON.stringify(answers)); } catch {}
+  }, [answers]);
+  useEffect(() => {
+    try { sessionStorage.setItem("gw_result", result ?? ""); } catch {}
+  }, [result]);
+
+  // reset selection when step changes
+  useEffect(() => { setSelectedIdx(null); }, [step, result]);
+
   const ProgressBar = () => (
     <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
       <motion.div
         className={`h-2 ${COLOR_MAP[activeColor].bar}`}
         animate={{ width: `${barPercent}%` }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
+        transition={{ type: "spring", stiffness: 180, damping: 24 }}
       />
     </div>
   );
@@ -192,52 +236,69 @@ export function GrowthWizard() {
   const Stepper = () => (
     <div className="flex items-center justify-center gap-3 mt-4">
       {Array.from({ length: totalSteps }).map((_, i) => (
-        <div
+        <motion.div
           key={i}
           className={`h-2 w-6 rounded-full ${i <= (result ? totalSteps - 1 : step) ? COLOR_MAP[activeColor].dot : "bg-slate-700"}`}
+          animate={{ scale: i === step && !result ? 1.1 : 1, opacity: 1 }}
+          transition={{ type: "spring", stiffness: 220, damping: 18 }}
         />
       ))}
     </div>
   );
 
-  const QuestionCard = () => {
+  const QuestionContent = () => {
     const q = QUESTIONS[step];
     const Icon = q.icon;
     return (
       <motion.div
         key={step}
-        initial={{ x: 80, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: -80, opacity: 0 }}
-        transition={{ duration: 0.35 }}
-        className="bg-slate-800/30 border border-slate-700/40 rounded-2xl p-8 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)]"
+        initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
+        transition={{ type: "spring", stiffness: 260, damping: 24 }}
         role="group"
-        aria-label={q.title}
+        aria-label={t(q.title as any)}
       >
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-2">
             <Icon className={`w-5 h-5 ${COLOR_MAP["blue"].text}`} />
-            <span className="text-sm text-slate-300">Paso {step + 1} de {totalSteps}</span>
+            <span className="text-sm text-slate-300">{lang === "es" ? "Paso" : "Step"} {step + 1} {lang === "es" ? "de" : "of"} {totalSteps}</span>
           </div>
-          <button onClick={goBack} className="inline-flex items-center gap-1 text-slate-300/90 hover:text-white transition disabled:opacity-40" disabled={atFirst} aria-label="Volver">
-            <ChevronLeft className="w-4 h-4" /> Volver
+          <button onClick={goBack} className="inline-flex items-center gap-1 text-slate-300/90 hover:text-white transition disabled:opacity-40" disabled={atFirst} aria-label={t("wizard.action.back" as any)}>
+            <ChevronLeft className="w-4 h-4" /> {t("wizard.action.back" as any)}
           </button>
         </div>
-        <p className="text-lg font-medium text-white text-center mb-5">{q.question}</p>
+        <p className="text-lg font-medium text-white text-center mb-5">{t(q.question as any)}</p>
         <div className="grid gap-3 text-left">
           {q.options.map((opt, i) => (
-            <button
+            <motion.button
               key={i}
-              onClick={() => handleAnswer(opt.value)}
-              className={`rounded-xl border border-slate-700/40 px-4 py-3 text-slate-200 transition ${COLOR_MAP[opt.color].hoverBorder} ${COLOR_MAP[opt.color].hoverBg} focus:outline-none focus:ring-2 ${COLOR_MAP[opt.color].ring}`}
+              onClick={() => {
+                setSelectedIdx(i);
+                setTimeout(() => handleAnswer(opt.value), 170);
+              }}
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.995 }}
+              className={`rounded-xl px-4 py-3 text-slate-200 transition-colors duration-200 border ${selectedIdx === i ? `border-transparent ring-2 ${COLOR_MAP[opt.color].ring}` : "border-slate-700/40"} ${COLOR_MAP[opt.color].hoverBorder} ${COLOR_MAP[opt.color].hoverBg} focus:outline-none`}
             >
-              {opt.label}
-            </button>
+              <div className="flex items-center justify-between">
+                <span>{t(opt.label as any)}</span>
+                {selectedIdx === i && (
+                  <motion.span
+                    layoutId="selected-glow"
+                    className={`ml-3 inline-block w-2.5 h-2.5 rounded-full ${COLOR_MAP[opt.color].dot}`}
+                    initial={{ scale: 0.6, opacity: 0.6 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    transition={{ type: "spring", stiffness: 280, damping: 18 }}
+                  />
+                )}
+              </div>
+            </motion.button>
           ))}
         </div>
         <div className="flex items-center justify-end mt-6">
           <div className="flex items-center gap-2 text-slate-400 text-sm">
-            Siguiente
+            {t("wizard.action.next" as any)}
             <ChevronRight className="w-4 h-4" />
           </div>
         </div>
@@ -245,48 +306,48 @@ export function GrowthWizard() {
     );
   };
 
-  const ResultCard = () => {
+  const ResultContent = () => {
     if (!result) return null;
     const plan = PLANS[result];
     const Icon = plan.icon;
     return (
       <motion.div
         key="result"
-        initial={{ y: 40, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        exit={{ y: -40, opacity: 0 }}
-        transition={{ duration: 0.4 }}
-        className="bg-slate-800/30 border border-slate-700/40 rounded-2xl p-10 backdrop-blur-md text-center shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)]"
+        initial={{ opacity: 0, y: 10, filter: "blur(8px)" }}
+        animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+        exit={{ opacity: 0, y: -10, filter: "blur(8px)" }}
+        transition={{ type: "spring", stiffness: 240, damping: 22 }}
+        className="text-center"
       >
         <div className="flex items-center justify-center gap-2 mb-3">
           <Icon className={`w-7 h-7 ${COLOR_MAP[plan.color].text}`} />
           <Sparkles className="w-5 h-5 text-amber-300" />
         </div>
         <h3 className="text-3xl font-bold mb-2">
-          Tu plan ideal es {" "}
-          <span className={`${COLOR_MAP[plan.color].text}`}>{plan.title}</span>
+          {t("wizard.result.titlePrefix" as any)} {" "}
+          <span className={`${COLOR_MAP[plan.color].text}`}>{t(plan.title as any)}</span>
         </h3>
-        <p className="text-slate-300 mb-6">{plan.desc}</p>
+        <p className="text-slate-300 mb-6">{t(plan.desc as any)}</p>
         <ul className="grid sm:grid-cols-2 gap-2 text-slate-300 mb-8 text-left max-w-md mx-auto">
           {plan.features.map((f, i) => (
             <li key={i} className="flex items-center gap-2">
               <span className={`w-1.5 h-1.5 rounded-full ${COLOR_MAP[plan.color].dot}`} />
-              {f}
+              {t(f as any)}
             </li>
           ))}
         </ul>
         <div className="flex flex-col sm:flex-row justify-center gap-3">
           <a href="#comparison" className="px-6 py-3 bg-blue-600 rounded-xl font-semibold hover:bg-blue-500 transition">
-            Ver detalles del plan
+            {t("wizard.cta.details" as any)}
           </a>
           <button onClick={() => openCalendly()} className="px-6 py-3 border border-slate-600 rounded-xl hover:bg-slate-800 transition">
-            Agendar una demo
+            {t("wizard.cta.demo" as any)}
           </button>
           <button
             onClick={() => { setStep(0); setAnswers([]); setResult(null); }}
             className="px-6 py-3 border border-slate-700/60 rounded-xl hover:bg-slate-800/60 transition"
           >
-            Rehacer quiz
+            {t("wizard.action.restart" as any)}
           </button>
         </div>
       </motion.div>
@@ -297,17 +358,20 @@ export function GrowthWizard() {
     <section className="py-20 md:py-28 bg-[#0b1120] text-white">
       <div className="container mx-auto px-6">
         <div className="max-w-3xl mx-auto text-center mb-8">
-          <h2 className="text-3xl md:text-4xl font-bold">Encuentra tu nivel de prospección</h2>
-          <p className="text-slate-300 mt-3">Un asistente rápido para recomendarte el plan ideal según tu negocio.</p>
+          <h2 className="text-3xl md:text-4xl font-bold">{t("wizard.title" as any)}</h2>
+          <p className="text-slate-300 mt-3">{t("wizard.subtitle" as any)}</p>
         </div>
 
         <div className="max-w-3xl mx-auto">
           <ProgressBar />
           <Stepper />
-          <div className="relative overflow-hidden min-h-[340px] mt-6">
-            <AnimatePresence mode="wait">
-              {result ? <ResultCard /> : <QuestionCard />}
-            </AnimatePresence>
+          <div className="relative overflow-hidden mt-6">
+            {/* Card estática */}
+            <div className="bg-slate-800/30 border border-slate-700/40 rounded-2xl p-8 md:p-10 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] min-h-[360px]">
+              <AnimatePresence mode="wait" initial={false}>
+                {result ? <ResultContent /> : <QuestionContent />}
+              </AnimatePresence>
+            </div>
           </div>
         </div>
       </div>
