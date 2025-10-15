@@ -6,6 +6,7 @@ import { CheckCircle2, Calendar, ArrowRight } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { Trans } from "@/components/ui/Trans";
 import LanguageToggle from "@/components/ui/LanguageToggle";
+import { openCalendly } from "@/lib/calendly";
 
 const fadeParent: Variants = {
   hidden: { opacity: 0 },
@@ -98,12 +99,12 @@ export function Hero() {
             <ArrowRight className="ml-2 w-5 h-5 transition-transform group-hover:translate-x-1" />
             <span className="absolute inset-0 rounded-xl ring-1 ring-inset ring-white/10" />
           </Link>
-          <Link
-            href="/login"
+          <button
+            onClick={openCalendly}
             className="inline-flex items-center justify-center rounded-xl px-8 py-4 text-base font-semibold border border-slate-600/60 text-slate-200 hover:text-white bg-slate-800/30 hover:bg-slate-800/60 backdrop-blur-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900"
           >
             <Calendar className="mr-2 w-5 h-5" /> {t("landing.hero.secondaryCta")}
-          </Link>
+          </button>
         </motion.div>
       </motion.div>
     </section>

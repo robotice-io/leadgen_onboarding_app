@@ -8,6 +8,7 @@ import { WhyLeadGen } from "@/components/landing/WhyLeadGen";
 import { Deliverables } from "@/components/landing/Deliverables";
 import { Pricing } from "@/components/landing/Pricing";
 import { useI18n } from "@/lib/i18n";
+import { openCalendly } from "@/lib/calendly";
 
 export default function Home() {
 	const { t, lang } = useI18n();
@@ -81,13 +82,13 @@ export default function Home() {
 							{t("landing.finalCta.primaryCta")}
 							<ArrowRight className="ml-2 w-5 h-5" />
 						</Link>
-						<Link
-							href="/login"
-							className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-blue-700 text-white text-lg font-semibold border-2 border-white hover:bg-blue-600 transition-all"
-						>
-							<Calendar className="mr-2 w-5 h-5" />
-							{t("landing.finalCta.secondaryCta")}
-						</Link>
+									<button
+										onClick={openCalendly}
+										className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-blue-700 text-white text-lg font-semibold border-2 border-white hover:bg-blue-600 transition-all"
+									>
+										<Calendar className="mr-2 w-5 h-5" />
+										{t("landing.finalCta.secondaryCta")}
+									</button>
 					</div>
 				</div>
 			</section>
