@@ -22,6 +22,8 @@ export function Navbar() {
   const latestY = useRef(0);
   const ticking = useRef(false);
   const hideTimer = useRef<number | null>(null);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const [navHeight, setNavHeight] = useState(0);
 
   useEffect(() => {
     try { setAuthed(isAuthenticated()); } catch { setAuthed(false); }
@@ -31,9 +33,9 @@ export function Navbar() {
     function update() {
       const y = latestY.current;
       setScrolled(y > 8);
-      const delta = y - lastY.current;
-      const threshold = 6;
-      const hideDelay = 120; // ms delay to avoid flicker
+  const delta = y - lastY.current;
+  const threshold = 6;
+  const hideDelay = 220; // ms delay to avoid flicker
       if (y > 24 && delta > threshold) {
         if (hideTimer.current) window.clearTimeout(hideTimer.current);
         hideTimer.current = window.setTimeout(() => setHidden(true), hideDelay) as unknown as number;
@@ -62,6 +64,16 @@ export function Navbar() {
   }, []);
 
   useEffect(() => {
+    const updateHeight = () => {
+      const h = rootRef.current?.offsetHeight || 0;
+      setNavHeight(h);
+    };
+    updateHeight();
+    window.addEventListener("resize", updateHeight);
+    return () => window.removeEventListener("resize", updateHeight);
+  }, []);
+
+  useEffect(() => {
     function onDocClick(e: MouseEvent) {
       if (!(e.target instanceof Node)) return;
       if (profileRef.current && !profileRef.current.contains(e.target)) setOpen(false);
@@ -78,12 +90,7 @@ export function Navbar() {
     return () => window.removeEventListener("hashchange", updateHash);
   }, []);
 
-  const containerClasses = [
-    "fixed top-0 inset-x-0 z-40 transition-transform transition-opacity",
-    hidden
-      ? "-translate-y-full opacity-0 duration-500 ease-[cubic-bezier(0.4,0,0.2,1)]"
-      : "translate-y-0 opacity-100 duration-300 ease-out",
-  ].join(" ");
+  const containerBase = "fixed top-0 inset-x-0 z-40";
 
   const isGlass = scrolled || mobileOpen;
   const shellClasses = [
@@ -104,7 +111,13 @@ export function Navbar() {
   const pricingActive = isPricing;
 
   return (
-    <div className={containerClasses} style={{ willChange: "transform, opacity" }}>
+    <motion.div
+      ref={rootRef}
+      className={containerBase}
+      style={{ willChange: "transform, opacity" }}
+      animate={{ y: hidden ? -(navHeight + 12) : 0, opacity: hidden ? 0 : 1 }}
+      transition={{ duration: hidden ? 0.55 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+    >
       <div className={shellClasses}>
         <nav className="flex items-center justify-between px-4 sm:px-6 py-3">
           <div className="flex items-center gap-4">
@@ -201,6 +214,6 @@ export function Navbar() {
           )}
         </AnimatePresence>
       </div>
-    </div>
+    </motion.div>
   );
 }
