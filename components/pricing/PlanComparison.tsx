@@ -41,37 +41,37 @@ export function PlanComparison() {
 
   // Desktop grid comparative
   const DesktopGrid = () => (
-    <div className="hidden md:block overflow-x-auto pb-6 -mx-4 md:mx-0">
-      <div className="min-w-[1000px] grid grid-cols-[220px_repeat(4,1fr)] rounded-2xl border border-slate-700/40 bg-slate-800/30 backdrop-blur-md">
-        {/* Header row */}
-        <div className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-slate-700/40"></div>
+    <div className="hidden md:block overflow-x-auto pb-4 -mx-4 md:mx-0">
+      <div className="min-w-[940px] grid grid-cols-[200px_repeat(4,1fr)] rounded-2xl border border-slate-700/40 bg-slate-800/30 backdrop-blur-md">
+        {/* Header row (no sticky para ahorrar espacio visual) */}
+        <div className="border-b border-slate-700/40"></div>
         {plans.map((p) => (
-          <div key={p.key} className="sticky top-0 z-10 bg-slate-900/80 backdrop-blur-md border-b border-l border-slate-700/40 p-6 text-center">
-            <h3 className="text-lg font-semibold mb-1">{p.name}</h3>
-            <p className="text-blue-400 font-bold text-xl mb-1">{p.price}</p>
-            {p.note && <p className="text-slate-400 text-xs">{p.note}</p>}
+          <div key={p.key} className="border-b border-l border-slate-700/40 p-4 text-center">
+            <h3 className="text-base font-semibold mb-0.5 leading-tight">{p.name}</h3>
+            <p className="text-blue-400 font-bold text-lg leading-tight">{p.price}</p>
+            {p.note && <p className="text-slate-400 text-[11px] leading-tight">{p.note}</p>}
           </div>
         ))}
 
         {/* Feature rows */}
         {features.map((f, i) => (
           <>
-            <div key={`label-${i}`} className={`p-4 min-h-[60px] ${i % 2 === 0 ? "bg-slate-800/40" : ""} border-t border-slate-700/20 text-slate-300`}>{f.label}</div>
-            {plans.map((p, j) => (
+            <div key={`label-${i}`} className={`px-3 py-2.5 min-h-[44px] ${i % 2 === 0 ? "bg-slate-800/40" : ""} border-t border-slate-700/20 text-slate-300 text-sm`}>{f.label}</div>
+            {plans.map((p) => (
               <div
                 key={`cell-${i}-${p.key}`}
-                className={`p-4 min-h-[60px] text-center ${i % 2 === 0 ? "bg-slate-800/40" : ""} border-t border-l border-slate-700/20`}
+                className={`px-3 py-2.5 min-h-[44px] text-center ${i % 2 === 0 ? "bg-slate-800/40" : ""} border-t border-l border-slate-700/20`}
               >
                 {typeof (f.values as any)[p.key] === "boolean" ? (
                   (f.values as any)[p.key] ? (
-                    <Check className="w-5 h-5 text-emerald-400 mx-auto" />
+                    <Check className="w-4 h-4 text-emerald-400 mx-auto" />
                   ) : (
-                    <X className="w-5 h-5 text-slate-600 mx-auto" />
+                    <X className="w-4 h-4 text-slate-600 mx-auto" />
                   )
                 ) : (f.values as any)[p.key] === "Custom" || (f.values as any)[p.key] === "Personalizado" ? (
-                  <CircleDashed className="w-5 h-5 text-orange-400 mx-auto" />
+                  <CircleDashed className="w-4 h-4 text-orange-400 mx-auto" />
                 ) : (
-                  <span className="text-slate-200">{(f.values as any)[p.key]}</span>
+                  <span className="text-slate-200 text-sm">{(f.values as any)[p.key]}</span>
                 )}
               </div>
             ))}
@@ -79,10 +79,10 @@ export function PlanComparison() {
         ))}
 
         {/* CTA row */}
-        <div className="p-4" />
+        <div className="px-3 py-3" />
         {plans.map((p) => (
-          <div key={`cta-${p.key}`} className="p-4 border-t border-l border-slate-700/20 flex items-center justify-center">
-            <Link href="/login" className="inline-flex items-center justify-center px-4 py-2.5 rounded-lg bg-blue-600 hover:bg-blue-500 font-semibold text-white">
+          <div key={`cta-${p.key}`} className="px-3 py-3 border-t border-l border-slate-700/20 flex items-center justify-center">
+            <Link href="/login" className="inline-flex items-center justify-center px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-500 font-semibold text-white text-sm">
               {ctaLabel(p.key)}
             </Link>
           </div>
@@ -144,11 +144,11 @@ export function PlanComparison() {
   );
 
   return (
-    <section id="comparison" className="py-20 md:py-28">
+    <section id="comparison" className="py-16 md:py-20">
       <div className="container mx-auto px-6">
         <div className="text-center max-w-3xl mx-auto mb-10">
           <h2 className="text-3xl md:text-4xl font-bold">{t("pricing.comparison.heading")}</h2>
-          <p className="text-slate-300 mt-2">{t("pricing.comparison.subtitle")}</p>
+          <p className="text-slate-300 mt-1">{t("pricing.comparison.subtitle")}</p>
         </div>
 
         <DesktopGrid />
