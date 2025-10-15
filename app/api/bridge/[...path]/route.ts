@@ -9,10 +9,14 @@ function getApiBase() {
 
 function getApiKey(): string {
   const apiKey = process.env.API_KEY;
-  if (!apiKey) {
-    throw new Error("API key not configured. Please set API_KEY in your environment variables (server-side only).");
+  if (apiKey) return apiKey;
+  // Dev/Preview fallback: allow using public key env only outside production to avoid 500s during local/preview testing
+  const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+  if (!isProd) {
+    const publicKey = process.env.NEXT_PUBLIC_API_KEY;
+    if (publicKey) return publicKey;
   }
-  return apiKey;
+  throw new Error("API key not configured. Please set API_KEY in your environment variables (server-side only).");
 }
 
 async function proxy(req: NextRequest) {

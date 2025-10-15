@@ -157,11 +157,11 @@ export async function login(email: string, password: string): Promise<AuthTokens
   removeRefreshToken();
   removeTenant();
   
-  const url = getRequestUrl("/api/v1/auth/login");
-  // Login endpoint does NOT require API key per backend specification
+  // Force proxy for login to ensure server API key is used
+  const url = getRequestUrl("/api/v1/auth/login", true);
   const res = await fetch(url, {
     method: "POST",
-    headers: buildHeaders(false), // No API key for login
+    headers: buildHeaders(true), // Include API key via proxy
     body: JSON.stringify({ email, password }),
   });
 

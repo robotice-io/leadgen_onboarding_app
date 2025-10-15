@@ -9,8 +9,13 @@ function getApiBase() {
 
 function getApiKey(): string {
   const apiKey = process.env.API_KEY;
-  if (!apiKey) throw new Error("API_KEY not configured on server");
-  return apiKey;
+  if (apiKey) return apiKey;
+  const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+  if (!isProd) {
+    const publicKey = process.env.NEXT_PUBLIC_API_KEY;
+    if (publicKey) return publicKey;
+  }
+  throw new Error("API_KEY not configured on server");
 }
 
 export async function POST(req: NextRequest) {

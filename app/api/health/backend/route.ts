@@ -8,7 +8,14 @@ function getApiBase() {
 }
 
 function getApiKey(): string {
-  const k = process.env.API_KEY;
+  let k = process.env.API_KEY;
+  if (!k) {
+    const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+    if (!isProd) {
+      const publicK = process.env.NEXT_PUBLIC_API_KEY;
+      if (publicK) k = publicK;
+    }
+  }
   if (!k) throw new Error("API_KEY not configured on server");
   return k;
 }
