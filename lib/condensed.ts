@@ -21,6 +21,7 @@ export type CondensedDashboard = {
   timing?: {
     time_distribution?: Record<string, number>;
     median_time_to_open_minutes?: number;
+    avg_time_to_open_minutes?: number;
   };
   deliverability?: {
     provider_performance?: Array<{ provider: string; opens_count: number; open_rate: number }>;
@@ -36,12 +37,22 @@ export type CondensedDashboard = {
 };
 
 // Mapea la respuesta de /metrics/{tenantId}/comprehensive-analytics al shape CondensedDashboard usado por el Dashboard
-function mapComprehensiveToCondensed(payload: any): CondensedDashboard {
-  const overview = payload?.campaign_overview || payload?.performance_summary || {};
-  const timing = payload?.timing_analysis || {};
-  const deliverability = payload?.deliverability_health || {};
-  const platform = payload?.platform_intelligence || {};
-  const trends = payload?.trend_analysis || {};
+function pickWindow(payload: any, days: number) {
+  if (!payload) return payload;
+  if (days <= 1 && payload.today) return payload.today;
+  if (days <= 7 && payload.last_7_days) return payload.last_7_days;
+  if (days <= 14 && payload.last_14_days) return payload.last_14_days;
+  if (payload.last_30_days) return payload.last_30_days;
+  return payload; // fallback to root (legacy)
+}
+
+function mapComprehensiveToCondensed(payload: any, days: number): CondensedDashboard {
+  const windowed = pickWindow(payload, days) || payload;
+  const overview = windowed?.campaign_overview || windowed?.performance_summary || {};
+  const timing = windowed?.timing_analysis || {};
+  const deliverability = windowed?.deliverability_health || {};
+  const platform = windowed?.platform_intelligence || {};
+  const trends = windowed?.trend_analysis || {};
 
   const mapped: CondensedDashboard = {
     overview: {
@@ -66,6 +77,7 @@ function mapComprehensiveToCondensed(payload: any): CondensedDashboard {
     timing: {
       time_distribution: timing.time_distribution,
       median_time_to_open_minutes: timing.median_time_to_open_minutes ?? payload?.timing_analysis?.median_time_to_open_minutes,
+      avg_time_to_open_minutes: timing.avg_time_to_open_minutes ?? overview.avg_time_to_open ?? payload?.timing_analysis?.avg_time_to_open_minutes,
     },
     deliverability: {
       provider_performance: deliverability.provider_performance,
@@ -99,7 +111,7 @@ export function useCondensedDashboard(tenantId?: number, days = 30) {
         throw new Error(txt || `Failed to fetch condensed dashboard`);
       }
       const json = await res.json();
-      return mapComprehensiveToCondensed(json);
+      return mapComprehensiveToCondensed(json, days);
     },
     enabled: !!tenantId,
     staleTime: 60_000,

@@ -63,9 +63,9 @@ export function KpiSummary({ data, loading, days = 30, onChangeDays }: Props) {
         <KPIItem labelKey="dashboard.deliverability" value={(ov?.deliverability_score ?? de?.inbox_placement_score ?? 0)} format="percent-int" suffix="%" icon={<Gauge className="h-4 w-4" />} />
         <KPIItem labelKey="dashboard.fastResponse" value={ov?.fast_response_rate ?? 0} format="percent-int" suffix="%" icon={<Timer className="h-4 w-4" />} />
 
-        <KPIItem labelKey="dashboard.multiDevice" value={ov?.multi_device_rate ?? 0} format="percent-int" suffix="%" icon={<Repeat className="h-4 w-4" />} />
-        <KPIItem labelKey="dashboard.engagementDepth" value={ov?.engagement_depth ?? 0} format="percent-int" suffix="%" icon={<Cpu className="h-4 w-4" />} />
-        <KPIItem labelKey="dashboard.medianTimeToOpen" value={ti?.median_time_to_open_minutes ?? 0} format="minutes-2" suffix="m" icon={<Timer className="h-4 w-4" />} />
+  <KPIItem labelKey="dashboard.multiDevice" value={ov?.multi_device_rate ?? 0} format="percent-int" suffix="%" icon={<Repeat className="h-4 w-4" />} />
+  <KPIItem labelKey="dashboard.engagementDepth" value={ov?.engagement_depth ?? 0} format="percent-int" suffix="%" icon={<Cpu className="h-4 w-4" />} />
+  <KPIItem labelKey="dashboard.avgTimeToOpen" value={ti?.avg_time_to_open_minutes ?? 0} format="minutes-2" suffix="m" icon={<Timer className="h-4 w-4" />} />
       </div>
 
       {/* Mini trend tile */}
