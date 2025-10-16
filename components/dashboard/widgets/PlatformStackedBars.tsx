@@ -14,13 +14,13 @@ const PLATFORM_COLORS: Record<string, string> = {
   unknown: "#9CA3AF",
 };
 
-export function PlatformStackedBars({ days = 30 }: { days?: number }) {
+export function PlatformStackedBars({ days = 30, data: prefetched }: { days?: number; data?: Array<{ date: string; [platform: string]: number | string }> }) {
   const tenant = getTenant();
   const tenantId = tenant?.tenant_id as number | undefined;
-  const { data, isLoading, error } = useTrends(tenantId, days);
+  const { data, isLoading, error } = prefetched ? { data: undefined, isLoading: false, error: undefined } as any : useTrends(tenantId, days);
 
   const keys = new Set<string>();
-  const chartData = (data?.daily_trends || []).map(d => {
+  const chartData = prefetched || (data?.daily_trends || []).map((d: any) => {
     const pd = d.platform_distribution || {};
     Object.keys(pd).forEach(k => keys.add(k));
     return { date: d.date, ...pd } as any;

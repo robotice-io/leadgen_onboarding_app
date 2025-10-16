@@ -5,12 +5,12 @@ import { ChartCard } from "@/components/dashboard/cards/ChartCard";
 import { useDeliverability } from "@/lib/metrics";
 import { getTenant } from "@/lib/auth-client";
 
-export function DeliverabilityProviders({ days = 30 }: { days?: number }) {
+export function DeliverabilityProviders({ days = 30, providers }: { days?: number; providers?: Array<{ provider: string; opens_count: number; open_rate: number }> }) {
   const tenant = getTenant();
   const tenantId = tenant?.tenant_id as number | undefined;
-  const { data, isLoading, error } = useDeliverability(tenantId, days);
+  const { data, isLoading, error } = providers ? { data: undefined, isLoading: false, error: undefined } as any : useDeliverability(tenantId, days);
 
-  const rows = (data?.provider_performance || []).map(p => ({
+  const rows = (providers || data?.provider_performance || []).map((p: any) => ({
     provider: p.provider,
     opens: p.opens_count,
     openRate: p.open_rate,

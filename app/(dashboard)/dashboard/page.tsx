@@ -4,7 +4,9 @@ import { useI18n } from "@/lib/i18n";
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
 import { getTenant } from "@/lib/auth-client";
-import { useCampaignOverview, useDeliverability, useEngagement, usePlatformIntelligence, useTimingAnalysis } from "@/lib/metrics";
+// Metrics widgets obtain their own data or can be wired to condensed payload in future iterations
+import { useCondensedDashboard } from "@/lib/condensed";
+import { useTenantId } from "@/lib/use-tenant-id";
 import { KpiCard } from "@/components/dashboard/cards/KpiCard";
 import { OpenRateTrend } from "@/components/dashboard/widgets/OpenRateTrend";
 import { SentOpenedBars } from "@/components/dashboard/widgets/SentOpenedBars";
@@ -18,13 +20,8 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function DashboardPage() {
   const { t } = useI18n();
-  const tenant = getTenant();
-  const tenantId = tenant?.tenant_id as number | undefined;
-  const { data: overview, isLoading: overviewLoading, error: overviewError } = useCampaignOverview(tenantId, 30);
-  const { data: deliverability, isLoading: delivLoading, error: delivError } = useDeliverability(tenantId, 30);
-  const { data: engagement, isLoading: engageLoading, error: engageError } = useEngagement(tenantId, 30);
-  const { data: platform, isLoading: platformLoading, error: platformError } = usePlatformIntelligence(tenantId, 30);
-  const { data: timing, isLoading: timingLoading, error: timingError } = useTimingAnalysis(tenantId, 30);
+  const { tenantId, loading: tenantLoading } = useTenantId();
+  const { data: condensed, isLoading: condensedLoading, error: condensedError } = useCondensedDashboard(tenantId ?? undefined, 30);
 
   // Recent emails stays from existing endpoint for continuity
   // We'll keep the old fetch logic for recent emails to avoid breaking changes in this pass
@@ -47,6 +44,14 @@ export default function DashboardPage() {
     retry: 1,
   });
 
+  if (tenantLoading || condensedLoading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
+
   if (!tenantId) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -64,8 +69,8 @@ export default function DashboardPage() {
   }
 
   // If core overview endpoint fails, show a friendly error
-  if (overviewError) {
-    const message = (overviewError as Error)?.message || t("dashboard.failedToLoad");
+  if (condensedError) {
+  const message = t("dashboard.failedToLoad");
     return (
       <div className="flex items-center justify-center h-64">
         <div className="text-center">
@@ -73,7 +78,7 @@ export default function DashboardPage() {
           <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
             {t("dashboard.failedToLoad")}
           </h3>
-          <p className="text-gray-500 dark:text-gray-400">{message}</p>
+          <p className="text-gray-500 dark:text-gray-400">{(condensedError as Error)?.message || message}</p>
         </div>
       </div>
     );
@@ -95,25 +100,25 @@ export default function DashboardPage() {
 
       {/* KPI Cards (8–10 indicators) */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        <KpiCard title="Total Emails" value={overview?.total_emails_sent ?? 0} loading={overviewLoading} delta={overview?.weekly_change !== undefined ? `${overview.weekly_change > 0 ? '+' : ''}${overview.weekly_change}% vs last week` : undefined} deltaType={(overview?.weekly_change ?? 0) > 0 ? 'up' : (overview?.weekly_change ?? 0) < 0 ? 'down' : 'neutral'} />
-        <KpiCard title="Total Opens" value={overview?.total_opens ?? 0} loading={overviewLoading} />
-        <KpiCard title="Open Rate" value={(overview?.open_rate ?? 0).toFixed(2)} suffix="%" loading={overviewLoading} />
-        <KpiCard title="Deliverability" value={(overview?.deliverability_score ?? deliverability?.inbox_placement_score ?? 0).toFixed(0)} suffix="%" loading={overviewLoading || delivLoading} />
-        <KpiCard title="Fast Response" value={(overview?.fast_response_rate ?? 0).toFixed(0)} suffix="%" loading={overviewLoading} />
-        <KpiCard title="Multi-device" value={(overview?.multi_device_rate ?? engagement?.multi_device_rate ?? 0).toFixed(0)} suffix="%" loading={overviewLoading || engageLoading} />
-        <KpiCard title="Engagement Depth" value={(overview?.engagement_depth ?? engagement?.engagement_depth_score ?? 0).toFixed(0)} suffix="%" loading={overviewLoading || engageLoading} />
-        <KpiCard title="Median Time to Open" value={(timing?.median_time_to_open_minutes ?? 0).toFixed(2)} suffix="m" loading={timingLoading} />
+  <KpiCard title="Total Emails" value={condensed?.overview?.total_emails_sent ?? 0} loading={condensedLoading} delta={condensed?.overview?.weekly_change !== undefined ? `${(condensed?.overview?.weekly_change ?? 0) > 0 ? '+' : ''}${condensed?.overview?.weekly_change}% vs last week` : undefined} deltaType={(condensed?.overview?.weekly_change ?? 0) > 0 ? 'up' : (condensed?.overview?.weekly_change ?? 0) < 0 ? 'down' : 'neutral'} />
+  <KpiCard title="Total Opens" value={condensed?.overview?.total_opens ?? 0} loading={condensedLoading} />
+  <KpiCard title="Open Rate" value={(condensed?.overview?.open_rate ?? 0).toFixed(2)} suffix="%" loading={condensedLoading} />
+  <KpiCard title="Deliverability" value={(condensed?.overview?.deliverability_score ?? condensed?.deliverability?.inbox_placement_score ?? 0).toFixed(0)} suffix="%" loading={condensedLoading} />
+  <KpiCard title="Fast Response" value={(condensed?.overview?.fast_response_rate ?? 0).toFixed(0)} suffix="%" loading={condensedLoading} />
+  <KpiCard title="Multi-device" value={(condensed?.overview?.multi_device_rate ?? 0).toFixed(0)} suffix="%" loading={condensedLoading} />
+  <KpiCard title="Engagement Depth" value={(condensed?.overview?.engagement_depth ?? 0).toFixed(0)} suffix="%" loading={condensedLoading} />
+  <KpiCard title="Median Time to Open" value={(condensed?.timing?.median_time_to_open_minutes ?? 0).toFixed(2)} suffix="m" loading={condensedLoading} />
       </div>
 
       {/* Charts Section: diversos y configurados */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <OpenRateTrend days={30} />
-        <TimingBreakdown days={30} />
-        <DeliverabilityProviders days={30} />
-        <DeviceTypeDonut days={30} />
-        <SentOpenedBars days={30} />
-        <PlatformStackedBars days={30} />
-        <TopDevicesList days={30} />
+        <OpenRateTrend days={30} data={(condensed?.trends?.daily_trends || []).map(d => ({ date: d.date, rate: d.open_rate }))} />
+        <TimingBreakdown days={30} distribution={condensed?.timing?.time_distribution} />
+        <DeliverabilityProviders days={30} providers={condensed?.deliverability?.provider_performance} />
+        <DeviceTypeDonut days={30} distribution={condensed?.platform?.device_type_distribution} />
+        <SentOpenedBars days={30} data={(condensed?.trends?.daily_trends || []).map(d => ({ date: d.date, opens: d.opens_count }))} />
+        <PlatformStackedBars days={30} data={(condensed?.trends?.daily_trends || []).map(d => ({ date: d.date, ...(d.platform_distribution || {}) })) as any} />
+        <TopDevicesList days={30} distribution={condensed?.platform?.device_type_distribution || undefined} />
       </div>
 
       {/* Recent Emails */}

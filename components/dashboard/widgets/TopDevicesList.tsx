@@ -4,12 +4,12 @@ import { ListCard } from "@/components/dashboard/cards/ListCard";
 import { usePlatformIntelligence } from "@/lib/metrics";
 import { getTenant } from "@/lib/auth-client";
 
-export function TopDevicesList({ days = 30 }: { days?: number }) {
+export function TopDevicesList({ days = 30, distribution }: { days?: number; distribution?: Record<string, number> }) {
   const tenant = getTenant();
   const tenantId = tenant?.tenant_id as number | undefined;
-  const { data, isLoading } = usePlatformIntelligence(tenantId, days);
+  const { data, isLoading } = distribution ? { data: undefined, isLoading: false } as any : usePlatformIntelligence(tenantId, days);
 
-  const items = Object.entries(data?.device_type_distribution || {})
+  const items = Object.entries((distribution || data?.device_type_distribution || {}) as Record<string, number>)
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count)
     .slice(0, 5);

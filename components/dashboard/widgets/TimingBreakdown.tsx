@@ -5,12 +5,12 @@ import { ChartCard } from "@/components/dashboard/cards/ChartCard";
 import { useTimingAnalysis } from "@/lib/metrics";
 import { getTenant } from "@/lib/auth-client";
 
-export function TimingBreakdown({ days = 30 }: { days?: number }) {
+export function TimingBreakdown({ days = 30, distribution: prefetched }: { days?: number; distribution?: { immediate?: number; fast?: number; moderate?: number; delayed?: number } }) {
   const tenant = getTenant();
   const tenantId = tenant?.tenant_id as number | undefined;
-  const { data, isLoading, error } = useTimingAnalysis(tenantId, days);
+  const { data, isLoading, error } = prefetched ? { data: undefined, isLoading: false, error: undefined } as any : useTimingAnalysis(tenantId, days);
 
-  const distribution = data?.time_distribution || { immediate: 0, fast: 0, moderate: 0, delayed: 0 };
+  const distribution = prefetched || data?.time_distribution || { immediate: 0, fast: 0, moderate: 0, delayed: 0 };
   const chartData = [
     { name: "Immediate", value: distribution.immediate },
     { name: "Fast", value: distribution.fast },

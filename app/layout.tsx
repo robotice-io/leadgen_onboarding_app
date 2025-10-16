@@ -37,6 +37,20 @@ export default function RootLayout({
         {/* Calendly assets for popup widget */}
         <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
         <script src="https://assets.calendly.com/assets/external/widget.js" async type="text/javascript"></script>
+        {/* Early theme setter to avoid FOUC and ensure toggle works */}
+        <script
+          dangerouslySetInnerHTML={{ __html: `
+            (function(){
+              try {
+                var s = localStorage.getItem('robotice-theme');
+                var m = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+                var dark = s ? s === 'dark' : m;
+                var root = document.documentElement;
+                if (dark) root.classList.add('dark'); else root.classList.remove('dark');
+              } catch (e) {}
+            })();
+          `}}
+        />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}

@@ -5,18 +5,18 @@ import { ChartCard } from "@/components/dashboard/cards/ChartCard";
 import { useTrends } from "@/lib/metrics";
 import { getTenant } from "@/lib/auth-client";
 
-export function OpenRateTrend({ days = 30 }: { days?: number }) {
+export function OpenRateTrend({ days = 30, data: prefetched }: { days?: number; data?: Array<{ date: string; rate: number }> }) {
   const tenant = getTenant();
   const tenantId = tenant?.tenant_id as number | undefined;
-  const { data, isLoading, error } = useTrends(tenantId, days);
+  const { data, isLoading, error } = prefetched ? { data: undefined, isLoading: false, error: undefined } as any : useTrends(tenantId, days);
 
-  const chartData = (data?.daily_trends || []).map(d => ({
+  const chartData = prefetched || (data?.daily_trends || []).map((d: any) => ({
     date: d.date,
     rate: d.open_rate,
   }));
 
   return (
-    <ChartCard title="Open Rate Trend" subtitle={`Last ${days} days`} loading={isLoading} error={error ? (error as any).message : undefined}>
+  <ChartCard title="Open Rate Trend" subtitle={`Last ${days} days`} loading={isLoading} error={error ? (error as any).message : undefined}>
       <div style={{ width: "100%", height: 300 }}>
         <ResponsiveContainer>
           <LineChart data={chartData}>

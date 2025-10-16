@@ -8,12 +8,12 @@ import { getTenant } from "@/lib/auth-client";
 // As trends returns opens_count, we can pair with total_emails_sent normalized per day when available later.
 // For now, show opens_count as bars and overlay open_rate as context (secondary axis) in future.
 
-export function SentOpenedBars({ days = 30 }: { days?: number }) {
+export function SentOpenedBars({ days = 30, data: prefetched }: { days?: number; data?: Array<{ date: string; opens: number }> }) {
   const tenant = getTenant();
   const tenantId = tenant?.tenant_id as number | undefined;
-  const { data, isLoading, error } = useTrends(tenantId, days);
+  const { data, isLoading, error } = prefetched ? { data: undefined, isLoading: false, error: undefined } as any : useTrends(tenantId, days);
 
-  const chartData = (data?.daily_trends || []).map(d => ({
+  const chartData = prefetched || (data?.daily_trends || []).map((d: any) => ({
     date: d.date,
     opens: d.opens_count,
   }));

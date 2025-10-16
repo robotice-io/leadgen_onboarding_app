@@ -11,13 +11,13 @@ const COLORS = {
   unknown: "#6B7280",
 };
 
-export function DeviceTypeDonut({ days = 30 }: { days?: number }) {
+export function DeviceTypeDonut({ days = 30, distribution }: { days?: number; distribution?: Record<string, number> }) {
   const tenant = getTenant();
   const tenantId = tenant?.tenant_id as number | undefined;
-  const { data, isLoading, error } = usePlatformIntelligence(tenantId, days);
+  const { data, isLoading, error } = distribution ? { data: undefined, isLoading: false, error: undefined } as any : usePlatformIntelligence(tenantId, days);
 
-  const dist = data?.device_type_distribution || {};
-  const entries = Object.entries(dist).map(([name, value]) => ({ name, value }));
+  const dist = (distribution || data?.device_type_distribution || {}) as Record<string, number>;
+  const entries = Object.entries(dist).map(([name, value]) => ({ name, value: Number(value) }));
 
   return (
     <ChartCard title="Device Types" subtitle={`Last ${days} days`} loading={isLoading} error={error ? (error as any).message : undefined}>

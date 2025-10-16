@@ -7,9 +7,8 @@
   --font-geist-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* Dark theme variables applied when .dark on html */
-.dark :root,
-.dark {
+/* Dark theme variables applied on html element */
+html.dark {
   --background: #0a0a0a;
   --foreground: #ededed;
 }
