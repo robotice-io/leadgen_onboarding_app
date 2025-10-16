@@ -7,7 +7,7 @@ import { getTenant } from "@/lib/auth-client";
 // Metrics widgets obtain their own data or can be wired to condensed payload in future iterations
 import { useCondensedDashboard } from "@/lib/condensed";
 import { useTenantId } from "@/lib/use-tenant-id";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { KpiCard } from "@/components/dashboard/cards/KpiCard";
 import { KpiSummary } from "@/components/dashboard/KpiSummary";
 import { InsightsCard } from "@/components/dashboard/InsightsCard";
@@ -26,6 +26,20 @@ export default function DashboardPage() {
   const [days, setDays] = useState<number>(30);
   const { tenantId, loading: tenantLoading } = useTenantId();
   const { data: condensed, isLoading: condensedLoading, error: condensedError } = useCondensedDashboard(tenantId ?? undefined, days);
+
+  // Persistencia del rango (7/14/30)
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('robotice-dashboard-days');
+      const n = saved ? Number(saved) : NaN;
+      if (n === 7 || n === 14 || n === 30) setDays(n);
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    try { localStorage.setItem('robotice-dashboard-days', String(days)); } catch {}
+  }, [days]);
 
   // Recent emails stays from existing endpoint for continuity
   // We'll keep the old fetch logic for recent emails to avoid breaking changes in this pass

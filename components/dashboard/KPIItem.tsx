@@ -62,11 +62,15 @@ export function KPIItem({ labelKey, value, format = "raw", suffix, icon, delta, 
 
   const aria = ariaLabel || `${t(labelKey)} ${valText}${suffix ? ` ${suffix}` : ""}`;
 
+  const deltaId = hasDelta ? `${labelKey}-delta` : undefined;
+
   return (
     <div
       role="group"
       aria-label={aria}
-      className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/60 p-4 hover:border-gray-300 dark:hover:border-gray-700 focus-within:ring-2 focus-within:ring-blue-500/40 transition-colors duration-150"
+      aria-describedby={deltaId}
+      tabIndex={0}
+      className="rounded-xl border border-gray-200 dark:border-gray-800 bg-white/70 dark:bg-gray-900/60 p-4 hover:border-gray-300 dark:hover:border-gray-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/40 transition-[border-color,background-color] duration-150 motion-reduce:transition-none"
     >
       <div className="flex items-start justify-between">
         <p className="text-[11px] uppercase tracking-wide text-gray-500 dark:text-gray-400">{t(labelKey)}</p>
@@ -85,7 +89,7 @@ export function KPIItem({ labelKey, value, format = "raw", suffix, icon, delta, 
       )}
 
       {hasDelta ? (
-        <div className={`inline-flex mt-3 px-2 py-0.5 rounded-full text-[11px] font-medium ${badgeClass}`}>
+        <div id={deltaId} className={`inline-flex mt-3 px-2 py-0.5 rounded-full text-[11px] font-medium ${badgeClass}`}>
           {`${delta!.value > 0 ? "+" : delta!.value < 0 ? "-" : ""}${Math.abs(delta!.value)}%`} {hintKey ? t(hintKey) : ""}
         </div>
       ) : null}

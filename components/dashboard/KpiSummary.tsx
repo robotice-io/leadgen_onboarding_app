@@ -30,12 +30,14 @@ export function KpiSummary({ data, loading, days = 30, onChangeDays }: Props) {
           <p className="text-xs text-gray-500 dark:text-gray-400">{t("dashboard.kpiBlock.subtitle")}</p>
         </div>
         {/* Selector de rango */}
-        <div className="inline-flex items-center gap-1 rounded-md border border-gray-200 dark:border-gray-700 p-1 bg-gray-50 dark:bg-gray-800/50">
+        <div className="inline-flex items-center gap-1 rounded-md border border-gray-200 dark:border-gray-700 p-1 bg-gray-50 dark:bg-gray-800/50" role="group" aria-label="Select range">
           {[7,14,30].map((d) => (
             <button
               key={d}
               onClick={() => onChangeDays?.(d)}
-              className={`px-2 h-7 text-xs rounded ${days===d? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+              aria-pressed={days===d}
+              aria-label={`${d} days`}
+              className={`px-2 h-7 text-xs rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 ${days===d? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
             >{d}d</button>
           ))}
         </div>

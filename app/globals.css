@@ -91,6 +91,13 @@ html {
 * {
   transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    animation-duration: 1ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
 
 /* Wizard Fase B: transiciones suaves */
 @keyframes fade-in-up {
