@@ -21,22 +21,32 @@ export function KpiSummary({ data, loading, days = 30, onChangeDays }: Props) {
   const ti = data?.timing;
   const de = data?.deliverability;
   const weekly = typeof ov?.weekly_change === 'number' ? `${ov?.weekly_change}${t("dashboard.vsLastWeek")}` : undefined;
+  const dynamicTitle = days === 1
+    ? t("dashboard.kpiBlock.titleToday")
+    : `${t("dashboard.kpiBlock.titleLast")} ${days} ${t("dashboard.daysLabel")}`;
 
   return (
     <div className="bg-white dark:bg-gray-900/70 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-white uppercase">{t("dashboard.kpiBlock.title")}</h2>
+          <h2 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-white uppercase">{dynamicTitle}</h2>
           <p className="text-xs text-gray-500 dark:text-gray-400">{t("dashboard.kpiBlock.subtitle")}</p>
         </div>
         {/* Selector de rango */}
         <div className="inline-flex items-center gap-1 rounded-md border border-gray-200 dark:border-gray-700 p-1 bg-gray-50 dark:bg-gray-800/50" role="group" aria-label={t("dashboard.selectRange")}>
+          {/* Hoy */}
+          <button
+            onClick={() => onChangeDays?.(1)}
+            aria-pressed={days===1}
+            aria-label={t("dashboard.todayShort")}
+            className={`px-2 h-7 text-xs rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 ${days===1? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+          >{t("dashboard.todayShort")}</button>
           {[7,14,30].map((d) => (
             <button
               key={d}
               onClick={() => onChangeDays?.(d)}
               aria-pressed={days===d}
-              aria-label={`${d}${t("dashboard.daysShort")}`}
+              aria-label={`${d} ${t("dashboard.daysLabel")}`}
               className={`px-2 h-7 text-xs rounded focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50 ${days===d? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
             >{d}{t("dashboard.daysShort")}</button>
           ))}
@@ -62,7 +72,7 @@ export function KpiSummary({ data, loading, days = 30, onChangeDays }: Props) {
       <div className="mt-4">
         <MiniTrendTile
           title={t("dashboard.openRateTrend")}
-          subtitle={`${days}${t("dashboard.daysShort")}`}
+          subtitle={days===1 ? t("dashboard.todayShort") : `${days}${t("dashboard.daysShort")}`}
           data={(data?.trends?.daily_trends || []).map(d => ({ date: d.date, value: Number((d.open_rate ?? 0).toFixed(2)) }))}
           height={150}
           ySuffix="%"

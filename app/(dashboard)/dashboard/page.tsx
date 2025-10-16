@@ -27,12 +27,12 @@ export default function DashboardPage() {
   const { tenantId, loading: tenantLoading } = useTenantId();
   const { data: condensed, isLoading: condensedLoading, error: condensedError } = useCondensedDashboard(tenantId ?? undefined, days);
 
-  // Persistencia del rango (7/14/30)
+  // Persistencia del rango (Hoy/7/14/30)
   useEffect(() => {
     try {
       const saved = localStorage.getItem('robotice-dashboard-days');
       const n = saved ? Number(saved) : NaN;
-      if (n === 7 || n === 14 || n === 30) setDays(n);
+      if (n === 1 || n === 7 || n === 14 || n === 30) setDays(n);
     } catch {}
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
