@@ -9,8 +9,9 @@
 
 /* Dark theme variables applied on html element */
 html.dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
+  /* Fondo negro puro estilo Vercel, con texto ligeramente gris para suavidad */
+  --background: #000000;
+  --foreground: #e5e5e5;
 }
 
 body {

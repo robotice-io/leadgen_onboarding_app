@@ -61,7 +61,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) {
     return (
-      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center`}>
+      <div className={`min-h-screen bg-white dark:bg-black flex items-center justify-center`}>
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
@@ -72,7 +72,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-      <div className={`min-h-screen bg-gray-50 dark:bg-gray-900`}>
+      <div className={`min-h-screen bg-white dark:bg-black`}>
         {/* Sidebar */}
         <DashboardSidebar 
           isOpen={sidebarOpen} 
@@ -92,7 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           />
 
           {/* Page Content */}
-          <main className="p-4 lg:p-8 pt-24">
+          <main className="p-4 lg:p-8 pt-28 lg:pt-32">
             {children}
           </main>
         </div>
