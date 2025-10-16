@@ -28,7 +28,7 @@ export async function apiGet(path: string, init?: RequestInit): Promise<Response
     ...(init?.headers as Record<string, string> || {}),
   };
   const tenantId = getTenantIdFromStorage();
-  if (tenantId && !headers["X-Tenant-ID"]) headers["X-Tenant-ID"] = String(tenantId);
+  if (tenantId) headers["X-Tenant-ID"] = String(tenantId);
 
   return fetch(url, {
     ...init,
@@ -47,7 +47,7 @@ export async function apiPost(path: string, body: unknown, init?: RequestInit): 
     ...(init?.headers as Record<string, string> || {}),
   };
   const tenantId = getTenantIdFromStorage();
-  if (tenantId && !headers["X-Tenant-ID"]) headers["X-Tenant-ID"] = String(tenantId);
+  if (tenantId) headers["X-Tenant-ID"] = String(tenantId);
 
   return fetch(url, {
     ...init,
