@@ -41,7 +41,7 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{ __html: `
             (function(){
-              try { bn
+              try {
                 var s = localStorage.getItem('robotice-theme');
                 var m = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
                 var dark = s ? s === 'dark' : m;

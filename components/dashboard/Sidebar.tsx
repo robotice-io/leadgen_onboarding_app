@@ -71,8 +71,8 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
   return (
     <>
       {/* Desktop Sidebar */}
-      <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-64 lg:flex-col">
-        <div className="flex grow flex-col gap-y-3 overflow-y-auto bg-white dark:bg-gray-900 border-r border-gray-200 dark:border-gray-800 px-6 py-4">
+      <div className="hidden lg:fixed lg:inset-y-0 lg:z-40 lg:flex lg:w-64 lg:flex-col">
+        <div className="flex grow flex-col gap-y-3 overflow-y-auto px-4 py-4 text-white mx-3 my-3 rounded-2xl border border-white/30 bg-black pt-24">
           {/* Logo */}
           <div className="flex h-16 shrink-0 items-center justify-center py-2">
             <Link href="/" className="flex items-center justify-center">
@@ -88,13 +88,13 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
 
           {/* Tenant Info Card (no dropdown) */}
           <div className="relative">
-            <div className="w-full flex items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
-              <Building2 className="h-5 w-5 text-gray-500" />
+            <div className="w-full flex items-center p-3 rounded-lg bg-white/5">
+              <Building2 className="h-5 w-5 text-white/70" />
               <div className="text-left ml-3">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                <p className="text-sm font-medium text-white">
                   {getTenantName()}
                 </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
+                <p className="text-xs text-white/70">
                   {getTenantEmail()}
                 </p>
               </div>
@@ -116,16 +116,16 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
                           href={item.href}
                           aria-current={isActive ? "page" : undefined}
                           className={`
-                            group flex gap-x-3 rounded-md p-3 text-sm font-medium transition-all
+                            group flex gap-x-3 rounded-md p-3 text-sm font-medium transition-all border border-transparent
                             ${isActive
-                              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                              : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800'
+                              ? 'bg-white/10 text-white border-white/15'
+                              : 'text-white/80 hover:text-white hover:bg-white/5'
                             }
                           `}
                         >
                           <item.icon
                             className={`h-5 w-5 shrink-0 ${
-                              isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
+                              isActive ? 'text-white' : 'text-white/60 group-hover:text-white'
                             }`}
                           />
                           {item.name}
@@ -149,17 +149,11 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
       <div className={`lg:hidden fixed inset-y-0 z-50 flex w-64 flex-col transition-transform duration-300 ${
         isOpen ? 'translate-x-0' : '-translate-x-full'
       }`}>
-        <div className="flex grow flex-col gap-y-3 overflow-y-auto bg-white dark:bg-gray-900 px-6 py-4">
+        <div className="flex grow flex-col gap-y-3 overflow-y-auto bg-black text-white px-4 py-4">
           {/* Mobile Header */}
           <div className="flex h-24 shrink-0 items-center justify-between">
             <Link href="/" className="flex items-center justify-center">
-              <Image
-                src="/landing_logo.png"
-                alt="Robotice"
-                width={140}
-                height={90}
-                className="rounded-lg hover:opacity-80 transition-opacity object-contain"
-              />
+              <Image src="/landing_logo.png" alt="Robotice" width={140} height={90} className="rounded-lg hover:opacity-80 transition-opacity object-contain" />
             </Link>
             <button
               onClick={onClose}
@@ -185,17 +179,10 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
                           onClick={onClose}
                           className={`
                             group flex gap-x-3 rounded-md p-3 text-sm font-medium transition-all
-                            ${isActive
-                              ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
-                              : 'text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 hover:bg-gray-50 dark:hover:bg-gray-800'
-                            }
+                            ${isActive ? 'bg-white/10 text-white' : 'text-white/80 hover:text-white hover:bg-white/5'}
                           `}
                         >
-                          <item.icon
-                            className={`h-5 w-5 shrink-0 ${
-                              isActive ? 'text-blue-600 dark:text-blue-400' : 'text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400'
-                            }`}
-                          />
+                          <item.icon className={`h-5 w-5 shrink-0 ${isActive ? 'text-white' : 'text-white/60 group-hover:text-white'}`} />
                           {item.name}
                         </Link>
                       </li>
