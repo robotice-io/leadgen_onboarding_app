@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isAuthenticated, getUser, getUserTenant, getTenant, logout } from "@/lib/auth-client";
-import { I18nProvider } from "@/lib/i18n";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
 import { DashboardHeader } from "@/components/dashboard/Header";
 import { User } from "@/types/types";
@@ -73,7 +72,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
   }
 
   return (
-    <I18nProvider>
       <div className={`min-h-screen bg-gray-50 dark:bg-gray-900`}>
         {/* Sidebar */}
         <DashboardSidebar 
@@ -107,6 +105,5 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           />
         )}
       </div>
-    </I18nProvider>
   );
 }

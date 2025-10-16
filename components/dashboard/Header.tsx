@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Menu, LogOut, User as UserIcon } from "lucide-react";
 import { User } from "@/types/types";
 import { useI18n } from "@/lib/i18n";
+import { ThemeToggleButton } from "@/lib/theme";
 
 interface HeaderProps {
   onMenuClick: () => void;
@@ -74,6 +75,8 @@ export function DashboardHeader({ onMenuClick, user, tenant, onLogout }: HeaderP
       <div className="flex h-16 items-center justify-between px-4 lg:px-8">
         {/* Left Section */}
         <div className="flex items-center gap-4">
+          {/* Theme Toggle */}
+          <ThemeToggleButton />
           {/* Mobile Menu Button */}
           <button
             onClick={onMenuClick}
