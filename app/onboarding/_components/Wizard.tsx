@@ -41,13 +41,18 @@ export default function Wizard() {
   
   const [credsSaved, setCredsSaved] = useState<boolean>(false);
   const [tenantId, setTenantId] = useState<number | null>(null);
+  const [allowDirectConnect, setAllowDirectConnect] = useState<boolean>(false);
 
   
 
-  // Read success flags from URL after OAuth callback redirect
+  // Read success flags and forced step from URL after OAuth callback redirect
   const readStatusFromUrl = useCallback(() => {
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
+    const forcedStep = Number(params.get("step") || "");
+    if (forcedStep === 2 || forcedStep === 3) {
+      setStep(forcedStep);
+    }
     if (params.get("success") === "1") {
       setSuccessMessage(t("googleConnected"));
       setStep(3);
@@ -90,6 +95,23 @@ export default function Wizard() {
       router.prefetch("/oauth/callback");
     } catch {}
   }, [router]);
+
+  // If tenant exists and reports token_expired, jump to step 3 and set tenantId
+  useEffect(() => {
+    try {
+      const tenantStr = localStorage.getItem("robotice_tenant");
+      const tenant = tenantStr ? JSON.parse(tenantStr) : null;
+      const lsId = localStorage.getItem("robotice-tenant-id");
+      if (tenant?.id) setTenantId(Number(tenant.id));
+      else if (lsId) setTenantId(Number(lsId));
+      if (tenant?.onboarding_status === "token_expired") {
+        setAllowDirectConnect(true);
+        setStep(3);
+      } else if (tenant?.onboarding_step === 2) {
+        setStep(2);
+      }
+    } catch {}
+  }, []);
 
   // thin top progress bar control
   const [busyCount, setBusyCount] = useState<number>(0);
@@ -366,7 +388,7 @@ export default function Wizard() {
             </div>
             <div className="pt-6">
               <div className="grid gap-3">
-                {!credsSaved ? (
+                {!credsSaved && !allowDirectConnect ? (
                   <button
                     className="relative w-full h-11 rounded-md bg-blue-600 text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60 transition-all"
                     onClick={handleSave}

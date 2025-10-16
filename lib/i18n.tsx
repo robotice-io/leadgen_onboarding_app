@@ -199,6 +199,8 @@ const ES: Dictionary = {
   "dashboard.gmailConnected": "Gmail conectado",
   "dashboard.active": "Activo",
   "dashboard.pending": "Pendiente",
+  "dashboard.reconnect": "Re-conectar",
+  "dashboard.reauthRequired": "Token expirado, vuelve a autorizar",
   // Nav
   "nav.dashboard": "Panel de Control",
   "nav.campaigns": "Campañas",
@@ -712,6 +714,8 @@ const EN: Dictionary = {
   "dashboard.gmailConnected": "Gmail connected",
   "dashboard.active": "Active",
   "dashboard.pending": "Pending",
+  "dashboard.reconnect": "Reconnect",
+  "dashboard.reauthRequired": "Token expired, please reauthorize",
   // Nav
   "nav.dashboard": "Dashboard",
   "nav.campaigns": "Campaigns",

@@ -23,6 +23,16 @@ export default function OnboardingPage() {
         const tenant = await getUserTenant();
         if (tenant?.onboarding_status === "completed") {
           router.replace("/dashboard");
+          return;
+        }
+        if (tenant?.onboarding_status === "token_expired") {
+          // Force step 3 for re-auth
+          router.replace("/onboarding?step=3");
+          return;
+        }
+        if (tenant?.onboarding_step === 2) {
+          router.replace("/onboarding?step=2");
+          return;
         }
       } catch (e) {
         // Fail-open: stay in onboarding, logs only

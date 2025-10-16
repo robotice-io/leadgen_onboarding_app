@@ -65,6 +65,18 @@ function buildHeaders(includeApiKey = true): Record<string, string> {
   return headers;
 }
 
+// --- Cookie helpers for propagating tenant to server-side proxy ---
+function setTenantCookie(tenantId: string | number, maxAgeSeconds = 60 * 60 * 24 * 30) {
+  if (typeof document === "undefined") return;
+  const v = encodeURIComponent(String(tenantId));
+  document.cookie = `robotice-tenant-id=${v}; Path=/; Max-Age=${maxAgeSeconds}; SameSite=Lax`;
+}
+
+function clearTenantCookie() {
+  if (typeof document === "undefined") return;
+  document.cookie = `robotice-tenant-id=; Path=/; Max-Age=0; SameSite=Lax`;
+}
+
 export function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem(TOKEN_KEY);
@@ -123,11 +135,17 @@ export function getTenant(): any | null {
 export function setTenant(tenant: any): void {
   if (typeof window === "undefined") return;
   localStorage.setItem(TENANT_KEY, JSON.stringify(tenant));
+  // Best-effort: if tenant has an id, also mirror into cookie for server-side proxy
+  try {
+    const id = (tenant && (tenant.id || tenant.tenant_id)) as string | number | undefined;
+    if (id != null) setTenantCookie(id);
+  } catch {}
 }
 
 export function removeTenant(): void {
   if (typeof window === "undefined") return;
   localStorage.removeItem(TENANT_KEY);
+  try { clearTenantCookie(); } catch {}
 }
 
 let refreshTimerId: number | undefined;
@@ -245,6 +263,10 @@ export async function login(email: string, password: string): Promise<AuthTokens
   const userData = loginData.user;
   const tenantData = loginData.tenant;
   const tenantId = tenantData?.id;
+  // Persist onboarding flags if present
+  const onboardingStatus = tenantData?.onboarding_status;
+  const onboardingStep = tenantData?.onboarding_step;
+  const googleTokenLive = tenantData?.google_token_live;
   
   if (!userData) {
     throw new Error("Login response missing user data");
@@ -256,10 +278,12 @@ export async function login(email: string, password: string): Promise<AuthTokens
   
   // Store user and tenant data from login response
   setUser(userData);
-  setTenant(tenantData);
+  setTenant({ ...tenantData, onboarding_status: onboardingStatus, onboarding_step: onboardingStep, google_token_live: googleTokenLive });
   
   // Store tenant ID in localStorage for API calls
   localStorage.setItem("robotice-tenant-id", tenantId.toString());
+  // And also as a cookie so server proxy can inject X-Tenant-ID when needed
+  try { setTenantCookie(tenantId); } catch {}
   
   // Return a minimal token object for compatibility
   return { access_token: "", token_type: "api-key" } as AuthTokens;
@@ -407,6 +431,10 @@ export async function getUserTenant(): Promise<any> {
 
 export async function logout(): Promise<void> {
   removeTenant();
+  try {
+    localStorage.removeItem("robotice-tenant-id");
+  } catch {}
+  try { clearTenantCookie(); } catch {}
   window.location.href = "/login";
 }
 
