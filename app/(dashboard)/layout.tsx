@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isAuthenticated, getUser, getUserTenant, getTenant, logout } from "@/lib/auth-client";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
-import { DashboardHeader } from "@/components/dashboard/Header";
+import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 import { User } from "@/types/types";
 
 
@@ -83,8 +83,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
         {/* Main Content */}
         <div className="lg:pl-64">
-          {/* Header */}
-          <DashboardHeader 
+          {/* Fixed top navbar (landing non-scroll style) */}
+          <DashboardNavbar
             onMenuClick={() => setSidebarOpen(true)}
             user={user}
             tenant={tenant}
@@ -92,7 +92,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           />
 
           {/* Page Content */}
-          <main className="p-4 lg:p-8">
+          <main className="p-4 lg:p-8 pt-24">
             {children}
           </main>
         </div>
