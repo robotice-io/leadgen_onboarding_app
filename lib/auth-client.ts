@@ -233,11 +233,10 @@ export async function login(email: string, password: string): Promise<AuthTokens
   removeRefreshToken();
   removeTenant();
   
-  // Force proxy for login to ensure server API key is used
-  const url = getRequestUrl("/api/v1/auth/login", true);
-  const res = await fetch(url, {
+  // Llamada simple al endpoint server-side que usa la API_KEY del entorno (Vercel injecta)
+  const res = await fetch("/api/auth/login", {
     method: "POST",
-    headers: buildHeaders(true), // Include API key via proxy
+    headers: { "Content-Type": "application/json", Accept: "application/json" },
     body: JSON.stringify({ email, password }),
   });
 

@@ -4,7 +4,9 @@ export const runtime = "nodejs";
 
 function getApiBase() {
   const env = process.env.NEXT_PUBLIC_API_BASE_URL;
-  return (env && env.replace(/\/$/, "")) || "https://lead-gen-service.robotice.io";
+  const base = (env && env.replace(/\/$/, "")) || "https://lead-gen-service.robotice.io";
+  // Normalize: if env incorrectly includes '/api/v1' suffix, strip it to avoid '/api/v1/api/v1'
+  return base.replace(/\/api\/v1\/?$/, "");
 }
 
 function getApiKey(): string {
@@ -43,9 +45,14 @@ export async function POST(req: NextRequest) {
       signal: controller.signal,
     });
 
-    const text = await res.text();
-    const headers = new Headers({ "content-type": res.headers.get("content-type") || "application/json" });
-    return new Response(text, { status: res.status, headers });
+    const body = await res.arrayBuffer();
+    const headers = new Headers(res.headers);
+    headers.delete("content-length");
+    headers.delete("transfer-encoding");
+    headers.delete("content-encoding");
+    const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
+    if (!isProd) headers.set("X-Login-Target", target);
+    return new Response(body, { status: res.status, headers });
   } catch (err: any) {
     const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
     const message = isProd ? "Login upstream failed" : `Login upstream failed: ${err?.message || String(err)}`;
