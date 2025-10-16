@@ -2,6 +2,7 @@
 
 import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip } from "recharts";
 import React, { useEffect, useMemo, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 
 export function MiniTrendTile({
   title,
@@ -18,6 +19,7 @@ export function MiniTrendTile({
   ySuffix?: string;
   maxPoints?: number;
 }) {
+  const { lang } = useI18n();
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -34,7 +36,11 @@ export function MiniTrendTile({
     return data.slice(-n);
   }, [data, maxPoints]);
 
-  const WD = ['do','lu','ma','mi','jue','vi','sa'];
+  const WD_MAP: Record<string, string[]> = {
+    es: ['do','lu','ma','mi','ju','vi','sa'],
+    en: ['su','mo','tu','we','th','fr','sa'],
+  };
+  const WD = WD_MAP[lang] || WD_MAP['es'];
   const fmtTick = (d: string) => {
     const dt = new Date(d);
     if (isNaN(dt.getTime())) return d;

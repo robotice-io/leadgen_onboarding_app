@@ -5,11 +5,13 @@ import { ChartCard } from "@/components/dashboard/cards/ChartCard";
 import { useTrends } from "@/lib/metrics";
 import { getTenant } from "@/lib/auth-client";
 import { useEffect, useMemo, useState } from "react";
+import { useI18n } from "@/lib/i18n";
 
 export function OpenRateTrend({ days = 30, data: prefetched, maxPoints = 20 }: { days?: number; data?: Array<{ date: string; rate: number }>; maxPoints?: number }) {
   const tenant = getTenant();
   const tenantId = tenant?.tenant_id as number | undefined;
   const { data, isLoading, error } = prefetched ? { data: undefined, isLoading: false, error: undefined } as any : useTrends(tenantId, days);
+  const { lang } = useI18n();
   const [isMobile, setIsMobile] = useState(false);
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -22,7 +24,8 @@ export function OpenRateTrend({ days = 30, data: prefetched, maxPoints = 20 }: {
 
   const rawData = prefetched || (data?.daily_trends || []).map((d: any) => ({ date: d.date, rate: d.open_rate }));
   const chartData = useMemo(() => rawData.slice(-Math.max(1, Math.min(maxPoints ?? 20, 60))), [rawData, maxPoints]);
-  const WD = ['do','lu','ma','mi','jue','vi','sa'];
+  const WD_MAP: Record<string, string[]> = { es: ['do','lu','ma','mi','ju','vi','sa'], en: ['su','mo','tu','we','th','fr','sa'] };
+  const WD = WD_MAP[lang] || WD_MAP['es'];
   const fmtTick = (d: string) => {
     const dt = new Date(d);
     if (isNaN(dt.getTime())) return d;
