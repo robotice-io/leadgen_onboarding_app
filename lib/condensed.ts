@@ -10,6 +10,7 @@ export type CondensedDashboard = {
     total_opens?: number;
     unique_opens?: number;
     open_rate?: number; // %
+    avg_opens_per_email?: number;
     fast_response_rate?: number; // %
     deliverability_score?: number; // %
     multi_device_rate?: number; // %
@@ -47,7 +48,14 @@ function mapComprehensiveToCondensed(payload: any): CondensedDashboard {
       total_emails_sent: overview.total_emails_sent ?? payload?.core_metrics?.emails_sent ?? 0,
       total_opens: overview.total_opens ?? payload?.core_metrics?.total_opens ?? 0,
       unique_opens: overview.unique_opens ?? payload?.core_metrics?.unique_opens ?? 0,
-      open_rate: overview.open_rate ?? payload?.core_metrics?.open_rate ? Number((payload?.core_metrics?.open_rate * 100).toFixed(2)) : undefined,
+      avg_opens_per_email: overview.avg_opens_per_email ?? payload?.core_metrics?.avg_opens_per_email,
+      // open_rate puede venir como porcentaje (overview.open_rate = 39.12) o como fracción (core_metrics.open_rate = 0.3912)
+      open_rate: ((): number | undefined => {
+        if (typeof overview.open_rate === 'number') return Number(overview.open_rate.toFixed(2));
+        const frac = payload?.core_metrics?.open_rate;
+        if (typeof frac === 'number') return Number((frac * 100).toFixed(2));
+        return undefined;
+      })(),
       fast_response_rate: overview.fast_response_rate ?? timing.fast_response_rate,
       deliverability_score: overview.deliverability_score ?? deliverability.inbox_placement_score,
       multi_device_rate: overview.multi_device_rate ?? payload?.engagement_patterns?.multi_device_rate,

@@ -8,6 +8,7 @@ import { getTenant } from "@/lib/auth-client";
 import { useCondensedDashboard } from "@/lib/condensed";
 import { useTenantId } from "@/lib/use-tenant-id";
 import { KpiCard } from "@/components/dashboard/cards/KpiCard";
+import { KpiSummary } from "@/components/dashboard/KpiSummary";
 import { OpenRateTrend } from "@/components/dashboard/widgets/OpenRateTrend";
 import { SentOpenedBars } from "@/components/dashboard/widgets/SentOpenedBars";
 import { DeviceTypeDonut } from "@/components/dashboard/widgets/DeviceTypeDonut";
@@ -98,17 +99,8 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      {/* KPI Cards (8–10 indicators) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-  <KpiCard title="Total Emails" value={condensed?.overview?.total_emails_sent ?? 0} loading={condensedLoading} delta={condensed?.overview?.weekly_change !== undefined ? `${(condensed?.overview?.weekly_change ?? 0) > 0 ? '+' : ''}${condensed?.overview?.weekly_change}% vs last week` : undefined} deltaType={(condensed?.overview?.weekly_change ?? 0) > 0 ? 'up' : (condensed?.overview?.weekly_change ?? 0) < 0 ? 'down' : 'neutral'} />
-  <KpiCard title="Total Opens" value={condensed?.overview?.total_opens ?? 0} loading={condensedLoading} />
-  <KpiCard title="Open Rate" value={(condensed?.overview?.open_rate ?? 0).toFixed(2)} suffix="%" loading={condensedLoading} />
-  <KpiCard title="Deliverability" value={(condensed?.overview?.deliverability_score ?? condensed?.deliverability?.inbox_placement_score ?? 0).toFixed(0)} suffix="%" loading={condensedLoading} />
-  <KpiCard title="Fast Response" value={(condensed?.overview?.fast_response_rate ?? 0).toFixed(0)} suffix="%" loading={condensedLoading} />
-  <KpiCard title="Multi-device" value={(condensed?.overview?.multi_device_rate ?? 0).toFixed(0)} suffix="%" loading={condensedLoading} />
-  <KpiCard title="Engagement Depth" value={(condensed?.overview?.engagement_depth ?? 0).toFixed(0)} suffix="%" loading={condensedLoading} />
-  <KpiCard title="Median Time to Open" value={(condensed?.timing?.median_time_to_open_minutes ?? 0).toFixed(2)} suffix="m" loading={condensedLoading} />
-      </div>
+    {/* KPI Summary block (minimalista, un solo componente con cards internas) */}
+    <KpiSummary data={condensed} loading={condensedLoading} />
 
       {/* Charts Section: diversos y configurados */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
