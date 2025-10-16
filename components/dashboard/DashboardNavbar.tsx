@@ -39,6 +39,11 @@ export default function DashboardNavbar({ onMenuClick, onLogout, tenant, user }:
 
   return (
     <div className="fixed top-0 inset-x-0 z-50">
+      {/* Heavy blur strip between top edge and navbar (matches navbar top margin) */}
+      <div
+        className="fixed top-0 inset-x-0 h-6 md:h-8 pointer-events-none z-40 backdrop-blur-2xl top-blur-gradient"
+        style={{ WebkitBackdropFilter: "blur(24px)", backdropFilter: "blur(24px)" }}
+      />
       <div className="mx-4 my-3 rounded-2xl border bg-white text-gray-900 border-black/10 dark:border-white/30 dark:bg-black dark:text-white">
         <nav className="flex items-center justify-between px-4 sm:px-6 py-3">
           <div className="flex items-center gap-2">

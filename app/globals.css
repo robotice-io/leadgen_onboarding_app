@@ -24,6 +24,17 @@ body {
   text-rendering: optimizeLegibility;
 }
 
+/* Top gradient under heavy blur to emphasize separation */
+.top-blur-gradient {
+  background: linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0));
+}
+
+@media (prefers-color-scheme: light) {
+  html:not(.dark) .top-blur-gradient {
+    background: linear-gradient(to bottom, rgba(0,0,0,0.06), rgba(0,0,0,0));
+  }
+}
+
 /* Aplicar Geist Sans a todos los elementos de texto */
 h1, h2, h3, h4, h5, h6, p, span, div, a, button, input, textarea, select {
   font-family: var(--font-geist-sans);
