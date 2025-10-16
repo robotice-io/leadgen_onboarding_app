@@ -1,6 +1,4 @@
 "use client";
-
-import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
@@ -11,7 +9,6 @@ import {
   Users, 
   TrendingUp,
   X,
-  ChevronDown,
   Building2
 } from "lucide-react";
 import { User } from "@/types/types";
@@ -28,7 +25,6 @@ interface SidebarProps {
 export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps) {
   const { t } = useI18n();
   const pathname = usePathname();
-  const [tenantMenuOpen, setTenantMenuOpen] = useState(false);
 
   // Get tenant info with fallbacks
   const getTenantName = () => {
@@ -90,25 +86,19 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
             </Link>
           </div>
 
-          {/* Tenant Selector */}
+          {/* Tenant Info Card (no dropdown) */}
           <div className="relative">
-            <button
-              onClick={() => setTenantMenuOpen(!tenantMenuOpen)}
-              className="w-full flex items-center justify-between p-3 rounded-lg bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <Building2 className="h-5 w-5 text-gray-500" />
-                <div className="text-left">
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">
-                    {getTenantName()}
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-400">
-                    {getTenantEmail()}
-                  </p>
-                </div>
+            <div className="w-full flex items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-800">
+              <Building2 className="h-5 w-5 text-gray-500" />
+              <div className="text-left ml-3">
+                <p className="text-sm font-medium text-gray-900 dark:text-white">
+                  {getTenantName()}
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  {getTenantEmail()}
+                </p>
               </div>
-              <ChevronDown className={`h-4 w-4 text-gray-500 transition-transform ${tenantMenuOpen ? 'rotate-180' : ''}`} />
-            </button>
+            </div>
           </div>
 
           {/* Navigation */}
