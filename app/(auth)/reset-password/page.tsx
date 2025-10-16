@@ -9,10 +9,12 @@ import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { KeyRound, CheckCircle, Lock } from "lucide-react";
 import { resetPassword } from "@/lib/auth-client";
+import { useI18n } from "@/lib/i18n";
 
 function ResetPasswordForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useI18n();
   const [token, setToken] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -87,9 +89,9 @@ function ResetPasswordForm() {
               <CheckCircle className="h-8 w-8 text-green-600" />
             </div>
           </div>
-          <h1 className="text-2xl font-semibold text-center mb-2">Password Reset Complete!</h1>
+          <h1 className="text-2xl font-semibold text-center mb-2">{t("reset.success.title" as any)}</h1>
           <p className="text-sm text-black/60 dark:text-white/70 text-center">
-            Your password has been successfully reset. Redirecting to login...
+            {t("reset.success.subtitle" as any)}
           </p>
         </CardHeader>
 
@@ -99,9 +101,9 @@ function ResetPasswordForm() {
               <div className="flex gap-3 justify-center">
                 <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-green-900 dark:text-green-100">
-                  <p className="font-medium">Password Updated Successfully!</p>
+                  <p className="font-medium">{t("reset.success.bodyTitle" as any)}</p>
                   <p className="text-green-800 dark:text-green-200">
-                    You can now sign in with your new password.
+                    {t("reset.success.bodySubtitle" as any)}
                   </p>
                 </div>
               </div>
@@ -110,11 +112,11 @@ function ResetPasswordForm() {
         </CardBody>
 
         <CardFooter>
-          <p className="text-sm text-center text-black/60 dark:text-white/70">
-            <Link href="/login" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
-              Go to Sign In
+          <div className="text-center w-full">
+            <Link href="/login" className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+              {t("reset.goToSignIn" as any)}
             </Link>
-          </p>
+          </div>
         </CardFooter>
       </Card>
     );
@@ -129,9 +131,9 @@ function ResetPasswordForm() {
               <Lock className="h-8 w-8 text-blue-600" />
             </div>
           </div>
-          <h1 className="text-2xl font-semibold text-center mb-2">Reset Your Password</h1>
+          <h1 className="text-2xl font-semibold text-center mb-2">{t("reset.title" as any)}</h1>
           <p className="text-sm text-black/60 dark:text-white/70 text-center">
-            Enter your new password below
+            {t("reset.subtitle" as any)}
           </p>
         </CardHeader>
 
@@ -153,8 +155,8 @@ function ResetPasswordForm() {
             <Input
               name="password"
               type="password"
-              label="New Password"
-              placeholder="Enter new password"
+              label={t("reset.newPassword" as any)}
+              placeholder={t("reset.newPassword.placeholder" as any)}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -165,8 +167,8 @@ function ResetPasswordForm() {
             <Input
               name="confirmPassword"
               type="password"
-              label="Confirm New Password"
-              placeholder="Confirm new password"
+              label={t("reset.confirmPassword" as any)}
+              placeholder={t("reset.confirmPassword.placeholder" as any)}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
@@ -178,27 +180,27 @@ function ResetPasswordForm() {
               <div className="flex gap-3">
                 <KeyRound className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                 <div className="text-sm text-blue-900 dark:text-blue-100">
-                  <p className="font-medium mb-1">Password Requirements:</p>
+                  <p className="font-medium mb-1">{t("reset.requirements.title" as any)}</p>
                   <ul className="list-disc list-inside space-y-1 text-blue-800 dark:text-blue-200">
-                    <li>At least 8 characters long</li>
-                    <li>Use a combination of letters, numbers, and symbols</li>
-                    <li>Avoid common passwords or personal information</li>
+                    <li>{t("reset.requirements.r1" as any)}</li>
+                    <li>{t("reset.requirements.r2" as any)}</li>
+                    <li>{t("reset.requirements.r3" as any)}</li>
                   </ul>
                 </div>
               </div>
             </div>
 
             <Button type="submit" fullWidth loading={loading}>
-              Reset Password
+              {t("reset.cta" as any)}
             </Button>
           </form>
         </CardBody>
 
         <CardFooter>
           <p className="text-sm text-center text-black/60 dark:text-white/70">
-            Remember your password?{" "}
+            {t("reset.remember" as any)}{" "}
             <Link href="/login" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
-              Sign in
+              {t("reset.signIn" as any)}
             </Link>
           </p>
         </CardFooter>

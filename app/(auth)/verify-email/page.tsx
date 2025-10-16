@@ -9,10 +9,12 @@ import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { Mail, CheckCircle, KeyRound } from "lucide-react";
 import { verifyEmail } from "@/lib/auth-client";
+import { useI18n } from "@/lib/i18n";
 
 function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { t } = useI18n();
   const [verificationCode, setVerificationCode] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [verified, setVerified] = useState(false);
@@ -42,17 +44,12 @@ function VerifyEmailForm() {
       
       setVerified(true);
       setToast({ 
-        message: response.message || "Email verified successfully!", 
+        message: response.message || t("verify.success" as any), 
         type: "success" 
       });
-      
-      // Redirect to login after successful verification
-      setTimeout(() => {
-        router.push("/login");
-      }, 2000);
     } catch (err) {
       setToast({ 
-        message: err instanceof Error ? err.message : "Verification failed", 
+        message: err instanceof Error ? err.message : t("verify.failed" as any), 
         type: "error" 
       });
     } finally {
@@ -76,29 +73,36 @@ function VerifyEmailForm() {
             </div>
           </div>
           <h1 className="text-2xl font-semibold text-center mb-2">
-            {verified ? "Email Verified!" : "Verify Your Email"}
+            {verified ? t("verify.title.success" as any) : t("verify.title" as any)}
           </h1>
           <p className="text-sm text-black/60 dark:text-white/70 text-center">
             {verified 
-              ? "Your email has been successfully verified. Redirecting to login..."
-              : "Enter the verification code from your email or click the link in your email"
+              ? t("verify.subtitle.success" as any)
+              : t("verify.subtitle" as any)
             }
           </p>
         </CardHeader>
 
         <CardBody>
           {verified ? (
-            <div className="text-center py-4">
-              <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
-                <div className="flex gap-3 justify-center">
-                  <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-green-900 dark:text-green-100">
-                    <p className="font-medium">Verification Complete!</p>
-                    <p className="text-green-800 dark:text-green-200">
-                      You can now sign in to your account.
-                    </p>
+            <div className="space-y-4 text-center">
+              <div className="py-4">
+                <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                  <div className="flex gap-3 justify-center">
+                    <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
+                    <div className="text-sm text-green-900 dark:text-green-100">
+                      <p className="font-medium">{t("verify.success.title" as any)}</p>
+                      <p className="text-green-800 dark:text-green-200">
+                        {t("verify.success.subtitle" as any)}
+                      </p>
+                    </div>
                   </div>
                 </div>
+              </div>
+              <div>
+                <Link href="/login" className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                  {t("verify.goToSignIn" as any)}
+                </Link>
               </div>
             </div>
           ) : (
@@ -107,8 +111,8 @@ function VerifyEmailForm() {
                 <Input
                   name="verificationCode"
                   type="text"
-                  label="Verification Code"
-                  placeholder="Enter verification code"
+                  label={t("verify.code.label" as any)}
+                  placeholder={t("verify.code.placeholder" as any)}
                   value={verificationCode}
                   onChange={(e) => setVerificationCode(e.target.value)}
                   required
@@ -120,7 +124,7 @@ function VerifyEmailForm() {
                   loading={verifying}
                   fullWidth
                 >
-                  Verify Email
+                  {t("verify.cta" as any)}
                 </Button>
               </div>
 
@@ -128,11 +132,11 @@ function VerifyEmailForm() {
                 <div className="flex gap-3">
                   <KeyRound className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
                   <div className="text-sm text-blue-900 dark:text-blue-100">
-                    <p className="font-medium mb-1">How to verify:</p>
+                    <p className="font-medium mb-1">{t("verify.how.title" as any)}</p>
                     <ol className="list-decimal list-inside space-y-1 text-blue-800 dark:text-blue-200">
-                      <li>Check your inbox for the verification email</li>
-                      <li>Click the verification link in the email (automatic)</li>
-                      <li>Or copy the verification code and paste it above</li>
+                      <li>{t("verify.how.s1" as any)}</li>
+                      <li>{t("verify.how.s2" as any)}</li>
+                      <li>{t("verify.how.s3" as any)}</li>
                     </ol>
                   </div>
                 </div>
@@ -140,17 +144,17 @@ function VerifyEmailForm() {
 
               <div className="text-center">
                 <p className="text-sm text-black/60 dark:text-white/70 mb-3">
-                  Didn't receive the email?
+                  {t("verify.resend.prompt" as any)}
                 </p>
                 <Button
                   variant="outline"
                   onClick={() => {
                     // TODO: Implement resend verification email API call
-                    setToast({ message: "Resend functionality coming soon", type: "error" });
+                    setToast({ message: t("verify.resend.soon" as any), type: "error" });
                   }}
                   loading={resending}
                 >
-                  Resend Verification Email
+                  {t("verify.resend.cta" as any)}
                 </Button>
               </div>
             </div>
@@ -160,7 +164,7 @@ function VerifyEmailForm() {
         <CardFooter>
           <p className="text-sm text-center text-black/60 dark:text-white/70">
             <Link href="/login" className="text-blue-600 hover:text-blue-700 dark:text-blue-400 font-medium">
-              Back to Sign In
+              {t("verify.backToSignIn" as any)}
             </Link>
           </p>
         </CardFooter>

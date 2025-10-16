@@ -153,28 +153,60 @@ export function scheduleTokenRefresh(expiresInSeconds?: number): void {
 
 // Change password for logged-in user (settings)
 export async function changePassword(currentPassword: string, newPassword: string): Promise<any> {
-  // Force proxy to ensure server API key is used
-  const url = getRequestUrl("/api/v1/auth/change-password", true);
-  const res = await fetch(url, {
-    method: "POST",
-    headers: buildHeaders(true),
-    body: JSON.stringify({ current_password: currentPassword, new_password: newPassword }),
-  });
+  // Try a set of common endpoints/methods and body shapes to match backend implementation
+  const candidates: Array<{ method: "POST" | "PUT" | "PATCH"; path: string }> = [
+    { method: "POST", path: "/api/v1/auth/change-password" },
+    { method: "POST", path: "/api/v1/auth/password" },
+    { method: "PUT",  path: "/api/v1/auth/password" },
+    { method: "PATCH", path: "/api/v1/auth/password" },
+    { method: "POST", path: "/api/v1/users/password" },
+    { method: "POST", path: "/api/v1/profile/password" },
+  ];
+  const bodies: Array<Record<string, string>> = [
+    { current_password: currentPassword, new_password: newPassword },
+    { old_password: currentPassword,     new_password: newPassword },
+    { password: currentPassword,         new_password: newPassword },
+  ];
 
-  if (!res.ok) {
-    if (res.status === 429) {
-      throw new Error("[429] Too many attempts. Try again in a minute.");
+  const headers = buildHeaders(true);
+  let lastStatus = 0;
+  let lastError = "";
+  for (const c of candidates) {
+    for (const b of bodies) {
+      const url = getRequestUrl(c.path, true);
+      try {
+        const res = await fetch(url, {
+          method: c.method,
+          headers: { ...headers, "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(b),
+        });
+        lastStatus = res.status;
+        if (res.ok) {
+          if (process.env.NODE_ENV !== "production") {
+            console.debug("changePassword via", c.method, c.path, "with body keys", Object.keys(b));
+          }
+          return res.json().catch(() => ({ ok: true }));
+        }
+        // For 404/405 try next candidate; for 400/401/403/422 surface error
+        const text = await res.text();
+        let msg = "Change password failed";
+        try {
+          const j = JSON.parse(text);
+          msg = j?.detail || j?.message || msg;
+        } catch {}
+        lastError = `[${res.status}] ${msg}`;
+        if (res.status === 404 || res.status === 405) {
+          continue; // try next candidate
+        } else {
+          throw new Error(lastError);
+        }
+      } catch (err: any) {
+        // network or thrown above; continue if not final attempt
+        lastError = err?.message || String(err);
+      }
     }
-    const errorText = await res.text();
-    let errorMessage = "Change password failed";
-    try {
-      const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
-    } catch {}
-    throw new Error(`[${res.status}] ${errorMessage}`);
   }
-
-  return res.json().catch(() => ({ ok: true }));
+  throw new Error(lastError || `[${lastStatus || 0}] Change password failed`);
 }
 
 export async function login(email: string, password: string): Promise<AuthTokens> {
