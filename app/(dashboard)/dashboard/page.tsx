@@ -7,8 +7,10 @@ import { getTenant } from "@/lib/auth-client";
 // Metrics widgets obtain their own data or can be wired to condensed payload in future iterations
 import { useCondensedDashboard } from "@/lib/condensed";
 import { useTenantId } from "@/lib/use-tenant-id";
+import { useState } from "react";
 import { KpiCard } from "@/components/dashboard/cards/KpiCard";
 import { KpiSummary } from "@/components/dashboard/KpiSummary";
+import { InsightsCard } from "@/components/dashboard/InsightsCard";
 import { OpenRateTrend } from "@/components/dashboard/widgets/OpenRateTrend";
 import { SentOpenedBars } from "@/components/dashboard/widgets/SentOpenedBars";
 import { DeviceTypeDonut } from "@/components/dashboard/widgets/DeviceTypeDonut";
@@ -21,8 +23,9 @@ import { Skeleton } from "@/components/ui/Skeleton";
 
 export default function DashboardPage() {
   const { t } = useI18n();
+  const [days, setDays] = useState<number>(30);
   const { tenantId, loading: tenantLoading } = useTenantId();
-  const { data: condensed, isLoading: condensedLoading, error: condensedError } = useCondensedDashboard(tenantId ?? undefined, 30);
+  const { data: condensed, isLoading: condensedLoading, error: condensedError } = useCondensedDashboard(tenantId ?? undefined, days);
 
   // Recent emails stays from existing endpoint for continuity
   // We'll keep the old fetch logic for recent emails to avoid breaking changes in this pass
@@ -100,17 +103,20 @@ export default function DashboardPage() {
       </div>
 
     {/* KPI Summary block (minimalista, un solo componente con cards internas) */}
-    <KpiSummary data={condensed} loading={condensedLoading} />
+  <KpiSummary data={condensed} loading={condensedLoading} days={days} onChangeDays={setDays} />
+
+  {/* Insights */}
+  <InsightsCard data={condensed as any} loading={condensedLoading} />
 
       {/* Charts Section: diversos y configurados */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <OpenRateTrend days={30} data={(condensed?.trends?.daily_trends || []).map(d => ({ date: d.date, rate: d.open_rate }))} />
-        <TimingBreakdown days={30} distribution={condensed?.timing?.time_distribution} />
-        <DeliverabilityProviders days={30} providers={condensed?.deliverability?.provider_performance} />
-        <DeviceTypeDonut days={30} distribution={condensed?.platform?.device_type_distribution} />
-        <SentOpenedBars days={30} data={(condensed?.trends?.daily_trends || []).map(d => ({ date: d.date, opens: d.opens_count }))} />
-        <PlatformStackedBars days={30} data={(condensed?.trends?.daily_trends || []).map(d => ({ date: d.date, ...(d.platform_distribution || {}) })) as any} />
-        <TopDevicesList days={30} distribution={condensed?.platform?.device_type_distribution || undefined} />
+  <OpenRateTrend days={days} data={(condensed?.trends?.daily_trends || []).map(d => ({ date: d.date, rate: d.open_rate }))} />
+  <TimingBreakdown days={days} distribution={condensed?.timing?.time_distribution} />
+  <DeliverabilityProviders days={days} providers={condensed?.deliverability?.provider_performance} />
+  <DeviceTypeDonut days={days} distribution={condensed?.platform?.device_type_distribution} />
+  <SentOpenedBars days={days} data={(condensed?.trends?.daily_trends || []).map(d => ({ date: d.date, opens: d.opens_count }))} />
+  <PlatformStackedBars days={days} data={(condensed?.trends?.daily_trends || []).map(d => ({ date: d.date, ...(d.platform_distribution || {}) })) as any} />
+  <TopDevicesList days={days} distribution={condensed?.platform?.device_type_distribution || undefined} />
       </div>
 
       {/* Recent Emails */}

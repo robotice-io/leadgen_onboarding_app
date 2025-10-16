@@ -3,46 +3,68 @@
 import React from "react";
 import { KpiCard } from "@/components/dashboard/cards/KpiCard";
 import type { CondensedDashboard } from "@/lib/condensed";
+import { useI18n } from "@/lib/i18n";
+import { BarChart3, Mail, Gauge, Timer, Cpu, Repeat, Layers, TrendingUp } from "lucide-react";
+import { KPIItem } from "@/components/dashboard/KPIItem";
+import { MiniTrendTile } from "@/components/dashboard/widgets/MiniTrendTile";
 
 type Props = {
   data?: CondensedDashboard;
   loading?: boolean;
+  days?: number;
+  onChangeDays?: (d: number) => void;
 };
 
-export function KpiSummary({ data, loading }: Props) {
+export function KpiSummary({ data, loading, days = 30, onChangeDays }: Props) {
+  const { t } = useI18n();
   const ov = data?.overview;
   const ti = data?.timing;
   const de = data?.deliverability;
+  const weekly = typeof ov?.weekly_change === 'number' ? `${ov?.weekly_change}${t("dashboard.vsLastWeek")}` : undefined;
 
   return (
-    <div className="bg-white dark:bg-gray-900/70 rounded-2xl border border-gray-200 dark:border-gray-800 p-5">
+    <div className="bg-white dark:bg-gray-900/70 rounded-2xl border border-gray-200 dark:border-gray-800 p-6">
       <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-white uppercase">Today's Emails</h2>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Sales Summary</p>
+          <h2 className="text-sm font-semibold tracking-wide text-gray-900 dark:text-white uppercase">{t("dashboard.kpiBlock.title")}</h2>
+          <p className="text-xs text-gray-500 dark:text-gray-400">{t("dashboard.kpiBlock.subtitle")}</p>
         </div>
-        {/* Placeholder para futuras acciones: Export, Date Range, etc. */}
+        {/* Selector de rango */}
+        <div className="inline-flex items-center gap-1 rounded-md border border-gray-200 dark:border-gray-700 p-1 bg-gray-50 dark:bg-gray-800/50">
+          {[7,14,30].map((d) => (
+            <button
+              key={d}
+              onClick={() => onChangeDays?.(d)}
+              className={`px-2 h-7 text-xs rounded ${days===d? 'bg-blue-600 text-white' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'}`}
+            >{d}d</button>
+          ))}
+        </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard title="Total Emails" value={ov?.total_emails_sent ?? 0} loading={loading} delta={ov?.weekly_change !== undefined ? `${ov?.weekly_change}% vs last week` : undefined} deltaType={(ov?.weekly_change ?? 0) > 0 ? 'up' : (ov?.weekly_change ?? 0) < 0 ? 'down' : 'neutral'} />
-        <KpiCard title="Total Opens" value={ov?.total_opens ?? 0} loading={loading} />
-  <KpiCard title="Open Rate" value={(ov?.open_rate ?? 0).toFixed(2)} suffix="%" loading={loading} />
-  <KpiCard title="Average opens" value={Number((ov?.avg_opens_per_email ?? 0).toFixed(2))} loading={loading} />
+      {/* 3x3 KPIs */}
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        <KPIItem labelKey="dashboard.totalEmails" value={ov?.total_emails_sent ?? 0} format="int" icon={<Mail className="h-4 w-4" />} delta={typeof ov?.weekly_change==='number'?{ value: ov!.weekly_change }:null} hintKey="dashboard.vsLastWeek" />
+        <KPIItem labelKey="dashboard.totalOpens" value={ov?.total_opens ?? 0} format="int" icon={<BarChart3 className="h-4 w-4" />} />
+        <KPIItem labelKey="dashboard.openRate" value={ov?.open_rate ?? 0} format="percent-2" suffix="%" icon={<TrendingUp className="h-4 w-4" />} delta={typeof ov?.weekly_change==='number'?{ value: ov!.weekly_change }:null} hintKey="dashboard.vsLastWeek" />
+
+        <KPIItem labelKey="dashboard.avgOpens" value={ov?.avg_opens_per_email ?? 0} format="float-2" icon={<Layers className="h-4 w-4" />} />
+        <KPIItem labelKey="dashboard.deliverability" value={(ov?.deliverability_score ?? de?.inbox_placement_score ?? 0)} format="percent-int" suffix="%" icon={<Gauge className="h-4 w-4" />} />
+        <KPIItem labelKey="dashboard.fastResponse" value={ov?.fast_response_rate ?? 0} format="percent-int" suffix="%" icon={<Timer className="h-4 w-4" />} />
+
+        <KPIItem labelKey="dashboard.multiDevice" value={ov?.multi_device_rate ?? 0} format="percent-int" suffix="%" icon={<Repeat className="h-4 w-4" />} />
+        <KPIItem labelKey="dashboard.engagementDepth" value={ov?.engagement_depth ?? 0} format="percent-int" suffix="%" icon={<Cpu className="h-4 w-4" />} />
+        <KPIItem labelKey="dashboard.medianTimeToOpen" value={ti?.median_time_to_open_minutes ?? 0} format="minutes-2" suffix="m" icon={<Timer className="h-4 w-4" />} />
       </div>
 
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard title="Fast response" value={(ov?.fast_response_rate ?? 0).toFixed(0)} suffix="%" loading={loading} />
-        <KpiCard title="Deliverability" value={Number((ov?.deliverability_score ?? de?.inbox_placement_score ?? 0).toFixed(0))} suffix="%" loading={loading} />
-        <KpiCard title="Multi-device" value={Number((ov?.multi_device_rate ?? 0).toFixed(0))} suffix="%" loading={loading} />
-        <KpiCard title="Engagement depth" value={Number((ov?.engagement_depth ?? 0).toFixed(0))} suffix="%" loading={loading} />
-      </div>
-
-      <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <KpiCard title="Median time to open" value={Number((ti?.median_time_to_open_minutes ?? 0).toFixed(2))} suffix="m" loading={loading} />
-        {ov?.performance_grade ? (
-          <KpiCard title="Performance grade" value={ov?.performance_grade} loading={loading} />
-        ) : null}
+      {/* Mini trend tile */}
+      <div className="mt-4">
+        <MiniTrendTile
+          title={t("dashboard.openRateTrend")}
+          subtitle={`${days}d`}
+          data={(data?.trends?.daily_trends || []).map(d => ({ date: d.date, value: Number((d.open_rate ?? 0).toFixed(2)) }))}
+          height={150}
+          ySuffix="%"
+        />
       </div>
     </div>
   );
