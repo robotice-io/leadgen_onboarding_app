@@ -148,8 +148,8 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
             </ul>
           </nav>
 
-          {/* Bottom Section */}
-          <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
+          {/* Bottom Section (no divider, with breathing space) */}
+          <div className="mt-4 pt-1 pb-2">
             <OnboardingButton user={user} />
           </div>
         </div>
@@ -216,8 +216,8 @@ export function DashboardSidebar({ isOpen, onClose, user, tenant }: SidebarProps
             </ul>
           </nav>
           
-          {/* Mobile Bottom Section */}
-          <div className="border-t border-gray-200 dark:border-gray-800 pt-4">
+          {/* Mobile Bottom Section (no divider, with breathing space) */}
+          <div className="mt-4 pt-1 pb-2">
             <OnboardingButton user={user} />
           </div>
         </div>
