@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" fill="#ffffff"/>
+  <!-- Top-left quarter circle -->
+  <path d="M512 0 A512 512 0 0 0 0 512 L0 0 Z" fill="#3454F5"/>
+  <!-- Top-right circle -->
+  <circle cx="768" cy="256" r="170" fill="#3454F5"/>
+  <!-- Bottom-left circle -->
+  <circle cx="256" cy="768" r="170" fill="#3454F5"/>
+  <!-- Bottom-right quarter circle -->
+  <path d="M512 1024 A512 512 0 0 0 1024 512 L1024 1024 Z" fill="#3454F5"/>
+</svg>
+
+
+
+

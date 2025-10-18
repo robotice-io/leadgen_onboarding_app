@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+export const runtime = "nodejs";
 import { getIntegrationById } from "@/lib/store";
 import { getAccessTokenForIntegration, toBase64Url } from "@/lib/google";
 
@@ -47,6 +48,7 @@ export async function POST(req: NextRequest) {
     return new Response(e instanceof Error ? e.message : "Server error", { status: 500 });
   }
 }
+
 
 
 
