@@ -98,7 +98,6 @@ export function Navbar() {
   }, []);
 
   const containerBase = "fixed top-0 inset-x-0 z-40";
-
   const isGlass = scrolled || mobileOpen;
   const shellClasses = [
     "mx-4 my-3 rounded-2xl border transition-all",
@@ -106,7 +105,7 @@ export function Navbar() {
       ? hidden
         ? "backdrop-blur-xl bg-white/12 border-white/15 shadow-[0_14px_32px_-12px_rgba(0,0,0,0.6)] duration-400"
         : "backdrop-blur-xl bg-white/12 border-white/15 shadow-[0_8px_20px_-12px_rgba(0,0,0,0.5)] duration-300"
-      : "bg-transparent border-white/30 backdrop-blur-0 shadow-none duration-300",
+      : "bg-black text-white border-white/15 backdrop-blur-0 shadow-none duration-300",
   ].join(" ");
 
   const linkBase = "inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10";
@@ -125,7 +124,7 @@ export function Navbar() {
       animate={{ y: hidden ? -(navHeight + 12) : 0, opacity: hidden ? 0 : 1 }}
       transition={{ duration: hidden ? 0.55 : 0.45, ease: [0.22, 1, 0.36, 1] }}
     >
-      <div className={shellClasses}>
+    <div className={shellClasses}>
   <nav className="flex items-center justify-between px-4 sm:px-6 py-3">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
