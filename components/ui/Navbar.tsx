@@ -105,7 +105,7 @@ export function Navbar() {
       ? hidden
         ? "backdrop-blur-xl bg-white/12 border-white/15 shadow-[0_14px_32px_-12px_rgba(0,0,0,0.6)] duration-400"
         : "backdrop-blur-xl bg-white/12 border-white/15 shadow-[0_8px_20px_-12px_rgba(0,0,0,0.5)] duration-300"
-      : "bg-black text-white border-white/15 backdrop-blur-0 shadow-none duration-300",
+      : "bg-transparent border-white/30 backdrop-blur-0 shadow-none duration-300",
   ].join(" ");
 
   const linkBase = "inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium transition-colors hover:bg-white/10";

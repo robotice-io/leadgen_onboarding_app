@@ -32,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         {/* Calendly assets for popup widget */}
         <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet" />
@@ -43,8 +43,8 @@ export default function RootLayout({
             (function(){
               try {
                 var s = localStorage.getItem('robotice-theme');
-                var m = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-                var dark = s ? s === 'dark' : m;
+                // Default to dark when no saved preference
+                var dark = s ? s === 'dark' : true;
                 var root = document.documentElement;
                 if (dark) root.classList.add('dark'); else root.classList.remove('dark');
               } catch (e) {}

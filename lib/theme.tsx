@@ -15,12 +15,12 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 const STORAGE_KEY = "robotice-theme";
 
 function getInitialTheme(): Theme {
-  if (typeof window === "undefined") return "light";
+  // Default to dark theme by default (SSR and first load)
+  if (typeof window === "undefined") return "dark";
   const saved = window.localStorage.getItem(STORAGE_KEY) as Theme | null;
   if (saved === "light" || saved === "dark") return saved;
-  // Prefer OS setting
-  const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  return prefersDark ? "dark" : "light";
+  // Fallback to dark instead of OS preference
+  return "dark";
 }
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
