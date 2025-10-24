@@ -141,7 +141,7 @@ export function Navbar() {
             <div className="hidden lg:flex items-center gap-1">
               <Link href="/" className={[linkBase, homeActive ? activePill : ""].join(" ")}>{lang === "es" ? "Home" : "Home"}</Link>
               <Link href="/#como-funciona" className={[linkBase, howActive ? activePill : ""].join(" ")}>{lang === "es" ? "Cómo funciona" : "How it works"}</Link>
-              <Link href="/pricing#comparison" className={[linkBase, pricingActive ? activePill : ""].join(" ")}>{lang === "es" ? "Planes" : "Pricing"}</Link>
+              <Link href="/pricing" className={[linkBase, pricingActive ? activePill : ""].join(" ")}>{lang === "es" ? "Planes" : "Pricing"}</Link>
             </div>
           </div>
           <div className="flex items-center gap-2 sm:gap-3 whitespace-nowrap">
@@ -205,7 +205,7 @@ export function Navbar() {
               <div className="flex flex-col gap-1">
                 <Link href="/" onClick={() => setMobileOpen(false)} className={[linkBase, homeActive ? activePill : ""].join(" ")}>Home</Link>
                 <Link href="/#como-funciona" onClick={() => setMobileOpen(false)} className={[linkBase, howActive ? activePill : ""].join(" ")}>{lang === "es" ? "Cómo funciona" : "How it works"}</Link>
-                <Link href="/pricing#comparison" onClick={() => setMobileOpen(false)} className={[linkBase, pricingActive ? activePill : ""].join(" ")}>{lang === "es" ? "Planes" : "Pricing"}</Link>
+                <Link href="/pricing" onClick={() => setMobileOpen(false)} className={[linkBase, pricingActive ? activePill : ""].join(" ")}>{lang === "es" ? "Planes" : "Pricing"}</Link>
                 <Link href="mailto:contact@robotice.io" onClick={() => setMobileOpen(false)} className={linkBase}>{lang === "es" ? "Contacto" : "Contact"}</Link>
                 {authed ? (
                   <>
