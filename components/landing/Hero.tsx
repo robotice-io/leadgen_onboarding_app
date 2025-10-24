@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion, Variants } from "framer-motion";
 import { CheckCircle2, Calendar, ArrowRight } from "lucide-react";
+import { RetroGrid } from "@/components/ui/hero-section-dark";
 import { useI18n } from "@/lib/i18n";
 import { Trans } from "@/components/ui/Trans";
 import LanguageToggle from "@/components/ui/LanguageToggle";
@@ -28,11 +29,20 @@ export function Hero() {
   const { t } = useI18n();
   return (
     <section className="relative flex flex-col justify-center items-center min-h-[88vh] px-6 overflow-hidden">
-      {/* Background decorative layers */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_25%_25%,#132033,#0b121d_60%)]" />
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.35] mix-blend-overlay bg-grid-pattern" />
+      {/* Background decorative layers with Robotice blue-ish wow factor */}
+      <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_25%_25%,#0c1524,#0b121d_60%)]" />
+      {/* Animated retro grid */}
+      <RetroGrid
+        gridOptions={{
+          angle: 65,
+          opacity: 0.45,
+          cellSize: 56,
+          lightLineColor: "rgba(37,99,235,0.18)",
+          darkLineColor: "rgba(96,165,250,0.22)",
+        }}
+      />
       <div className="absolute -top-40 -left-40 w-[520px] h-[520px] rounded-full bg-blue-600/15 blur-3xl" />
-      <div className="absolute top-1/3 -right-40 w-[460px] h-[460px] rounded-full bg-indigo-500/20 blur-3xl" />
+      <div className="absolute top-1/3 -right-40 w-[460px] h-[460px] rounded-full bg-blue-500/20 blur-3xl" />
       <LanguageToggle />
 
       {/* Content */}

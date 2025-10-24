@@ -85,6 +85,16 @@ p {
   }
 }
 
+/* Animated retro grid used by HeroSection */
+@keyframes float-grid {
+  0% { background-position: 0px 0px, 0px 0px; }
+  100% { background-position: 400px 400px, 400px 400px; }
+}
+
+.animate-grid {
+  animation: float-grid 42s linear infinite alternate;
+}
+
 /* Smooth scroll para anclas */
 html {
   scroll-behavior: smooth;
