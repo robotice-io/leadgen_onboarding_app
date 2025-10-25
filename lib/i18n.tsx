@@ -337,8 +337,8 @@ const ES: Dictionary = {
   "verify.resend.soon": "La función de reenviar llegará pronto",
   
   // Landing page – Hero
-  "landing.hero.title": "Genera [hl]leads B2B reales[hl] con automatización e inteligencia artificial.",
-  "landing.hero.subtitle": "LeadGen by Robotice crea y ejecuta campañas hiperpersonalizadas desde tu propia cuenta de e-mail. Sin listas genéricas, sin spam — solo conversaciones reales que generan oportunidades.",
+  "landing.hero.title": "Encuentra, consigue y [hl]gana más clientes[hl] por correo electrónico",
+  "landing.hero.subtitle": "Lead-Gen te ayuda a encontrar clientes potenciales, ampliar las campañas de correo electrónico, llegar a las principales bandejas de entrada, interactuar de forma más inteligente y ganar más con la IA.",
   "landing.hero.bullet1": "Leads verificados",
   "landing.hero.bullet2": "Mensajes escritos por IA",
   "landing.hero.bullet3": "Resultados medibles en tiempo real",
@@ -883,8 +883,8 @@ const EN: Dictionary = {
   "verify.resend.soon": "Resend functionality coming soon",
   
   // Landing page – Hero
-  "landing.hero.title": "Generate [hl]real B2B leads[hl] with automation and artificial intelligence.",
-  "landing.hero.subtitle": "LeadGen by Robotice builds and runs hyper-personalized campaigns from your own email account. No generic lists, no spam — just real conversations that create opportunities.",
+  "landing.hero.title": "Find, reach, and [hl]win more customers[hl] via email",
+  "landing.hero.subtitle": "Lead‑Gen helps you find prospects, scale email campaigns, land in primary inboxes, engage smarter, and win more with AI.",
   "landing.hero.bullet1": "Verified leads",
   "landing.hero.bullet2": "AI‑written messages",
   "landing.hero.bullet3": "Real-time measurable results",
