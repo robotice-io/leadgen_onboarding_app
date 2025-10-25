@@ -344,6 +344,8 @@ const ES: Dictionary = {
   "landing.hero.bullet3": "Resultados medibles en tiempo real",
   "landing.hero.primaryCta": "Ver planes",
   "landing.hero.secondaryCta": "Agendar una demo",
+  "landing.hero.watchDemo": "Ver demo",
+  "landing.hero.trustedBy": "Confiado por equipos de ventas",
 
   // Landing – Cómo funciona
   "landing.how.heading": "Un sistema de prospección inteligente que trabaja incluso mientras duermes.",
@@ -890,6 +892,8 @@ const EN: Dictionary = {
   "landing.hero.bullet3": "Real-time measurable results",
   "landing.hero.primaryCta": "See plans",
   "landing.hero.secondaryCta": "Schedule a demo",
+  "landing.hero.watchDemo": "Watch demo",
+  "landing.hero.trustedBy": "Trusted by sales teams",
 
   // Landing – How it works
   "landing.how.heading": "An intelligent prospecting system that works even while you sleep.",
