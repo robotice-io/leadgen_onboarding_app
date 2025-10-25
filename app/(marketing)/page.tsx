@@ -3,7 +3,6 @@ import Link from "next/link";
 import Image from "next/image";
 import { TrendingUp, Mail, Calendar, ArrowRight } from "lucide-react";
 import { Hero } from "@/components/landing/Hero";
-import { HeroSection } from "@/components/ui/hero-section-dark";
 import { HowItWorks } from "@/components/landing/HowItWorks";
 import { WhyLeadGen } from "@/components/landing/WhyLeadGen";
 import { Deliverables } from "@/components/landing/Deliverables";
@@ -15,15 +14,7 @@ export default function Home() {
 	const { t, lang } = useI18n();
 	return (
 		<main className="min-h-screen w-full bg-gradient-to-b from-white to-blue-50 dark:from-gray-900 dark:to-gray-800">
-				{/* Replaced default landing hero with Robotice blueish 'wow' hero */}
-				<HeroSection
-					title={t("landing.hero.title")}
-					subtitle={{ regular: t("landing.hero.subtitle"), gradient: t("landing.hero.primaryCta") }}
-					description={t("landing.hero.subtitle")}
-					ctaText={t("landing.hero.primaryCta")}
-					ctaHref="/pricing#comparison"
-					gridOptions={{ angle: 65, opacity: 0.35, cellSize: 56 }}
-				/>
+			<Hero />
 
 			<HowItWorks />
 
