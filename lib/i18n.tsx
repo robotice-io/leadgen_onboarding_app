@@ -7,6 +7,15 @@ export type SupportedLang = "es" | "en";
 type Dictionary = Record<string, string>;
 
 const ES: Dictionary = {
+  // Common
+  "common.openMenu": "Abrir menú",
+  "common.search": "Buscar",
+  "common.notifications": "Notificaciones",
+  "common.userMenu": "Menú de usuario",
+  "common.language": "Idioma",
+  "common.theme": "Tema",
+  "common.dark": "Oscuro",
+  "common.light": "Claro",
   brandName: "Robotice",
   tagline: "LeadGen Wizzard",
   stepCompany: "Empresa",
@@ -108,11 +117,15 @@ const ES: Dictionary = {
   "help.connect3": "Se verificará el token con Refresh.",
   
   // Dashboard translations
+  "dashboard.overview": "Resumen",
   "dashboard.title": "Panel de Control",
   "dashboard.welcome": "¡Bienvenido de vuelta! Aquí está lo que está pasando con tus campañas.",
+  "dashboard.emailsSent": "Correos enviados",
   "dashboard.emailsSentToday": "Correos Enviados Hoy",
   "dashboard.opensToday": "Aperturas Hoy",
   "dashboard.openRate": "Tasa de Apertura",
+  "dashboard.responseRate": "Tasa de respuesta",
+  "dashboard.meetingsBooked": "Reuniones agendadas",
   "dashboard.totalEmails": "Total de correos",
   "dashboard.totalOpens": "Total de aperturas",
   "dashboard.avgOpens": "Aperturas promedio",
@@ -166,6 +179,23 @@ const ES: Dictionary = {
   "dashboard.pleaseLogin": "Por favor inicia sesión nuevamente",
   "dashboard.noDataYet": "Aún no hay datos para mostrar",
   "dashboard.sendFirstEmail": "Envía tu primer correo para empezar a ver estadísticas aquí",
+
+  // Dashboard V2 (Overview page)
+  "dashboard.trendExplorer": "Explorador de tendencias",
+  "dashboard.allCampaigns": "Todas las campañas",
+  "dashboard.recentActivity": "Actividad reciente",
+  "dashboard.campaignComparison": "Comparativa de campañas",
+  "dashboard.campaignLabel": "Campaña",
+  "dashboard.responses": "Respuestas",
+  "dashboard.meetings": "Reuniones",
+  "dashboard.statusLabel": "Estado",
+  "dashboard.paused": "Pausada",
+  "dashboard.stopped": "Detenida",
+  "dashboard.newResponse": "Nueva respuesta",
+  "dashboard.campaignReached20OpenRate": "La campaña alcanzó 20% de tasa de apertura",
+  "dashboard.ago.2h": "hace 2 h",
+  "dashboard.ago.4h": "hace 4 h",
+  "dashboard.ago.6h": "hace 6 h",
   
   // Settings translations
   "settings.title": "Configuración",
@@ -523,6 +553,15 @@ const ES: Dictionary = {
 };
 
 const EN: Dictionary = {
+  // Common
+  "common.openMenu": "Open menu",
+  "common.search": "Search",
+  "common.notifications": "Notifications",
+  "common.userMenu": "User menu",
+  "common.language": "Language",
+  "common.theme": "Theme",
+  "common.dark": "Dark",
+  "common.light": "Light",
   brandName: "Robotice",
   tagline: "LeadGen Wizzard",
   stepCompany: "Company",
@@ -624,11 +663,15 @@ const EN: Dictionary = {
   "help.connect3": "Token will be verified via Refresh.",
   
   // Dashboard translations
+  "dashboard.overview": "Overview",
   "dashboard.title": "Dashboard",
   "dashboard.welcome": "Welcome back! Here's what's happening with your campaigns.",
+  "dashboard.emailsSent": "Emails Sent",
   "dashboard.emailsSentToday": "Emails Sent Today",
   "dashboard.opensToday": "Opens Today",
   "dashboard.openRate": "Open Rate",
+  "dashboard.responseRate": "Response Rate",
+  "dashboard.meetingsBooked": "Meetings Booked",
   "dashboard.totalEmails": "Total emails",
   "dashboard.totalOpens": "Total opens",
   "dashboard.avgOpens": "Average opens",
@@ -682,6 +725,23 @@ const EN: Dictionary = {
   "dashboard.pleaseLogin": "Please log in again",
   "dashboard.noDataYet": "No data to display yet",
   "dashboard.sendFirstEmail": "Send your first email to start seeing stats here",
+
+  // Dashboard V2 (Overview page)
+  "dashboard.trendExplorer": "Interactive Trend Explorer",
+  "dashboard.allCampaigns": "All Campaigns",
+  "dashboard.recentActivity": "Recent Activity",
+  "dashboard.campaignComparison": "Campaign Comparison",
+  "dashboard.campaignLabel": "Campaign",
+  "dashboard.responses": "Responses",
+  "dashboard.meetings": "Meetings",
+  "dashboard.statusLabel": "Status",
+  "dashboard.paused": "Paused",
+  "dashboard.stopped": "Stopped",
+  "dashboard.newResponse": "New Response",
+  "dashboard.campaignReached20OpenRate": "Campaign reached 20% open rate",
+  "dashboard.ago.2h": "2h ago",
+  "dashboard.ago.4h": "4h ago",
+  "dashboard.ago.6h": "6h ago",
   
   // Settings translations
   "settings.title": "Settings",

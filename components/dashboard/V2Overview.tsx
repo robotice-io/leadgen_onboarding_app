@@ -42,7 +42,7 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
     return [
       {
         key: "emails",
-        label: "Emails Sent",
+        label: t("dashboard.emailsSent"),
         value: ov.total_emails_sent ?? (last?.opens_count ?? 0),
         delta: pct(last?.opens_count, prev?.opens_count) || "+12%",
         accent: "from-sky-500/20 to-sky-300/10",
@@ -50,7 +50,7 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
       },
       {
         key: "open",
-        label: "Open Rate",
+        label: t("dashboard.openRate"),
         value: `${(typeof (ov.open_rate ?? last?.open_rate) === 'number' ? Number(ov.open_rate ?? last?.open_rate).toFixed(2) : (ov.open_rate ?? last?.open_rate ?? 0))}%`,
         delta: pct(last?.open_rate, prev?.open_rate) || "+5%",
         accent: "from-violet-500/20 to-fuchsia-400/10",
@@ -58,7 +58,7 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
       },
       {
         key: "resp",
-        label: "Response Rate",
+        label: t("dashboard.responseRate"),
         value: `${ov.fast_response_rate ?? 0}%`,
         delta: "+2%",
         accent: "from-emerald-500/20 to-lime-400/10",
@@ -66,52 +66,52 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
       },
       {
         key: "meet",
-        label: "Meetings Booked",
+        label: t("dashboard.meetingsBooked"),
         value: ov.meetings ?? 45,
         delta: "+10%",
         accent: "from-amber-500/20 to-orange-400/10",
         line: series.map((p) => (p as any).meetings ?? 0),
       },
     ];
-  }, [data]);
+  }, [data, t]);
 
   const activities: ActivityItem[] = useMemo(() => {
     // Map recent emails (if available) into the compact activity format
     const list = (recent || []).slice(0, 3).map((e: any, i: number) => ({
       id: e?.uuid || String(i),
-      title: e?.subject || "New Response",
+      title: e?.subject || t("dashboard.newResponse"),
       subtitle: e?.to || e?.from || "john.doe@example.com",
       avatarUrl: e?.avatar || undefined,
-      timeAgo: e?.ago || (i === 0 ? "2h ago" : i === 1 ? "4h ago" : "6h ago"),
+      timeAgo: e?.ago || (i === 0 ? t("dashboard.ago.2h") : i === 1 ? t("dashboard.ago.4h") : t("dashboard.ago.6h")),
     }));
     // Fallback demo rows if no data
     if (list.length === 0) {
       return [
-        { id: "a1", title: "New Response", subtitle: "john.doe@example.com", timeAgo: "2h ago" },
-        { id: "a2", title: "Campaign Reached 20% Open Rate", subtitle: "Campaign X", timeAgo: "4h ago" },
-        { id: "a3", title: "New Contact Added", subtitle: "jane.smith@company.com", timeAgo: "6h ago" },
+        { id: "a1", title: t("dashboard.newResponse"), subtitle: "john.doe@example.com", timeAgo: t("dashboard.ago.2h") },
+        { id: "a2", title: t("dashboard.campaignReached20OpenRate"), subtitle: "Campaign X", timeAgo: t("dashboard.ago.4h") },
+        { id: "a3", title: t("dashboard.newContactAdded"), subtitle: "jane.smith@company.com", timeAgo: t("dashboard.ago.6h") },
       ];
     }
     return list;
-  }, [recent]);
+  }, [recent, t]);
 
   const campaigns = useMemo(() => {
     // Static demo table – wire to real endpoint later
     return [
-      { name: "Campaign A", sent: "2,500", open: "25%", responses: "100", meetings: "10", status: "Active" },
-      { name: "Campaign B", sent: "3,000", open: "20%", responses: "120", meetings: "15", status: "Paused" },
-      { name: "Campaign C", sent: "2,000", open: "30%", responses: "80", meetings: "8", status: "Active" },
-      { name: "Campaign D", sent: "1,500", open: "15%", responses: "50", meetings: "5", status: "Stopped" },
-      { name: "Campaign E", sent: "3,500", open: "22%", responses: "150", meetings: "20", status: "Active" },
+      { name: "Campaign A", sent: "2,500", open: "25%", responses: "100", meetings: "10", status: t("dashboard.active") },
+      { name: "Campaign B", sent: "3,000", open: "20%", responses: "120", meetings: "15", status: t("dashboard.paused") },
+      { name: "Campaign C", sent: "2,000", open: "30%", responses: "80", meetings: "8", status: t("dashboard.active") },
+      { name: "Campaign D", sent: "1,500", open: "15%", responses: "50", meetings: "5", status: t("dashboard.stopped") },
+      { name: "Campaign E", sent: "3,500", open: "22%", responses: "150", meetings: "20", status: t("dashboard.active") },
     ];
-  }, []);
+  }, [t]);
 
   return (
-    <div className="w-full bg-[#0D0F12] text-white rounded-2xl">
+    <div className="w-full bg-white dark:bg-gray-900/70 text-gray-900 dark:text-white rounded-2xl">
       {/* Title */}
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="flex flex-wrap justify-between gap-3 py-4">
-          <h1 className="text-[28px] sm:text-[32px] font-bold leading-tight tracking-tight">Overview</h1>
+          <h1 className="text-[28px] sm:text-[32px] font-bold leading-tight tracking-tight">{t("dashboard.overview")}</h1>
         </div>
       </div>
 
@@ -133,7 +133,7 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
 
       {/* Trend Explorer */}
       <div className="px-4 sm:px-6 lg:px-8">
-        <h2 className="text-[22px] font-bold tracking-tight mt-6 mb-3">Interactive Trend Explorer</h2>
+  <h2 className="text-[22px] font-bold tracking-tight mt-6 mb-3">{t("dashboard.trendExplorer")}</h2>
         <div className="rounded-lg p-4 sm:p-6 bg-[#111315] border border-[#282c39]">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <div className="flex items-center gap-3">
@@ -142,24 +142,24 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
                 onChange={(e) => setMetric(e.target.value)}
                 className="appearance-none bg-[#282c39] text-white text-sm font-medium pl-4 pr-10 py-2 rounded-lg border border-[#282c39] focus:outline-none"
               >
-                <option value="open_rate">Open Rate</option>
-                <option value="response_rate">Response Rate</option>
-                <option value="emails_sent">Emails Sent</option>
-                <option value="meetings">Meetings Booked</option>
+                <option value="open_rate">{t("dashboard.openRate")}</option>
+                <option value="response_rate">{t("dashboard.responseRate")}</option>
+                <option value="emails_sent">{t("dashboard.emailsSent")}</option>
+                <option value="meetings">{t("dashboard.meetingsBooked")}</option>
               </select>
               <select
                 value={campaign}
                 onChange={(e) => setCampaign(e.target.value)}
                 className="appearance-none bg-[#282c39] text-white text-sm font-medium pl-4 pr-10 py-2 rounded-lg border border-[#282c39] focus:outline-none"
               >
-                <option value="all">All Campaigns</option>
+                <option value="all">{t("dashboard.allCampaigns")}</option>
                 <option value="A">Campaign A</option>
                 <option value="B">Campaign B</option>
                 <option value="C">Campaign C</option>
               </select>
             </div>
             <div className="flex items-center gap-2">
-              {[{k:1,l:"Now"},{k:7,l:"7 days"},{k:14,l:"14 days"},{k:30,l:"30 days"}].map(({k,l}) => (
+              {[{k:1,l:t("dashboard.todayShort")},{k:7,l:`7 ${t("dashboard.daysLabel")}`},{k:14,l:`14 ${t("dashboard.daysLabel")}`},{k:30,l:`30 ${t("dashboard.daysLabel")}`}].map(({k,l}) => (
                 <button
                   key={k}
                   onClick={() => onChangeDays?.(k as 1|7|14|30)}
@@ -176,7 +176,7 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
 
       {/* Recent Activity */}
       <div className="px-4 sm:px-6 lg:px-8">
-        <h2 className="text-[22px] font-bold tracking-tight mt-6 mb-3">Recent Activity</h2>
+  <h2 className="text-[22px] font-bold tracking-tight mt-6 mb-3">{t("dashboard.recentActivity")}</h2>
         <div className="space-y-3">
           {activities.map((a) => (
             <div key={a.id} className="flex items-center justify-between gap-4 rounded-lg px-4 py-3 bg-[#111315] border border-[#282c39]">
@@ -202,17 +202,17 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
 
       {/* Campaign Comparison */}
       <div className="px-4 sm:px-6 lg:px-8">
-        <h2 className="text-[22px] font-bold tracking-tight mt-6 mb-3">Campaign Comparison</h2>
+        <h2 className="text-[22px] font-bold tracking-tight mt-6 mb-3">{t("dashboard.campaignComparison")}</h2>
         <div className="rounded-lg overflow-hidden border border-[#3b4154] bg-[#111315]">
           <table className="w-full">
             <thead className="bg-[#1c1e27]">
               <tr>
-                <th className="text-left px-4 py-3 text-sm">Campaign</th>
-                <th className="text-left px-4 py-3 text-sm">Sent</th>
-                <th className="text-left px-4 py-3 text-sm">Open</th>
-                <th className="text-left px-4 py-3 text-sm">Responses</th>
-                <th className="text-left px-4 py-3 text-sm">Meetings</th>
-                <th className="text-left px-4 py-3 text-sm">Status</th>
+                <th className="text-left px-4 py-3 text-sm">{t("dashboard.campaignLabel")}</th>
+                <th className="text-left px-4 py-3 text-sm">{t("dashboard.sent")}</th>
+                <th className="text-left px-4 py-3 text-sm">{t("dashboard.opensLabel")}</th>
+                <th className="text-left px-4 py-3 text-sm">{t("dashboard.responses")}</th>
+                <th className="text-left px-4 py-3 text-sm">{t("dashboard.meetings")}</th>
+                <th className="text-left px-4 py-3 text-sm">{t("dashboard.statusLabel")}</th>
               </tr>
             </thead>
             <tbody>
@@ -265,17 +265,16 @@ function KpiCard({
 }) {
   const positive = typeof delta === "string" ? delta.trim().startsWith("+") : true;
   return (
-    <div className="relative rounded-2xl p-5 sm:p-6 bg-[#0f1115] border border-white/10 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.6)] overflow-hidden">
-      {/* subtle gradient glow */}
-      <div className={`pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br ${accent} opacity-60 blur-2`} />
+    <div className="relative rounded-2xl p-5 sm:p-6 bg-white dark:bg-gray-900/70 border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
+      {/* removed colored gradient overlay to match theme */}
       <div className="relative">
         <div className="flex items-center justify-between">
           <div className="inline-flex items-center gap-2">
-            <span className="size-1.5 rounded-full bg-white/70" />
-            <p className="text-[13px] tracking-wide uppercase text-white/70 font-medium">{label}</p>
+            <span className="size-1.5 rounded-full bg-gray-100 dark:bg-gray-800" />
+            <p className="text-[13px] tracking-wide uppercase text-gray-700 dark:text-gray-300 font-medium">{label}</p>
           </div>
           {typeof delta === "string" && (
-            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold border ${positive ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" : "text-rose-400 border-rose-500/30 bg-rose-500/10"}`}>
+            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold border ${positive ? "text-emerald-600 border-emerald-200/20 bg-emerald-50/20" : "text-rose-600 border-rose-200/20 bg-rose-50/20"}`}>
               {positive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
               {delta}
             </span>
@@ -283,7 +282,7 @@ function KpiCard({
         </div>
 
         <div className="mt-3">
-          <div className="text-3xl sm:text-4xl font-black tracking-tight">{value}</div>
+          <div className="text-3xl sm:text-4xl font-black tracking-tight text-gray-900 dark:text-white">{value}</div>
         </div>
 
         {/* micro sparkline */}
