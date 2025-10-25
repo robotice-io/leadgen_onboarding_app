@@ -39,7 +39,7 @@ export function Hero() {
   }, [demoOpen]);
 
   return (
-    <section className="relative min-h-[78vh] px-4 overflow-hidden flex items-center">
+    <section className="relative min-h-[70vh] px-4 overflow-hidden flex items-center">
       {/* Background decorative layers */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_10%_10%,#122033_20%,#0a101b_70%)]" />
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.25] mix-blend-overlay bg-grid-pattern" />
@@ -47,8 +47,8 @@ export function Hero() {
       <div className="absolute top-1/3 -right-40 w-[460px] h-[460px] rounded-full bg-indigo-500/25 blur-3xl" />
       <LanguageToggle />
 
-      <div className="w-full max-w-6xl mx-auto py-6 md:py-8">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
+      <div className="w-full max-w-6xl mx-auto py-4 md:py-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
           {/* Left: copy */}
           <motion.div
             variants={fadeParent}
@@ -71,7 +71,7 @@ export function Hero() {
             {/* Headline */}
             <motion.h1
               variants={fadeUp}
-              className="font-black tracking-tight leading-[1.05] text-4xl sm:text-5xl md:text-[clamp(3rem,5.4vw,4.6rem)] text-white"
+              className="font-semibold tracking-tight leading-[1.05] text-3xl sm:text-4xl md:text-[clamp(2.55rem,4.59vw,3.91rem)] text-white"
             >
               <Trans k="landing.hero.title" />
             </motion.h1>
@@ -79,7 +79,7 @@ export function Hero() {
             {/* Subheadline */}
             <motion.p
               variants={fadeUp}
-              className="mt-4 md:mt-5 max-w-2xl md:max-w-none md:pr-6 text-lg md:text-xl text-slate-300"
+              className="mt-3 md:mt-4 max-w-2xl md:max-w-none md:pr-6 text-base md:text-lg text-slate-300"
             >
               {t("landing.hero.subtitle")}
             </motion.p>
@@ -87,7 +87,7 @@ export function Hero() {
             {/* Bullets */}
             <motion.ul
               variants={fadeUp}
-              className="mt-5 md:mt-6 flex flex-wrap items-center md:justify-start justify-center gap-x-6 gap-y-3 text-sm font-medium"
+              className="mt-4 md:mt-5 flex flex-wrap items-center md:justify-start justify-center gap-x-5 gap-y-2.5 text-[13px] font-medium"
             >
               {[
                 t("landing.hero.bullet1"),
@@ -103,7 +103,7 @@ export function Hero() {
             {/* CTAs */}
             <motion.div
               variants={fadeUp}
-              className="mt-7 md:mt-8 flex flex-col sm:flex-row md:justify-start items-center gap-4"
+              className="mt-6 md:mt-7 flex flex-col sm:flex-row md:justify-start items-center gap-3.5"
             >
               <Link
                 href="/pricing#comparison"
@@ -139,18 +139,18 @@ export function Hero() {
           >
             <motion.div
               variants={fadeUp}
-              className="relative mx-auto w-full max-w-[520px] xl:max-w-[580px] aspect-[16/10] rounded-[22px] border border-white/10 bg-gradient-to-br from-slate-900/60 to-slate-800/30 backdrop-blur-xl shadow-[0_10px_50px_-10px_rgba(37,99,235,0.35)] overflow-hidden"
+              className="relative mx-auto w-full max-w-[460px] xl:max-w-[520px] aspect-[16/10] rounded-[20px] border border-white/10 bg-gradient-to-br from-slate-900/60 to-slate-800/30 backdrop-blur-xl shadow-[0_8px_40px_-10px_rgba(37,99,235,0.35)] overflow-hidden"
             >
               {/* Mock window header */}
-              <div className="absolute top-0 inset-x-0 h-10 bg-white/5 flex items-center gap-2 px-4">
+              <div className="absolute top-0 inset-x-0 h-9 bg-white/5 flex items-center gap-2 px-4">
                 <span className="w-2.5 h-2.5 rounded-full bg-red-400/70" />
                 <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/70" />
                 <span className="w-2.5 h-2.5 rounded-full bg-green-400/70" />
                 <div className="ml-3 text-xs text-white/60">LeadGen Dashboard</div>
               </div>
-              <div className="absolute inset-0 pt-10 p-4">
+              <div className="absolute inset-0 pt-9 p-3.5">
                 {/* KPI row */}
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2.5">
                   {["Open Rate", "Replies", "Meetings"].map((k, i) => (
                     <div key={k} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
                       <div className="text-[10px] uppercase tracking-wide text-white/60">{k}</div>
@@ -162,7 +162,7 @@ export function Hero() {
                   ))}
                 </div>
                 {/* Chart area */}
-                <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] h-[160px] p-3">
+                <div className="mt-3.5 rounded-xl border border-white/10 bg-white/[0.03] h-[140px] p-3">
                   <div className="h-full w-full relative">
                     {/* faux grid */}
                     <div className="absolute inset-0 [background-image:linear-gradient(to_right,rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:28px_28px] rounded-lg" />
