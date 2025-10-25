@@ -39,12 +39,8 @@ export function Hero() {
   }, [demoOpen]);
 
   return (
-    <section className="relative min-h-[70vh] px-4 overflow-hidden flex items-center">
-      {/* Background decorative layers */}
-      <div className="absolute inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_10%_10%,#122033_20%,#0a101b_70%)]" />
-      <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.25] mix-blend-overlay bg-grid-pattern" />
-      <div className="absolute -top-40 -left-40 w-[520px] h-[520px] rounded-full bg-blue-600/20 blur-3xl" />
-      <div className="absolute top-1/3 -right-40 w-[460px] h-[460px] rounded-full bg-indigo-500/25 blur-3xl" />
+    <section className="relative min-h-[100svh] md:min-h-[92vh] px-4 overflow-hidden flex items-center bg-black">
+      {/* Solid black background (decorative layers removed as requested) */}
       <LanguageToggle />
 
       <div className="w-full max-w-6xl mx-auto py-4 md:py-6">
