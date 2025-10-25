@@ -57,7 +57,27 @@ export default function DashboardNavbar({ onMenuClick, onLogout, tenant, user }:
             </Link>
           </div>
 
+          {/* Right actions: search, notifications, user menu */}
           <div className="flex items-center gap-3" ref={ref}>
+            {/* Search */}
+            <div className="hidden md:flex items-center h-9 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/15 px-2 min-w-[200px]">
+              <svg width="16" height="16" viewBox="0 0 256 256" className="text-gray-600 dark:text-white/60">
+                <path fill="currentColor" d="M229.66,218.34l-50.07-50.06a88.11,88.11,0,1,0-11.31,11.31l50.06,50.07a8,8,0,0,0,11.32-11.32ZM40,112a72,72,0,1,1,72,72A72.08,72.08,0,0,1,40,112Z"></path>
+              </svg>
+              <input
+                placeholder="Search"
+                className="ml-2 bg-transparent outline-none text-sm text-gray-800 dark:text-white placeholder:text-gray-500 dark:placeholder:text-white/60 w-48"
+              />
+            </div>
+            {/* Bell */}
+            <button
+              className="hidden sm:inline-flex items-center justify-center h-9 w-9 rounded-lg bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/15 text-gray-700 dark:text-white"
+              aria-label="Notifications"
+            >
+              <svg width="18" height="18" viewBox="0 0 256 256" fill="currentColor">
+                <path d="M221.8,175.94C216.25,166.38,208,139.33,208,104a80,80,0,1,0-160,0c0,35.34-8.26,62.38-13.81,71.94A16,16,0,0,0,48,200H88.81a40,40,0,0,0,78.38,0H208a16,16,0,0,0,13.8-24.06ZM128,216a24,24,0,0,1-22.62-16h45.24A24,24,0,0,1,128,216ZM48,184c7.7-13.24,16-43.92,16-80a64,64,0,1,1,128,0c0,36.05,8.28,66.73,16,80Z"></path>
+              </svg>
+            </button>
             <button
               aria-label="User menu"
               onClick={() => setOpen((v) => !v)}
