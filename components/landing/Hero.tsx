@@ -39,7 +39,7 @@ export function Hero() {
   }, [demoOpen]);
 
   return (
-    <section className="relative min-h-[84vh] px-6 overflow-hidden flex items-center">
+    <section className="relative min-h-[78vh] px-4 overflow-hidden flex items-center">
       {/* Background decorative layers */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_10%_10%,#122033_20%,#0a101b_70%)]" />
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.25] mix-blend-overlay bg-grid-pattern" />
@@ -47,8 +47,8 @@ export function Hero() {
       <div className="absolute top-1/3 -right-40 w-[460px] h-[460px] rounded-full bg-indigo-500/25 blur-3xl" />
       <LanguageToggle />
 
-      <div className="w-full max-w-6xl mx-auto py-10 md:py-14">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
+      <div className="w-full max-w-6xl mx-auto py-6 md:py-8">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-center">
           {/* Left: copy */}
           <motion.div
             variants={fadeParent}
@@ -139,7 +139,7 @@ export function Hero() {
           >
             <motion.div
               variants={fadeUp}
-              className="relative mx-auto w-full max-w-[600px] aspect-[16/10] rounded-[22px] border border-white/10 bg-gradient-to-br from-slate-900/60 to-slate-800/30 backdrop-blur-xl shadow-[0_10px_50px_-10px_rgba(37,99,235,0.35)] overflow-hidden"
+              className="relative mx-auto w-full max-w-[520px] xl:max-w-[580px] aspect-[16/10] rounded-[22px] border border-white/10 bg-gradient-to-br from-slate-900/60 to-slate-800/30 backdrop-blur-xl shadow-[0_10px_50px_-10px_rgba(37,99,235,0.35)] overflow-hidden"
             >
               {/* Mock window header */}
               <div className="absolute top-0 inset-x-0 h-10 bg-white/5 flex items-center gap-2 px-4">
@@ -162,7 +162,7 @@ export function Hero() {
                   ))}
                 </div>
                 {/* Chart area */}
-                <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] h-[180px] p-3">
+                <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] h-[160px] p-3">
                   <div className="h-full w-full relative">
                     {/* faux grid */}
                     <div className="absolute inset-0 [background-image:linear-gradient(to_right,rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:28px_28px] rounded-lg" />
