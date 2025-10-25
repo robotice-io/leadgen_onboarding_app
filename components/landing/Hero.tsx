@@ -43,14 +43,14 @@ export function Hero() {
       {/* Solid black background (decorative layers removed as requested) */}
       <LanguageToggle />
 
-      <div className="w-full max-w-6xl mx-auto py-4 md:py-6">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
+      <div className="w-full max-w-7xl mx-auto py-4 md:py-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center">
           {/* Left: copy */}
           <motion.div
             variants={fadeParent}
             initial="hidden"
             animate="show"
-            className="md:col-span-6 text-center md:text-left"
+            className="md:col-span-7 text-center md:text-left"
           >
             {/* Logo removed (already present in navbar/sidebar) */}
 
@@ -110,7 +110,7 @@ export function Hero() {
             variants={fadeParent}
             initial="hidden"
             animate="show"
-            className="hidden md:block md:col-span-6"
+            className="hidden md:block md:col-span-5"
           >
             <motion.div variants={fadeUp} className="relative mx-auto md:ml-auto w-full max-w-[560px]">
               {/* soft glow behind card */}
