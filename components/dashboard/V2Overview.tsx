@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { TrendingUp, TrendingDown } from "lucide-react";
 import type { CondensedDashboard } from "@/lib/condensed";
 import { useI18n } from "@/lib/i18n";
 
@@ -28,12 +29,49 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
   const trend = data?.trends?.daily_trends || [];
 
   const kpis = useMemo(() => {
-    const ov = data?.overview || {} as any;
+    const ov = (data?.overview || {}) as any;
+    const series = data?.trends?.daily_trends || [];
+    const last = series[series.length - 1];
+    const prev = series[series.length - 2];
+    const pct = (a?: number, b?: number) => {
+      if (typeof a !== "number" || typeof b !== "number" || b === 0) return undefined as string | undefined;
+      const d = ((a - b) / Math.abs(b)) * 100;
+      const s = (d >= 0 ? "+" : "") + d.toFixed(0) + "%";
+      return s;
+    };
     return [
-      { label: "Emails Sent", value: ov.total_emails_sent ?? 0, delta: "+12%" },
-      { label: "Open Rate", value: `${ov.open_rate ?? 0}%`, delta: "+5%" },
-      { label: "Response Rate", value: `${ov.fast_response_rate ?? 0}%`, delta: "+2%" },
-      { label: "Meetings Booked", value: ov.meetings ?? 45, delta: "+10%" },
+      {
+        key: "emails",
+        label: "Emails Sent",
+        value: ov.total_emails_sent ?? (last?.opens_count ?? 0),
+        delta: pct(last?.opens_count, prev?.opens_count) || "+12%",
+        accent: "from-sky-500/20 to-sky-300/10",
+        line: series.map((p) => (p as any).emails_sent ?? p.opens_count ?? 0),
+      },
+      {
+        key: "open",
+        label: "Open Rate",
+        value: `${(typeof (ov.open_rate ?? last?.open_rate) === 'number' ? Number(ov.open_rate ?? last?.open_rate).toFixed(2) : (ov.open_rate ?? last?.open_rate ?? 0))}%`,
+        delta: pct(last?.open_rate, prev?.open_rate) || "+5%",
+        accent: "from-violet-500/20 to-fuchsia-400/10",
+        line: series.map((p) => p.open_rate ?? 0),
+      },
+      {
+        key: "resp",
+        label: "Response Rate",
+        value: `${ov.fast_response_rate ?? 0}%`,
+        delta: "+2%",
+        accent: "from-emerald-500/20 to-lime-400/10",
+        line: series.map((p) => (p as any).responses ?? 0),
+      },
+      {
+        key: "meet",
+        label: "Meetings Booked",
+        value: ov.meetings ?? 45,
+        delta: "+10%",
+        accent: "from-amber-500/20 to-orange-400/10",
+        line: series.map((p) => (p as any).meetings ?? 0),
+      },
     ];
   }, [data]);
 
@@ -77,15 +115,18 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
         </div>
       </div>
 
-      {/* KPI cards */}
+      {/* KPI cards (enhanced) */}
       <div className="px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {kpis.map((k) => (
-            <div key={k.label} className="rounded-lg p-6 bg-[#111315] border border-[#282c39]">
-              <p className="text-base font-medium text-white/90">{k.label}</p>
-              <p className="text-2xl font-bold mt-1">{k.value}</p>
-              <p className="text-[#0bda62] text-sm mt-1">{k.delta}</p>
-            </div>
+            <KpiCard
+              key={k.key}
+              label={k.label}
+              value={k.value}
+              delta={k.delta}
+              accent={k.accent}
+              line={k.line}
+            />
           ))}
         </div>
       </div>
@@ -206,6 +247,89 @@ function formatDateLabel(iso: string) {
   } catch {
     return iso;
   }
+}
+
+// --- KPI Card ---
+function KpiCard({
+  label,
+  value,
+  delta,
+  accent,
+  line = [],
+}: {
+  label: string;
+  value: string | number;
+  delta?: string;
+  accent: string; // tailwind gradient e.g. from-sky-500/20 to-sky-300/10
+  line?: number[];
+}) {
+  const positive = typeof delta === "string" ? delta.trim().startsWith("+") : true;
+  return (
+    <div className="relative rounded-2xl p-5 sm:p-6 bg-[#0f1115] border border-white/10 shadow-[0_10px_30px_-12px_rgba(0,0,0,0.6)] overflow-hidden">
+      {/* subtle gradient glow */}
+      <div className={`pointer-events-none absolute -inset-px rounded-2xl bg-gradient-to-br ${accent} opacity-60 blur-2`} />
+      <div className="relative">
+        <div className="flex items-center justify-between">
+          <div className="inline-flex items-center gap-2">
+            <span className="size-1.5 rounded-full bg-white/70" />
+            <p className="text-[13px] tracking-wide uppercase text-white/70 font-medium">{label}</p>
+          </div>
+          {typeof delta === "string" && (
+            <span className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold border ${positive ? "text-emerald-400 border-emerald-500/30 bg-emerald-500/10" : "text-rose-400 border-rose-500/30 bg-rose-500/10"}`}>
+              {positive ? <TrendingUp className="h-3.5 w-3.5" /> : <TrendingDown className="h-3.5 w-3.5" />}
+              {delta}
+            </span>
+          )}
+        </div>
+
+        <div className="mt-3">
+          <div className="text-3xl sm:text-4xl font-black tracking-tight">{value}</div>
+        </div>
+
+        {/* micro sparkline */}
+        <div className="mt-4 h-10">
+          <MicroSparkline values={line} positive={positive} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MicroSparkline({ values = [], positive }: { values?: number[]; positive?: boolean }) {
+  const width = 140;
+  const height = 40;
+  const min = values.length ? Math.min(...values) : 0;
+  const max = values.length ? Math.max(...values) : 1;
+  const range = max - min || 1;
+  const pts = values.map((v, i) => {
+    const x = (i / Math.max(values.length - 1, 1)) * width;
+    const y = height - ((v - min) / range) * height;
+    return `${x},${y}`;
+  });
+  const d = pts.length ? `M ${pts[0]} L ${pts.slice(1).join(" ")}` : "";
+  const stroke = positive ? "#34d399" : "#fb7185"; // emerald / rose
+  return (
+    <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%" className="overflow-visible">
+      <defs>
+        <linearGradient id="kpiLine" x1="0" x2="1" y1="0" y2="0">
+          <stop offset="0%" stopColor={stroke} stopOpacity="0.2" />
+          <stop offset="100%" stopColor={stroke} stopOpacity="0.0" />
+        </linearGradient>
+      </defs>
+      {/* baseline grid */}
+      <path d={`M0 ${height} H ${width}`} stroke="#1f2330" strokeWidth="1" />
+      {/* area fill */}
+      {pts.length >= 2 && (
+        <path
+          d={`${d} L ${width} ${height} L 0 ${height} Z`}
+          fill="url(#kpiLine)"
+          stroke="none"
+        />
+      )}
+      {/* line */}
+      <path d={d} fill="none" stroke={stroke} strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  );
 }
 
 function TrendChart({ metric, series }: { metric: string; series: TrendPoint[] }) {
