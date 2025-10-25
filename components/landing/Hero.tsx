@@ -112,54 +112,72 @@ export function Hero() {
             animate="show"
             className="hidden md:block md:col-span-6"
           >
-            <motion.div
-              variants={fadeUp}
-              className="relative mx-auto w-full max-w-[460px] xl:max-w-[520px] aspect-[16/10] rounded-[20px] border border-white/10 bg-gradient-to-br from-slate-900/60 to-slate-800/30 backdrop-blur-xl shadow-[0_8px_40px_-10px_rgba(37,99,235,0.35)] overflow-hidden"
-            >
-              {/* Mock window header */}
-              <div className="absolute top-0 inset-x-0 h-9 bg-white/5 flex items-center gap-2 px-4">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-400/70" />
-                <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/70" />
-                <span className="w-2.5 h-2.5 rounded-full bg-green-400/70" />
-                <div className="ml-3 text-xs text-white/60">LeadGen Dashboard</div>
-              </div>
-              <div className="absolute inset-0 pt-9 p-3.5">
-                {/* KPI row */}
-                <div className="grid grid-cols-3 gap-2.5">
-                  {["Open Rate", "Replies", "Meetings"].map((k, i) => (
-                    <div key={k} className="rounded-lg border border-white/10 bg-white/[0.03] p-3">
-                      <div className="text-[10px] uppercase tracking-wide text-white/60">{k}</div>
-                      <div className="mt-1 text-white font-semibold text-xl">{i===0?"72%": i===1?"5.2%":"11"}</div>
-                      <div className="mt-2 h-2 rounded bg-white/10 overflow-hidden">
-                        <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500" style={{ width: i===0?"72%": i===1?"52%":"68%" }} />
-                      </div>
-                    </div>
-                  ))}
+            <motion.div variants={fadeUp} className="relative mx-auto md:ml-auto w-full max-w-[560px]">
+              {/* soft glow behind card */}
+              <div className="pointer-events-none absolute -inset-6 -z-10 rounded-[28px] bg-gradient-to-br from-blue-600/20 via-indigo-500/15 to-fuchsia-500/10 blur-2xl" aria-hidden />
+              {/* Card */}
+              <div className="relative aspect-[16/10] rounded-2xl border border-white/10 bg-[#0b0b0b] shadow-[0_20px_70px_-20px_rgba(49,84,240,0.45)] overflow-hidden">
+                {/* Mock window header */}
+                <div className="absolute top-0 inset-x-0 h-9 bg-white/5 flex items-center gap-2 px-4">
+                  <span className="w-2.5 h-2.5 rounded-full bg-red-400/70" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-yellow-400/70" />
+                  <span className="w-2.5 h-2.5 rounded-full bg-green-400/70" />
+                  <div className="ml-3 text-xs text-white/70">LeadGen Dashboard</div>
                 </div>
-                {/* Chart area */}
-                <div className="mt-3.5 rounded-xl border border-white/10 bg-white/[0.03] h-[140px] p-3">
-                  <div className="h-full w-full relative">
-                    {/* faux grid */}
-                    <div className="absolute inset-0 [background-image:linear-gradient(to_right,rgba(255,255,255,0.07)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.07)_1px,transparent_1px)] [background-size:28px_28px] rounded-lg" />
-                    {/* faux line */}
-                    <svg viewBox="0 0 200 100" className="absolute inset-0 w-full h-full">
-                      <path d="M0 70 C 30 50, 50 80, 80 60 S 130 30, 160 45 S 200 60, 200 60" stroke="#60a5fa" strokeWidth="2.5" fill="none" />
-                      <path d="M0 85 C 25 75, 55 85, 80 75 S 120 55, 160 62 S 200 70, 200 70" stroke="#a78bfa" strokeWidth="2" fill="none" opacity="0.8" />
+                <div className="absolute inset-0 pt-9 p-4">
+                  {/* KPI row */}
+                  <div className="grid grid-cols-3 gap-3">
+                    {["Open Rate", "Replies", "Meetings"].map((k, i) => (
+                      <div key={k} className="rounded-xl border border-white/10 bg-white/[0.04] p-3">
+                        <div className="text-[10px] uppercase tracking-wide text-white/65">{k}</div>
+                        <div className="mt-1 text-white font-semibold text-xl">{i===0?"72%": i===1?"5.2%":"11"}</div>
+                        <div className="mt-2 h-2 rounded bg-white/10 overflow-hidden">
+                          <div className="h-full bg-gradient-to-r from-blue-500 to-indigo-500" style={{ width: i===0?"72%": i===1?"52%":"68%" }} />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Chart area */}
+                  <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.04] h-[150px] p-3">
+                    <div className="h-full w-full relative rounded-xl overflow-hidden">
+                      {/* grid */}
+                      <div className="absolute inset-0 [background-image:linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:28px_28px]" />
+                      {/* lines */}
+                      <svg viewBox="0 0 200 100" className="absolute inset-0 w-full h-full">
+                        <defs>
+                          <linearGradient id="lg1" x1="0" x2="1" y1="0" y2="0">
+                            <stop offset="0%" stopColor="#3154F0" />
+                            <stop offset="100%" stopColor="#8b5cf6" />
+                          </linearGradient>
+                          <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+                            <feGaussianBlur stdDeviation="3.2" result="coloredBlur" />
+                            <feMerge>
+                              <feMergeNode in="coloredBlur" />
+                              <feMergeNode in="SourceGraphic" />
+                            </feMerge>
+                          </filter>
+                        </defs>
+                        <path d="M0 76 C 18 70, 34 84, 54 72 S 96 42, 124 48 S 168 66, 200 62" stroke="url(#lg1)" strokeWidth="6" opacity="0.25" fill="none" filter="url(#glow)" />
+                        <path d="M0 76 C 18 70, 34 84, 54 72 S 96 42, 124 48 S 168 66, 200 62" stroke="url(#lg1)" strokeWidth="2.4" fill="none" />
+                        <path d="M0 88 C 22 80, 40 88, 62 82 S 112 58, 150 65 S 200 72, 200 72" stroke="#94a3b8" strokeWidth="1.8" opacity="0.6" />
+                      </svg>
+                    </div>
+                  </div>
+
+                  {/* Mini stat inside, non-overlapping */}
+                  <div className="absolute bottom-4 right-4 bg-white/10 backdrop-blur-md border border-white/15 rounded-xl p-3 w-[220px] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]">
+                    <div className="text-[11px] uppercase tracking-wide text-white/85">Emails sent</div>
+                    <svg viewBox="0 0 100 36" className="w-full h-[36px]">
+                      <defs>
+                        <linearGradient id="g1" x1="0" x2="1" y1="0" y2="0">
+                          <stop offset="0%" stopColor="#60a5fa" />
+                          <stop offset="100%" stopColor="#a78bfa" />
+                        </linearGradient>
+                      </defs>
+                      <path d="M0 30 C 10 26, 18 29, 28 24 S 48 16, 58 18 S 82 26, 100 20" stroke="url(#g1)" strokeWidth="2" fill="none" />
                     </svg>
                   </div>
-                </div>
-                {/* Floating mini card (instantly-like) */}
-                <div className="absolute -bottom-3 left-3 bg-white/10 backdrop-blur-md border border-white/15 rounded-xl p-3 w-[220px] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]">
-                  <div className="text-[11px] uppercase tracking-wide text-white/80">Emails sent</div>
-                  <svg viewBox="0 0 100 36" className="w-full h-[36px]">
-                    <defs>
-                      <linearGradient id="g1" x1="0" x2="1" y1="0" y2="0">
-                        <stop offset="0%" stopColor="#60a5fa" />
-                        <stop offset="100%" stopColor="#a78bfa" />
-                      </linearGradient>
-                    </defs>
-                    <path d="M0 30 C 10 26, 18 29, 28 24 S 48 16, 58 18 S 82 26, 100 20" stroke="url(#g1)" strokeWidth="2" fill="none" />
-                  </svg>
                 </div>
               </div>
             </motion.div>
