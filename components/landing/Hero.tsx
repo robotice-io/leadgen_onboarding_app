@@ -39,7 +39,7 @@ export function Hero() {
   }, [demoOpen]);
 
   return (
-    <section className="relative min-h-[92vh] px-6 overflow-hidden">
+    <section className="relative min-h-[84vh] px-6 overflow-hidden flex items-center">
       {/* Background decorative layers */}
       <div className="absolute inset-0 -z-10 bg-[radial-gradient(1200px_600px_at_10%_10%,#122033_20%,#0a101b_70%)]" />
       <div className="pointer-events-none absolute inset-0 -z-10 opacity-[0.25] mix-blend-overlay bg-grid-pattern" />
@@ -47,7 +47,7 @@ export function Hero() {
       <div className="absolute top-1/3 -right-40 w-[460px] h-[460px] rounded-full bg-indigo-500/25 blur-3xl" />
       <LanguageToggle />
 
-      <div className="w-full max-w-6xl mx-auto pt-20 md:pt-28">
+      <div className="w-full max-w-6xl mx-auto py-10 md:py-14">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center">
           {/* Left: copy */}
           <motion.div
@@ -57,7 +57,7 @@ export function Hero() {
             className="md:col-span-6 text-center md:text-left"
           >
             {/* Logo */}
-            <motion.div variants={fadeUp} className="mb-8 md:mb-10">
+            <motion.div variants={fadeUp} className="mb-6 md:mb-8">
               <Image
                 src="/landing_logo.png"
                 alt="Robotice.io"
@@ -79,7 +79,7 @@ export function Hero() {
             {/* Subheadline */}
             <motion.p
               variants={fadeUp}
-              className="mt-5 md:mt-6 max-w-2xl md:max-w-none md:pr-6 text-lg md:text-xl text-slate-300"
+              className="mt-4 md:mt-5 max-w-2xl md:max-w-none md:pr-6 text-lg md:text-xl text-slate-300"
             >
               {t("landing.hero.subtitle")}
             </motion.p>
@@ -87,7 +87,7 @@ export function Hero() {
             {/* Bullets */}
             <motion.ul
               variants={fadeUp}
-              className="mt-6 md:mt-7 flex flex-wrap items-center md:justify-start justify-center gap-x-6 gap-y-3 text-sm font-medium"
+              className="mt-5 md:mt-6 flex flex-wrap items-center md:justify-start justify-center gap-x-6 gap-y-3 text-sm font-medium"
             >
               {[
                 t("landing.hero.bullet1"),
@@ -103,7 +103,7 @@ export function Hero() {
             {/* CTAs */}
             <motion.div
               variants={fadeUp}
-              className="mt-8 md:mt-9 flex flex-col sm:flex-row md:justify-start items-center gap-4"
+              className="mt-7 md:mt-8 flex flex-col sm:flex-row md:justify-start items-center gap-4"
             >
               <Link
                 href="/pricing#comparison"
@@ -127,23 +127,7 @@ export function Hero() {
               </button>
             </motion.div>
 
-            {/* Trusted by */}
-            <motion.div variants={fadeUp} className="mt-8 md:mt-10">
-              <div className="text-slate-400 text-xs uppercase tracking-wider mb-3 text-center md:text-left">{t("landing.hero.trustedBy")}</div>
-              <div className="flex flex-wrap gap-4 items-center justify-center md:justify-start opacity-90">
-                {[
-                  { name: "Acme", hue: "from-white/10 to-white/0" },
-                  { name: "Globex", hue: "from-white/10 to-white/0" },
-                  { name: "Umbrella", hue: "from-white/10 to-white/0" },
-                  { name: "Initech", hue: "from-white/10 to-white/0" },
-                  { name: "Soylent", hue: "from-white/10 to-white/0" },
-                ].map((b) => (
-                  <div key={b.name} className="h-8 px-3 rounded-md border border-white/10 bg-gradient-to-br from-white/5 to-white/[0.02] text-white/80 text-xs font-medium flex items-center">
-                    {b.name}
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+            {/* Trusted by (removed per request) */}
           </motion.div>
 
           {/* Right: visual preview */}
