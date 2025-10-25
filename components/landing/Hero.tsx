@@ -74,26 +74,12 @@ export function Hero() {
               {t("landing.hero.subtitle")}
             </motion.p>
 
-            {/* Bullets */}
-            <motion.ul
-              variants={fadeUp}
-              className="mt-4 md:mt-5 flex flex-wrap items-center md:justify-start justify-center gap-x-5 gap-y-2.5 text-[13px] font-medium"
-            >
-              {[
-                t("landing.hero.bullet1"),
-                t("landing.hero.bullet2"),
-                t("landing.hero.bullet3"),
-              ].map((item) => (
-                <li key={item} className="flex items-center gap-2 text-slate-300 hover:text-white transition-colors">
-                  <CheckCircle2 className="w-4 h-4 text-green-500" /> {item}
-                </li>
-              ))}
-            </motion.ul>
+            {/* Instantly-like arrangement: CTA followed by reassurance checks */}
 
             {/* CTAs */}
             <motion.div
               variants={fadeUp}
-              className="mt-6 md:mt-7 flex flex-col sm:flex-row md:justify-start items-center gap-3.5"
+              className="mt-6 md:mt-7 flex flex-row flex-wrap md:justify-start items-center gap-3.5"
             >
               <Link
                 href="/pricing#comparison"
@@ -105,17 +91,20 @@ export function Hero() {
               </Link>
               <button
                 onClick={() => setDemoOpen(true)}
-                className="inline-flex items-center justify-center rounded-xl px-6 py-4 text-base font-semibold border border-slate-600/60 text-slate-200 hover:text-white bg-slate-800/30 hover:bg-slate-800/60 backdrop-blur-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900"
+                className="inline-flex items-center justify-center rounded-xl px-5 py-3.5 text-base font-semibold border border-slate-600/60 text-slate-200 hover:text-white bg-slate-800/30 hover:bg-slate-800/60 backdrop-blur-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900"
               >
                 <PlayCircle className="mr-2 w-5 h-5" /> {t("landing.hero.watchDemo")}
               </button>
-              <button
-                onClick={openCalendly}
-                className="inline-flex items-center justify-center rounded-xl px-6 py-4 text-base font-semibold border border-slate-600/60 text-slate-200 hover:text-white bg-slate-800/30 hover:bg-slate-800/60 backdrop-blur-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900"
-              >
-                <Calendar className="mr-2 w-5 h-5" /> {t("landing.hero.secondaryCta")}
-              </button>
             </motion.div>
+
+            {/* Reassurance checks */}
+            <motion.ul
+              variants={fadeUp}
+              className="mt-4 flex flex-wrap items-center md:justify-start justify-center gap-x-6 gap-y-2 text-[13px] text-slate-300"
+            >
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> {t("landing.hero.reassure1")}</li>
+              <li className="flex items-center gap-2"><CheckCircle2 className="w-4 h-4 text-emerald-400" /> {t("landing.hero.reassure2")}</li>
+            </motion.ul>
 
             {/* Trusted by (removed per request) */}
           </motion.div>
@@ -162,6 +151,19 @@ export function Hero() {
                       <path d="M0 85 C 25 75, 55 85, 80 75 S 120 55, 160 62 S 200 70, 200 70" stroke="#a78bfa" strokeWidth="2" fill="none" opacity="0.8" />
                     </svg>
                   </div>
+                </div>
+                {/* Floating mini card (instantly-like) */}
+                <div className="absolute -bottom-3 left-3 bg-white/10 backdrop-blur-md border border-white/15 rounded-xl p-3 w-[220px] shadow-[0_10px_30px_-10px_rgba(0,0,0,0.5)]">
+                  <div className="text-[11px] uppercase tracking-wide text-white/80">Emails sent</div>
+                  <svg viewBox="0 0 100 36" className="w-full h-[36px]">
+                    <defs>
+                      <linearGradient id="g1" x1="0" x2="1" y1="0" y2="0">
+                        <stop offset="0%" stopColor="#60a5fa" />
+                        <stop offset="100%" stopColor="#a78bfa" />
+                      </linearGradient>
+                    </defs>
+                    <path d="M0 30 C 10 26, 18 29, 28 24 S 48 16, 58 18 S 82 26, 100 20" stroke="url(#g1)" strokeWidth="2" fill="none" />
+                  </svg>
                 </div>
               </div>
             </motion.div>

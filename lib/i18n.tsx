@@ -346,6 +346,8 @@ const ES: Dictionary = {
   "landing.hero.secondaryCta": "Agendar una demo",
   "landing.hero.watchDemo": "Ver demo",
   "landing.hero.trustedBy": "Confiado por equipos de ventas",
+  "landing.hero.reassure1": "No se necesita tarjeta de crédito",
+  "landing.hero.reassure2": "Incluye pistas gratuitas",
 
   // Landing – Cómo funciona
   "landing.how.heading": "Un sistema de prospección inteligente que trabaja incluso mientras duermes.",
@@ -894,6 +896,8 @@ const EN: Dictionary = {
   "landing.hero.secondaryCta": "Schedule a demo",
   "landing.hero.watchDemo": "Watch demo",
   "landing.hero.trustedBy": "Trusted by sales teams",
+  "landing.hero.reassure1": "No credit card required",
+  "landing.hero.reassure2": "Includes free leads",
 
   // Landing – How it works
   "landing.how.heading": "An intelligent prospecting system that works even while you sleep.",
