@@ -56,17 +56,7 @@ export function Hero() {
             animate="show"
             className="md:col-span-6 text-center md:text-left"
           >
-            {/* Logo */}
-            <motion.div variants={fadeUp} className="mb-6 md:mb-8">
-              <Image
-                src="/landing_logo.png"
-                alt="Robotice.io"
-                width={200}
-                height={64}
-                priority
-                className="md:mx-0 mx-auto drop-shadow-[0_0_6px_rgba(59,130,246,0.45)]"
-              />
-            </motion.div>
+            {/* Logo removed (already present in navbar/sidebar) */}
 
             {/* Headline */}
             <motion.h1
