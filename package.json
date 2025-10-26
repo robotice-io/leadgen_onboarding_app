@@ -9,7 +9,11 @@
     "setup-env": "node generate-env.js"
   },
   "dependencies": {
+    "@number-flow/react": "^0.5.10",
+    "@radix-ui/react-slot": "^1.2.3",
     "@tanstack/react-query": "^5.62.14",
+    "canvas-confetti": "^1.9.4",
+    "class-variance-authority": "^0.7.1",
     "date-fns": "^4.1.0",
     "framer-motion": "^11.18.2",
     "lucide-react": "^0.453.0",

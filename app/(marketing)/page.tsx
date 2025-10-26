@@ -6,7 +6,7 @@ import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/ui/how-it-works";
 import { WhyLeadGenAI } from "@/components/ui/why-leadgen";
 import { Deliverables } from "@/components/landing/Deliverables";
-import { Pricing } from "@/components/landing/Pricing";
+import { PricingSection } from "@/components/ui/pricing";
 import { useI18n } from "@/lib/i18n";
 import { openCalendly } from "@/lib/calendly";
 
@@ -22,10 +22,61 @@ export default function Home() {
 
 			<Deliverables />
 
-			{/* Planes Section (nuevo) */}
-			<div id="planes">
-				<Pricing />
-			</div>
+					{/* Planes Section (nuevo tema negro) */}
+					<div id="planes">
+						<PricingSection
+							plans={[
+								{
+									name: "Starter",
+									price: "49",
+									yearlyPrice: "39",
+									period: "mes",
+									features: [
+										"3 000 leads verificados",
+										"1 remitente",
+										"Dashboard básico",
+										"Soporte por email",
+									],
+									description: "Para validar mercado con bajo volumen.",
+									buttonText: "Empezar",
+									href: "/login",
+								},
+								{
+									name: "Core",
+									price: "149",
+									yearlyPrice: "119",
+									period: "mes",
+									features: [
+										"5 000 leads",
+										"Hasta 3 remitentes",
+										"Campañas + contactos",
+										"Dashboard avanzado",
+									],
+									description: "Mantén tu pipeline activo.",
+									buttonText: "Elegir Core",
+									href: "/pricing#comparison",
+									isPopular: true,
+								},
+								{
+									name: "Pro",
+									price: "299",
+									yearlyPrice: "239",
+									period: "mes",
+									features: [
+										"8 000 – 12 000 leads",
+										"Reporte PDF",
+										"Integraciones CRM",
+										"Soporte prioritario",
+									],
+									description: "Escala y gestiona todo desde la app.",
+									buttonText: "Hablar con ventas",
+									href: "/contact",
+								},
+							]}
+							title="Elige el plan que impulsa tu crecimiento"
+							description={"IA, estrategia y automatización — en un solo flujo."}
+						/>
+					</div>
 
 			{/* Resultados Esperados Section */}
 			<section className="py-20 bg-white dark:bg-gray-900">
