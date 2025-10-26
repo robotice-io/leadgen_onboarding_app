@@ -26,10 +26,13 @@ export function WhyLeadGenAI() {
           <p className="mt-4 text-lg text-white/70">{t("landing.why.subtitle")}</p>
         </div>
 
-        {/* 5-card grid */}
-        <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-5">
+        {/* 5-card responsive mosaic: 2 on top row, 3 on bottom row */}
+        <ul className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-6">
           {items.map((it, idx) => (
-            <li key={idx} className="list-none">
+            <li
+              key={idx}
+              className={`list-none ${idx < 2 ? "lg:col-span-3" : "lg:col-span-2"}`}
+            >
               <div className="relative h-full rounded-2xl border border-white/10 p-2">
                 <GlowingEffect spread={44} glow disabled={false} proximity={72} inactiveZone={0.06} blur={10} />
                 <div className="relative flex h-full flex-col gap-4 rounded-xl bg-black/40 p-6">
