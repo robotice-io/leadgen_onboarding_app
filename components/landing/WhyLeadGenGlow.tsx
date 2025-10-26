@@ -2,15 +2,7 @@
 
 import { GlowingEffect } from "@/components/ui/glowing-effect-card";
 import { useI18n } from "@/lib/i18n";
-import {
-  ShieldCheck,
-  PenTool,
-  LayoutTemplate,
-  BarChart3,
-  Repeat,
-  Eye,
-  LifeBuoy,
-} from "lucide-react";
+import { ShieldCheck, PenTool, LayoutTemplate, BarChart3, Repeat } from "lucide-react";
 
 export function WhyLeadGenGlow() {
   const { t } = useI18n();
@@ -51,21 +43,7 @@ export function WhyLeadGenGlow() {
       // Row 2, right third
       classes: "md:col-span-12 xl:col-start-9 xl:col-end-13 xl:row-start-2 xl:row-end-3",
     },
-    {
-      icon: <Eye className="h-4 w-4 text-white/80" />,
-      title: t("landing.why.point6.title"),
-      desc: t("landing.why.point6.desc"),
-      // Row 3, left half
-      classes: "md:col-span-12 xl:col-start-1 xl:col-end-7 xl:row-start-3 xl:row-end-4",
-    },
-    // Support card
-    {
-      icon: <LifeBuoy className="h-4 w-4 text-white/80" />,
-      title: t("landing.why.point7.title"),
-      desc: t("landing.why.point7.desc"),
-      // Row 3, right half
-      classes: "md:col-span-12 xl:col-start-7 xl:col-end-13 xl:row-start-3 xl:row-end-4",
-    },
+    // (cards limited to first 5 for a clean mosaic)
   ];
 
   return (
@@ -78,7 +56,7 @@ export function WhyLeadGenGlow() {
           <p className="mt-4 text-lg text-white/70">{t("landing.why.subtitle")}</p>
         </div>
 
-        <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:grid-rows-3">
+  <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-2 lg:gap-4 xl:grid-rows-2">
           {cards.map((c, idx) => (
             <li key={idx} className={`min-h-[14rem] list-none ${c.classes}`}>
               <div className="relative h-full rounded-2xl border border-white/10 p-2 md:rounded-3xl md:p-3 overflow-hidden">
