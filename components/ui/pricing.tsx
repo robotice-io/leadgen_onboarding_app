@@ -69,7 +69,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 Button.displayName = "Button";
 
 // --- INTERACTIVE STARFIELD ---
-function Star({ mousePosition, containerRef }: { mousePosition: { x: number | null; y: number | null }; containerRef: React.RefObject<HTMLDivElement>; }) {
+function Star({ mousePosition, containerRef }: { mousePosition: { x: number | null; y: number | null }; containerRef: React.MutableRefObject<HTMLDivElement | null>; }) {
   const [initialPos] = useState({ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%` });
   const springConfig = { stiffness: 100, damping: 15, mass: 0.1 };
   const springX = useSpring(0, springConfig);
@@ -99,7 +99,7 @@ function Star({ mousePosition, containerRef }: { mousePosition: { x: number | nu
   );
 }
 
-function InteractiveStarfield({ mousePosition, containerRef }: { mousePosition: { x: number | null; y: number | null }; containerRef: React.RefObject<HTMLDivElement>; }) {
+function InteractiveStarfield({ mousePosition, containerRef }: { mousePosition: { x: number | null; y: number | null }; containerRef: React.MutableRefObject<HTMLDivElement | null>; }) {
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
       {Array.from({ length: 120 }).map((_, i) => (
