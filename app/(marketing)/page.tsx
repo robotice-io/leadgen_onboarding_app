@@ -4,7 +4,7 @@ import Image from "next/image";
 import { TrendingUp, Mail, Calendar, ArrowRight } from "lucide-react";
 import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/ui/how-it-works";
-import { WhyLeadGenGlow } from "@/components/landing/WhyLeadGenGlow";
+import { WhyLeadGenAI } from "@/components/ui/why-leadgen";
 import { Deliverables } from "@/components/landing/Deliverables";
 import { Pricing } from "@/components/landing/Pricing";
 import { useI18n } from "@/lib/i18n";
@@ -18,7 +18,7 @@ export default function Home() {
 
 			<HowItWorks className="bg-black" />
 
-			<WhyLeadGenGlow />
+			<WhyLeadGenAI />
 
 			<Deliverables />
 
