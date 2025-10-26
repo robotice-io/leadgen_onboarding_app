@@ -20,44 +20,51 @@ export function WhyLeadGenGlow() {
       icon: <ShieldCheck className="h-4 w-4 text-white/80" />,
       title: t("landing.why.point1.title"),
       desc: t("landing.why.point1.desc"),
-      area: "md:[grid-area:1/1/2/7] xl:[grid-area:1/1/2/5]",
+      // Row 1, left half
+      classes: "md:col-span-12 xl:col-start-1 xl:col-end-7 xl:row-start-1 xl:row-end-2",
     },
     {
       icon: <PenTool className="h-4 w-4 text-white/80" />,
       title: t("landing.why.point2.title"),
       desc: t("landing.why.point2.desc"),
-      area: "md:[grid-area:1/7/2/13] xl:[grid-area:2/1/3/5]",
+      // Row 1, right half
+      classes: "md:col-span-12 xl:col-start-7 xl:col-end-13 xl:row-start-1 xl:row-end-2",
     },
     {
       icon: <LayoutTemplate className="h-4 w-4 text-white/80" />,
       title: t("landing.why.point3.title"),
       desc: t("landing.why.point3.desc"),
-      area: "md:[grid-area:2/1/3/7] xl:[grid-area:1/5/3/8]",
+      // Row 2, left third
+      classes: "md:col-span-6 xl:col-start-1 xl:col-end-5 xl:row-start-2 xl:row-end-3",
     },
     {
       icon: <BarChart3 className="h-4 w-4 text-white/80" />,
       title: t("landing.why.point4.title"),
       desc: t("landing.why.point4.desc"),
-      area: "md:[grid-area:2/7/3/13] xl:[grid-area:1/8/2/13]",
+      // Row 2, middle third
+      classes: "md:col-span-6 xl:col-start-5 xl:col-end-9 xl:row-start-2 xl:row-end-3",
     },
     {
       icon: <Repeat className="h-4 w-4 text-white/80" />,
       title: t("landing.why.point5.title"),
       desc: t("landing.why.point5.desc"),
-      area: "md:[grid-area:3/1/4/8] xl:[grid-area:2/5/3/9]",
+      // Row 2, right third
+      classes: "md:col-span-12 xl:col-start-9 xl:col-end-13 xl:row-start-2 xl:row-end-3",
     },
     {
       icon: <Eye className="h-4 w-4 text-white/80" />,
       title: t("landing.why.point6.title"),
       desc: t("landing.why.point6.desc"),
-      area: "md:[grid-area:3/8/4/13] xl:[grid-area:2/9/3/13]",
+      // Row 3, left half
+      classes: "md:col-span-12 xl:col-start-1 xl:col-end-7 xl:row-start-3 xl:row-end-4",
     },
-    // Optional: Support card
+    // Support card
     {
       icon: <LifeBuoy className="h-4 w-4 text-white/80" />,
       title: t("landing.why.point7.title"),
       desc: t("landing.why.point7.desc"),
-      area: "hidden xl:[grid-area:1/9/2/13] xl:block",
+      // Row 3, right half
+      classes: "md:col-span-12 xl:col-start-7 xl:col-end-13 xl:row-start-3 xl:row-end-4",
     },
   ];
 
@@ -71,10 +78,10 @@ export function WhyLeadGenGlow() {
           <p className="mt-4 text-lg text-white/70">{t("landing.why.subtitle")}</p>
         </div>
 
-        <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:max-h-[34rem] xl:grid-rows-2">
+        <ul className="grid grid-cols-1 grid-rows-none gap-4 md:grid-cols-12 md:grid-rows-3 lg:gap-4 xl:grid-rows-3">
           {cards.map((c, idx) => (
-            <li key={idx} className={`min-h-[14rem] list-none ${c.area}`}>
-              <div className="relative h-full rounded-2xl border border-white/10 p-2 md:rounded-3xl md:p-3">
+            <li key={idx} className={`min-h-[14rem] list-none ${c.classes}`}>
+              <div className="relative h-full rounded-2xl border border-white/10 p-2 md:rounded-3xl md:p-3 overflow-hidden">
                 <GlowingEffect
                   spread={40}
                   glow={true}
