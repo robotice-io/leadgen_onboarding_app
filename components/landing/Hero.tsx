@@ -40,7 +40,84 @@ export function Hero() {
 
   return (
     <section className="relative min-h-[100svh] md:min-h-[92vh] px-4 overflow-hidden flex items-center bg-black">
-      {/* Solid black background (decorative layers removed as requested) */}
+      {/* Complex animated background (restored) */}
+      <div aria-hidden className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
+        {/* Subtle vignette */}
+        <div className="absolute inset-0 [background:radial-gradient(120%_80%_at_50%_0%,rgba(37,99,235,0.15),rgba(0,0,0,0)_60%)]" />
+
+        {/* Soft grid with edge fade */}
+        <div className="absolute inset-0 opacity-[0.22] [mask-image:radial-gradient(130%_90%_at_50%_20%,black,transparent_70%)] [background-image:linear-gradient(to_right,rgba(255,255,255,0.06)_1px,transparent_1px),linear-gradient(to_bottom,rgba(255,255,255,0.06)_1px,transparent_1px)] [background-size:38px_38px]" />
+
+        {/* Aurora blobs */}
+        <div className="aurora aurora-1" />
+        <div className="aurora aurora-2" />
+        <div className="aurora aurora-3" />
+
+        {/* Light sweep */}
+        <div className="light-sweep" />
+      </div>
+
+      {/* Keyframes and scoped FX styles */}
+      <style jsx>{`
+        .aurora {
+          position: absolute;
+          width: 60vw;
+          height: 60vw;
+          border-radius: 9999px;
+          filter: blur(72px);
+          opacity: 0.34;
+          mix-blend-mode: screen;
+          will-change: transform;
+        }
+        .aurora-1 {
+          top: -18vw;
+          left: -12vw;
+          background: radial-gradient(circle at 30% 30%, rgba(59,130,246,0.9), rgba(99,102,241,0.45) 40%, rgba(0,0,0,0) 62%);
+          animation: float1 24s ease-in-out infinite alternate;
+        }
+        .aurora-2 {
+          bottom: -26vw;
+          right: -18vw;
+          background: radial-gradient(circle at 70% 45%, rgba(168,85,247,0.85), rgba(59,130,246,0.38) 45%, rgba(0,0,0,0) 66%);
+          animation: float2 28s ease-in-out infinite alternate;
+        }
+        .aurora-3 {
+          top: 18vh;
+          right: 34vw;
+          width: 52vw;
+          height: 52vw;
+          background: radial-gradient(circle at 50% 50%, rgba(56,189,248,0.7), rgba(99,102,241,0.28) 52%, rgba(0,0,0,0) 68%);
+          animation: float3 32s ease-in-out infinite alternate;
+        }
+        .light-sweep {
+          position: absolute;
+          inset: -12%;
+          background: conic-gradient(from 180deg at 50% 50%, rgba(0,0,0,0) 0deg, rgba(99,102,241,0.12) 30deg, rgba(0,0,0,0) 60deg);
+          filter: blur(40px);
+          opacity: 0.5;
+          animation: rotate 42s linear infinite;
+        }
+        @keyframes rotate { to { transform: rotate(360deg); } }
+        @keyframes float1 {
+          0% { transform: translate3d(0,0,0) rotate(0deg); }
+          100% { transform: translate3d(8vw,4vh,0) rotate(15deg); }
+        }
+        @keyframes float2 {
+          0% { transform: translate3d(0,0,0) rotate(0deg); }
+          100% { transform: translate3d(-6vw,5vh,0) rotate(-12deg); }
+        }
+        @keyframes float3 {
+          0% { transform: translate3d(0,0,0) rotate(0deg); }
+          100% { transform: translate3d(5vw,-6vh,0) rotate(10deg); }
+        }
+        @media (max-width: 768px) {
+          .aurora { width: 90vw; height: 90vw; filter: blur(84px); opacity: 0.28; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          .aurora, .light-sweep { animation: none; }
+        }
+      `}</style>
+
       <LanguageToggle />
 
       <div className="w-full max-w-7xl mx-auto py-4 md:py-6">
