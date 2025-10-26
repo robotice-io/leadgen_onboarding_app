@@ -166,6 +166,20 @@ const GlowingEffect = memo(
             disabled && "!hidden"
           )}
         >
+          {/* Simple fallback glow layer (radial gradient) to ensure visible glow across setups.
+              Controlled by CSS variables: --active (0..1), --blur, --start rotation. */}
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0 rounded-[inherit] transition-opacity"
+            style={{
+              background: variant === "white"
+                ? 'radial-gradient(circle at 50% 50%, rgba(255,255,255,0.08), rgba(255,255,255,0))'
+                : 'radial-gradient(circle at 30% 30%, rgba(99,102,241,0.18), rgba(99,102,241,0) 25%), radial-gradient(circle at 70% 60%, rgba(168,85,247,0.12), rgba(168,85,247,0) 30%), radial-gradient(circle at 50% 50%, rgba(59,130,246,0.12), rgba(59,130,246,0) 40%)',
+              opacity: 'var(--active)',
+              filter: 'blur(var(--blur))',
+              transform: 'rotate(calc(var(--start) * 1deg))',
+            }}
+          />
           <div
             className={cn(
               "glow",
