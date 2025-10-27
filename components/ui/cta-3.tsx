@@ -32,14 +32,14 @@ export function CallToAction() {
 
       <div className="flex items-center justify-center gap-3">
         <Link href="/login" className="inline-flex">
-          <Button className="h-12 px-7 shadow-[0_8px_22px_-6px_rgba(37,99,235,0.55)] hover:shadow-[0_10px_28px_-4px_rgba(37,99,235,0.65)]">
+          <Button className="group relative h-12 px-7 overflow-hidden border border-white/10 backdrop-blur-sm shadow-[0_8px_24px_-12px_rgba(255,255,255,0.35)] hover:shadow-[0_10px_30px_-10px_rgba(255,255,255,0.45)] before:content-[''] before:absolute before:inset-0 before:rounded-md before:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.45),rgba(255,255,255,0.18)_42%,rgba(255,255,255,0.06)_70%,transparent_100%)] before:pointer-events-none">
             {t("landing.finalCta.primaryCta")}
             <ArrowRightIcon className="size-4 ml-2" />
           </Button>
         </Link>
         <Button
           variant="secondary"
-          className="h-12 px-7 border border-white/15 bg-white/10 text-white hover:bg-white/15"
+          className="group relative h-12 px-7 overflow-hidden border border-white/15 bg-white/10 text-white hover:bg-white/15 backdrop-blur-sm shadow-[0_8px_24px_-12px_rgba(255,255,255,0.35)] before:content-[''] before:absolute before:inset-0 before:rounded-md before:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.45),rgba(255,255,255,0.18)_42%,rgba(255,255,255,0.06)_70%,transparent_100%)] before:pointer-events-none"
           onClick={openCalendly}
         >
           <Calendar className="size-4 mr-2" /> {t("landing.finalCta.secondaryCta")}
