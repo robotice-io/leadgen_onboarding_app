@@ -1,7 +1,6 @@
 "use client";
 
 import { ShieldCheck, PenLine, LayoutTemplate, BarChart3, RefreshCw } from "lucide-react";
-import { GlowingEffect } from "@/components/ui/glowing-effect";
 import { useI18n } from "@/lib/i18n";
 
 // New black-themed "Por qué LeadGen by Robotice" with 5 glowing cards
@@ -34,8 +33,7 @@ export function WhyLeadGenAI() {
               className={`list-none ${idx < 2 ? "lg:col-span-3" : "lg:col-span-2"}`}
             >
               <div className="relative h-full rounded-2xl border border-white/10 p-2">
-                <GlowingEffect spread={44} glow disabled={false} proximity={72} inactiveZone={0.06} blur={10} />
-                <div className="relative z-10 flex h-full flex-col gap-4 rounded-xl bg-black/40 p-6">
+                <div className="relative flex h-full flex-col gap-4 rounded-xl bg-black/40 p-6">
                   <div className="w-fit rounded-lg border border-white/15 bg-white/5 p-2">
                     <it.icon className="h-5 w-5 text-white/80" />
                   </div>
