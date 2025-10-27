@@ -81,7 +81,7 @@ export function Hero() {
               className="mt-6 md:mt-7 flex flex-row flex-wrap md:justify-start items-center gap-3.5"
             >
               <Button
-                variant="primary"
+                variant="white"
                 onClick={() => router.push("/pricing#comparison")}
                 className="h-12 px-8 text-[15px] inline-flex items-center gap-2 shadow-[0_8px_22px_-6px_rgba(37,99,235,0.55)] hover:shadow-[0_10px_28px_-4px_rgba(37,99,235,0.65)]"
               >
