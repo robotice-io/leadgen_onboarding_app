@@ -5,6 +5,15 @@
   --foreground: #171717;
   --font-geist-sans: 'Geist', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
   --font-geist-mono: 'Geist Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  /* Rainbow button color stops */
+  --color-1: 0 100% 63%;
+  --color-2: 270 100% 63%;
+  --color-3: 210 100% 63%;
+  --color-4: 195 100% 63%;
+  --color-5: 90 100% 63%;
+  /* Basic shadcn-like tokens used by the button */
+  --primary-foreground: 0 0% 100%;
+  --ring: 217.2 91.2% 59.8%;
 }
 
 /* Dark theme variables applied on html element */
