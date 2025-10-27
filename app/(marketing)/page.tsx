@@ -10,6 +10,7 @@ import { PricingSection } from "@/components/ui/pricing";
 import { StatsSection } from "@/components/ui/stats-section-with-text";
 import { useI18n } from "@/lib/i18n";
 import { openCalendly } from "@/lib/calendly";
+import { CallToAction } from "@/components/ui/cta-3";
 
 export default function Home() {
 	const { t, lang } = useI18n();
@@ -82,32 +83,10 @@ export default function Home() {
 			{/* Resultados: modern black stats section */}
 			<StatsSection />
 
-			{/* CTA Final */}
-			<section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950">
-				<div className="container mx-auto px-6 text-center">
-					<h2 className="text-4xl md:text-5xl font-bold text-white mb-6">
-						{t("landing.finalCta.heading")}
-					</h2>
-					<p className="text-xl text-blue-100 mb-10 max-w-2xl mx-auto">
-						{t("landing.finalCta.subtitle")}
-					</p>
-          
-					<div className="flex flex-col sm:flex-row gap-4 justify-center">
-						<Link
-							href="/login"
-							className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-white text-blue-600 text-lg font-semibold hover:bg-gray-100 transition-all shadow-lg"
-						>
-							{t("landing.finalCta.primaryCta")}
-							<ArrowRight className="ml-2 w-5 h-5" />
-						</Link>
-									<button
-										onClick={openCalendly}
-										className="inline-flex items-center justify-center px-8 py-4 rounded-lg bg-blue-700 text-white text-lg font-semibold border-2 border-white hover:bg-blue-600 transition-all"
-									>
-										<Calendar className="mr-2 w-5 h-5" />
-										{t("landing.finalCta.secondaryCta")}
-									</button>
-					</div>
+			{/* CTA Final (modern black theme) */}
+			<section className="py-24 bg-black">
+				<div className="container mx-auto px-6">
+					<CallToAction />
 				</div>
 			</section>
 
