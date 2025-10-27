@@ -159,7 +159,7 @@ const GlowingEffect = memo(
             } as React.CSSProperties
           }
           className={cn(
-            "pointer-events-none absolute inset-0 rounded-[inherit] opacity-100 transition-opacity",
+            "pointer-events-none absolute inset-0 rounded-[inherit] opacity-100 transition-opacity z-10",
             glow && "opacity-100",
             blur > 0 && "blur-[var(--blur)] ",
             className,
@@ -174,9 +174,14 @@ const GlowingEffect = memo(
               "after:[border:var(--glowingeffect-border-width)_solid_transparent]",
               "after:[background:var(--gradient)] after:[background-attachment:fixed]",
               "after:opacity-[var(--active)] after:transition-opacity after:duration-300",
+              // Standard masking (border ring ∩ conic wedge)
               "after:[mask-clip:padding-box,border-box]",
-              "after:[mask-composite:intersect]",
-              "after:[mask-image:linear-gradient(#0000,#0000),conic-gradient(from_calc((var(--start)-var(--spread))*1deg),#00000000_0deg,#fff,#00000000_calc(var(--spread)*2deg))]"
+              "after:[mask-composite:exclude]",
+              "after:[mask-image:linear-gradient(#000_0_0),conic-gradient(from_calc((var(--start)-var(--spread))*1deg),#0000_0deg,#fff,#0000_calc(var(--spread)*2deg))]",
+              // WebKit fallbacks
+              "after:[-webkit-mask-clip:padding-box,border-box]",
+              "after:[-webkit-mask-composite:xor]",
+              'after:[-webkit-mask-image:linear-gradient(#000_0_0),conic-gradient(from_calc((var(--start)-var(--spread))*1deg),#0000_0deg,#fff,#0000_calc(var(--spread)*2deg))]'
             )}
           />
         </div>
