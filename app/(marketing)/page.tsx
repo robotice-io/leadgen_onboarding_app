@@ -11,6 +11,7 @@ import { StatsSection } from "@/components/ui/stats-section-with-text";
 import { useI18n } from "@/lib/i18n";
 import { openCalendly } from "@/lib/calendly";
 import { CallToAction } from "@/components/ui/cta-3";
+import { MinimalFooter } from "@/components/ui/minimal-footer";
 
 export default function Home() {
 	const { t, lang } = useI18n();
@@ -91,23 +92,7 @@ export default function Home() {
 			</section>
 
 			{/* Footer */}
-			<footer className="bg-gray-900 dark:bg-black text-gray-300 py-12">
-				<div className="container mx-auto px-6 text-center">
-					<Image
-						src="/landing_logo.png"
-						alt="Robotice.io"
-						width={120}
-						height={40}
-						className="mx-auto mb-4 brightness-200"
-					/>
-					<p className="mb-4">© 2025 Robotice.io - LeadGen. Todos los derechos reservados.</p>
-					<div className="flex justify-center gap-6 text-sm">
-						<Link href="/login" className="hover:text-white transition-colors">Login</Link>
-						<Link href="/pricing#comparison" className="hover:text-white transition-colors">Planes</Link>
-						<Link href="/onboarding" className="hover:text-white transition-colors">Onboarding</Link>
-					</div>
-				</div>
-			</footer>
+			<MinimalFooter />
 		</main>
 	);
 }
