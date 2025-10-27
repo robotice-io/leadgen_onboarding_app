@@ -1,7 +1,7 @@
 "use client";
 
 import { ShieldCheck, PenLine, LayoutTemplate, BarChart3, RefreshCw } from "lucide-react";
-import { GlowingEffect } from "@/components/ui/glowing-effect-card";
+import { GlowingEffect } from "@/components/ui/glowing-effect";
 import { useI18n } from "@/lib/i18n";
 
 // New black-themed "Por qué LeadGen by Robotice" with 5 glowing cards
