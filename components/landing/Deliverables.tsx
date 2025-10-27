@@ -25,7 +25,7 @@ export function Deliverables() {
           </p>
         </div>
 
-        <div className="mt-12 max-w-3xl mx-auto space-y-4">
+        <div className="mt-12 max-w-3xl mx-auto space-y-5">
           {items.map((it, i) => (
             <motion.div
               key={it.title}
@@ -33,10 +33,14 @@ export function Deliverables() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
               transition={{ delay: i * 0.08, duration: 0.45, ease: "easeOut" }}
-              className="group relative rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-7"
+              className="group relative rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-7 transition-all duration-300 hover:border-white/20 hover:bg-white/[0.05] hover:-translate-y-[2px]"
             >
-              {/* subtle left accent that grows on hover */}
-              <span className="pointer-events-none absolute left-0 top-0 h-full w-[2px] origin-top scale-y-50 bg-white/20 transition-transform duration-300 group-hover:scale-y-100" />
+              {/* subtle inner ring on hover */}
+              <span className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100 after:content-[''] after:absolute after:inset-0 after:rounded-[inherit] after:[box-shadow:inset_0_0_0_1px_rgba(255,255,255,0.15)]" />
+
+              {/* corner accents */}
+              <span className="pointer-events-none absolute top-3 left-3 h-3 w-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 border-t border-l border-white/30" />
+              <span className="pointer-events-none absolute bottom-3 right-3 h-3 w-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 border-b border-r border-white/30" />
 
               <div className="flex items-start gap-4">
                 <div className="mt-1 text-emerald-400/90">
@@ -52,8 +56,6 @@ export function Deliverables() {
                 </div>
               </div>
 
-              {/* minimal hover elongation */}
-              <div className="absolute inset-0 rounded-2xl transition-all duration-300 group-hover:translate-y-[-2px] group-hover:border-white/20" />
             </motion.div>
           ))}
         </div>
