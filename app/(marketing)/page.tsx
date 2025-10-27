@@ -7,6 +7,7 @@ import { HowItWorks } from "@/components/ui/how-it-works";
 import { WhyLeadGenAI } from "@/components/ui/why-leadgen";
 import { Deliverables } from "@/components/landing/Deliverables";
 import { PricingSection } from "@/components/ui/pricing";
+import { StatsSection } from "@/components/ui/stats-section-with-text";
 import { useI18n } from "@/lib/i18n";
 import { openCalendly } from "@/lib/calendly";
 
@@ -78,42 +79,8 @@ export default function Home() {
 						/>
 					</div>
 
-			{/* Resultados Esperados Section */}
-			<section className="py-20 bg-white dark:bg-gray-900">
-				<div className="container mx-auto px-6">
-					<div className="text-center mb-16">
-						<h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
-							{t("landing.results.heading")}
-						</h2>
-					</div>
-          
-					<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-5xl mx-auto">
-						<div className="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-8 text-center border border-blue-200 dark:border-blue-800">
-							<TrendingUp className="w-12 h-12 text-blue-600 dark:text-blue-400 mx-auto mb-4" />
-							<div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">65-80%</div>
-							<div className="text-gray-700 dark:text-gray-300 font-medium">{t("landing.results.point1")}</div>
-						</div>
-            
-						<div className="bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/20 dark:to-green-800/20 rounded-xl p-8 text-center border border-green-200 dark:border-green-800">
-							<Mail className="w-12 h-12 text-green-600 dark:text-green-400 mx-auto mb-4" />
-							<div className="text-4xl font-bold text-green-600 dark:text-green-400 mb-2">4-7%</div>
-							<div className="text-gray-700 dark:text-gray-300 font-medium">{t("landing.results.point2")}</div>
-						</div>
-            
-						<div className="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/20 dark:to-purple-800/20 rounded-xl p-8 text-center border border-purple-200 dark:border-purple-800">
-							<Calendar className="w-12 h-12 text-purple-600 dark:text-purple-400 mx-auto mb-4" />
-							<div className="text-4xl font-bold text-purple-600 dark:text-purple-400 mb-2">6-12</div>
-							<div className="text-gray-700 dark:text-gray-300 font-medium">{t("landing.results.point3")}</div>
-						</div>
-            
-						<div className="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/20 dark:to-orange-800/20 rounded-xl p-8 text-center border border-orange-200 dark:border-orange-800">
-							<TrendingUp className="w-12 h-12 text-orange-600 dark:text-orange-400 mx-auto mb-4" />
-							<div className="text-4xl font-bold text-orange-600 dark:text-orange-400 mb-2">×6</div>
-							<div className="text-gray-700 dark:text-gray-300 font-medium">{t("landing.results.point4")}</div>
-						</div>
-					</div>
-				</div>
-			</section>
+			{/* Resultados: modern black stats section */}
+			<StatsSection />
 
 			{/* CTA Final */}
 			<section className="py-20 bg-gradient-to-r from-blue-600 to-blue-800 dark:from-blue-800 dark:to-blue-950">
