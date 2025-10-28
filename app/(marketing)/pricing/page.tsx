@@ -6,6 +6,7 @@ import { PlanComparison } from "@/components/pricing/PlanComparison";
 import { SharedBenefits } from "@/components/pricing/SharedBenefits";
 import { FAQGrowthSection } from "@/components/pricing/FAQGrowthSection";
 import { PricingFinalCTA } from "@/components/pricing/PricingFinalCTA";
+import { MinimalFooter } from "@/components/ui/minimal-footer";
 
 export default function PricingPage() {
 	return (
@@ -17,6 +18,8 @@ export default function PricingPage() {
 			<SharedBenefits />
 			<FAQGrowthSection />
 			<PricingFinalCTA />
+			{/* Footer (same as landing, includes animations/links) */}
+			<MinimalFooter />
 		</main>
 	);
 }
