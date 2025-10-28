@@ -280,8 +280,8 @@ export function GrowthWizard() {
             <Icon className={`w-5 h-5 ${COLOR_MAP["blue"].text}`} />
             <span className="text-sm text-slate-300">{t("wizard.step" as any)} {step + 1} {t("wizard.of" as any)} {totalSteps}</span>
           </div>
-          <button onClick={goBack} className="inline-flex items-center gap-1 text-white/70 hover:text-white transition disabled:opacity-40" disabled={atFirst} aria-label={t("wizard.action.back" as any)}>
-            <ChevronLeft className="w-4 h-4" /> {t("wizard.action.back" as any)}
+          <button onClick={goBack} className="inline-flex text-white/70 hover:text-white transition disabled:opacity-40" disabled={atFirst} aria-label={t("wizard.action.back" as any)}>
+            {t("wizard.action.back" as any)}
           </button>
         </div>
         <p className="text-lg font-medium text-white text-center mb-5">{t(q.question as any)}</p>

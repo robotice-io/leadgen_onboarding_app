@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import Image from "next/image";
-import { TrendingUp, Mail, Calendar, ArrowRight } from "lucide-react";
+// removed unused icons
 import { Hero } from "@/components/landing/Hero";
 import { HowItWorks } from "@/components/ui/how-it-works";
 import { WhyLeadGenAI } from "@/components/ui/why-leadgen";

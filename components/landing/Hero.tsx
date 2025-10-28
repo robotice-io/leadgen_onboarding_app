@@ -4,7 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { motion, Variants } from "framer-motion";
-import { CheckCircle2, Calendar, ArrowRight, PlayCircle, X } from "lucide-react";
+import { CheckCircle2, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
 import { Trans } from "@/components/ui/Trans";
 import LanguageToggle from "@/components/ui/LanguageToggle";
@@ -86,13 +86,12 @@ export function Hero() {
                 className="h-12 px-8 text-[15px] inline-flex items-center gap-2 shadow-[0_8px_22px_-6px_rgba(37,99,235,0.55)] hover:shadow-[0_10px_28px_-4px_rgba(37,99,235,0.65)]"
               >
                 <span>{t("landing.hero.primaryCta")}</span>
-                <ArrowRight className="w-5 h-5" />
               </Button>
               <button
                 onClick={() => setDemoOpen(true)}
                 className="inline-flex items-center justify-center rounded-xl px-5 py-3.5 text-base font-semibold border border-slate-600/60 text-slate-200 hover:text-white bg-slate-800/30 hover:bg-slate-800/60 backdrop-blur-sm transition-all focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 focus:ring-offset-slate-900"
               >
-                <PlayCircle className="mr-2 w-5 h-5" /> {t("landing.hero.watchDemo")}
+                {t("landing.hero.watchDemo")}
               </button>
             </motion.div>
 

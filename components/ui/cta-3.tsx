@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowRightIcon, Calendar, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { useI18n } from "@/lib/i18n";
 import { openCalendly } from "@/lib/calendly";
@@ -34,7 +34,6 @@ export function CallToAction() {
         <Link href="/login" className="inline-flex">
           <Button variant="white" className="group relative h-12 px-7 overflow-hidden border border-white/10 backdrop-blur-sm shadow-[0_8px_24px_-12px_rgba(255,255,255,0.35)] hover:shadow-[0_10px_30px_-10px_rgba(255,255,255,0.45)] before:content-[''] before:absolute before:inset-0 before:rounded-md before:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.45),rgba(255,255,255,0.18)_42%,rgba(255,255,255,0.06)_70%,transparent_100%)] before:pointer-events-none">
             {t("landing.finalCta.primaryCta")}
-            <ArrowRightIcon className="size-4 ml-2" />
           </Button>
         </Link>
         <Button
@@ -42,7 +41,7 @@ export function CallToAction() {
           className="group relative h-12 px-7 overflow-hidden border border-white/15 bg-white/10 text-white hover:bg-white/15 backdrop-blur-sm shadow-[0_8px_24px_-12px_rgba(255,255,255,0.35)] before:content-[''] before:absolute before:inset-0 before:rounded-md before:bg-[linear-gradient(to_bottom,rgba(255,255,255,0.45),rgba(255,255,255,0.18)_42%,rgba(255,255,255,0.06)_70%,transparent_100%)] before:pointer-events-none"
           onClick={openCalendly}
         >
-          <Calendar className="size-4 mr-2" /> {t("landing.finalCta.secondaryCta")}
+          {t("landing.finalCta.secondaryCta")}
         </Button>
       </div>
     </div>
