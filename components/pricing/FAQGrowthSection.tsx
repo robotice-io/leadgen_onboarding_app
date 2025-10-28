@@ -31,10 +31,10 @@ const faqs = [
 
 export function FAQGrowthSection() {
   return (
-    <section className="py-20 px-6 md:px-0 bg-[#0b1120] text-white">
+    <section className="py-20 px-6 md:px-0 bg-black text-white">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-4xl font-bold text-center tracking-tight">Preguntas frecuentes</h2>
-        <p className="text-slate-400 text-center mt-2">
+        <p className="text-white/70 text-center mt-2">
           Todo lo que necesitas saber antes de automatizar tu prospección.
         </p>
 
@@ -46,13 +46,13 @@ export function FAQGrowthSection() {
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ delay: idx * 0.05 }}
               viewport={{ once: true }}
-              className="group border border-slate-700/40 rounded-2xl bg-slate-800/30 backdrop-blur-md p-5 cursor-pointer hover:border-blue-500/40 transition-all shadow-[0_0_20px_rgba(0,0,0,0.2)]"
+              className="group border border-white/10 rounded-2xl bg-white/5 backdrop-blur-md p-5 cursor-pointer hover:border-blue-500/40 transition-all shadow-[0_0_20px_rgba(0,0,0,0.2)]"
             >
               <summary className="flex items-center justify-between font-medium text-lg text-white list-none">
                 {faq.q}
-                <ChevronDown className="w-5 h-5 text-slate-400 group-open:rotate-180 transition-transform" />
+                <ChevronDown className="w-5 h-5 text-white/60 group-open:rotate-180 transition-transform" />
               </summary>
-              <p className="text-slate-400 text-sm mt-3 leading-relaxed">{faq.a}</p>
+              <p className="text-white/70 text-sm mt-3 leading-relaxed">{faq.a}</p>
             </motion.details>
           ))}
         </div>

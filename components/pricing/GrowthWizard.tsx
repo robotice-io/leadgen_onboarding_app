@@ -245,7 +245,7 @@ export function GrowthWizard() {
   useEffect(() => { setSelectedIdx(null); }, [step, result]);
 
   const ProgressBar = () => (
-    <div className="w-full h-2 rounded-full bg-slate-800 overflow-hidden">
+    <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
       <div
         className={`h-2 ${COLOR_MAP[activeColor].bar}`}
         style={{ width: `${barPercent}%`, transition: "width 280ms ease" }}
@@ -258,7 +258,7 @@ export function GrowthWizard() {
       {Array.from({ length: totalSteps }).map((_, i) => (
         <div
           key={i}
-          className={`h-2 w-6 rounded-full transition-transform duration-200 ${i <= (result ? totalSteps - 1 : step) ? COLOR_MAP[activeColor].dot : "bg-slate-700"}`}
+          className={`h-2 w-6 rounded-full transition-transform duration-200 ${i <= (result ? totalSteps - 1 : step) ? COLOR_MAP[activeColor].dot : "bg-white/10"}`}
           style={{ transform: i === step && !result ? "scale(1.06)" : "scale(1)" }}
         />
       ))}
@@ -280,7 +280,7 @@ export function GrowthWizard() {
             <Icon className={`w-5 h-5 ${COLOR_MAP["blue"].text}`} />
             <span className="text-sm text-slate-300">{t("wizard.step" as any)} {step + 1} {t("wizard.of" as any)} {totalSteps}</span>
           </div>
-          <button onClick={goBack} className="inline-flex items-center gap-1 text-slate-300/90 hover:text-white transition disabled:opacity-40" disabled={atFirst} aria-label={t("wizard.action.back" as any)}>
+          <button onClick={goBack} className="inline-flex items-center gap-1 text-white/70 hover:text-white transition disabled:opacity-40" disabled={atFirst} aria-label={t("wizard.action.back" as any)}>
             <ChevronLeft className="w-4 h-4" /> {t("wizard.action.back" as any)}
           </button>
         </div>
@@ -299,7 +299,7 @@ export function GrowthWizard() {
                   setSelectedIdx(null);
                 }, 140);
               }}
-              className={`rounded-xl px-4 py-3 text-slate-200 transition-colors duration-200 border ${selectedIdx === i ? `border-transparent ring-2 ${COLOR_MAP[opt.color].ring}` : "border-slate-700/40"} ${COLOR_MAP[opt.color].hoverBorder} ${COLOR_MAP[opt.color].hoverBg} focus:outline-none`}
+              className={`rounded-xl px-4 py-3 text-white/85 transition-colors duration-200 border ${selectedIdx === i ? `border-transparent ring-2 ${COLOR_MAP[opt.color].ring}` : "border-white/10"} ${COLOR_MAP[opt.color].hoverBorder} ${COLOR_MAP[opt.color].hoverBg} focus:outline-none bg-white/5`}
             >
               <div className="flex items-center justify-between">
                 <span>{t(opt.label as any)}</span>
@@ -346,15 +346,15 @@ export function GrowthWizard() {
           ))}
         </ul>
         <div className="flex flex-col sm:flex-row justify-center gap-3">
-          <a href="#comparison" className="px-6 py-3 bg-blue-600 rounded-xl font-semibold hover:bg-blue-500 transition">
+          <a href="#comparison" className="px-6 py-3 bg-blue-600 rounded-full font-semibold hover:bg-blue-500 transition text-white">
             {t("wizard.cta.details" as any)}
           </a>
-          <button onClick={() => openCalendly()} className="px-6 py-3 border border-slate-600 rounded-xl hover:bg-slate-800 transition">
+          <button onClick={() => openCalendly()} className="px-6 py-3 border border-white/15 rounded-full bg-white/5 hover:bg-white/10 transition text-white">
             {t("wizard.cta.demo" as any)}
           </button>
           <button
             onClick={() => { setStep(0); setAnswers([]); setResult(null); }}
-            className="px-6 py-3 border border-slate-700/60 rounded-xl hover:bg-slate-800/60 transition"
+            className="px-6 py-3 border border-white/10 rounded-full hover:bg-white/5 transition text-white/80"
           >
             {t("wizard.action.restart" as any)}
           </button>
@@ -364,18 +364,18 @@ export function GrowthWizard() {
   };
 
   return (
-    <section className="py-20 md:py-28 bg-[#0b1120] text-white">
+    <section className="py-20 md:py-28 bg-black text-white">
       <div className="container mx-auto px-6">
         <div className="max-w-3xl mx-auto text-center mb-8">
           <h2 className="text-3xl md:text-4xl font-bold">{t("wizard.title" as any)}</h2>
-          <p className="text-slate-300 mt-3">{t("wizard.subtitle" as any)}</p>
+          <p className="text-white/70 mt-3">{t("wizard.subtitle" as any)}</p>
         </div>
 
         <div className="max-w-3xl mx-auto">
           <ProgressBar />
           <Stepper />
           <div className="relative overflow-hidden mt-6">
-            <div className="bg-slate-800/30 border border-slate-700/40 rounded-2xl p-8 md:p-10 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] min-h-[380px]">
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-8 md:p-10 backdrop-blur-md shadow-[0_10px_30px_-10px_rgba(0,0,0,0.4)] min-h-[380px]">
               {result ? <ResultContent /> : <QuestionContent />}
             </div>
           </div>

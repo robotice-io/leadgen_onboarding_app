@@ -9,7 +9,7 @@ import { PricingFinalCTA } from "@/components/pricing/PricingFinalCTA";
 
 export default function PricingPage() {
 	return (
-		<main className="min-h-screen w-full bg-[#0b1120] text-white">
+		<main className="min-h-screen w-full bg-black text-white">
 			<PricingHero />
 			{/* MiniQuiz / Wizard mejorado */}
 			<GrowthWizard />
