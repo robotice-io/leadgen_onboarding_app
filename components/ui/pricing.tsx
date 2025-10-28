@@ -199,7 +199,7 @@ function PricingCard({ plan, index }: { plan: PricingPlan; index: number }) {
         <p className="mt-2 text-sm text-white/70">{plan.description}</p>
         <div className="mt-6 flex items-baseline justify-center gap-x-1">
           <span className="text-5xl font-bold tracking-tight text-white">
-            <NumberFlow value={isMonthly ? Number(plan.price) : Number(plan.yearlyPrice)} format={{ style: "currency", currency: "USD", minimumFractionDigits: 0 }} className="font-variant-numeric: tabular-nums" />
+            <NumberFlow value={isMonthly ? Number(plan.price) : Number(plan.yearlyPrice)} format={{ style: "currency", currency: "CLP", minimumFractionDigits: 0 }} className="font-variant-numeric: tabular-nums" />
           </span>
           <span className="text-sm font-semibold leading-6 tracking-wide text-white/70">/ {plan.period}</span>
         </div>
