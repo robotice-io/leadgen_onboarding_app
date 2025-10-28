@@ -21,6 +21,20 @@ export function PlanComparison() {
     [t, lang]
   );
 
+  // CLP currency formatter (no decimals)
+  const formatCLP = (value: number | null) => {
+    if (!value && value !== 0) return "";
+    try {
+      return new Intl.NumberFormat(lang === "es" ? "es-CL" : "es-CL", {
+        style: "currency",
+        currency: "CLP",
+        maximumFractionDigits: 0,
+      }).format(value);
+    } catch {
+      return `$${formatNumber(value as number, lang)}`;
+    }
+  };
+
   const features = useMemo(
     () => [
       { label: lang === "es" ? "Leads verificados" : "Verified leads", values: { starter: "3,000", core: "5,000", pro: "8,000–12,000", enterprise: lang === "es" ? "Custom" : "Custom" } },
@@ -66,7 +80,7 @@ export function PlanComparison() {
             {p.priceMonthly ? (
               <>
                 <p className="text-white font-semibold text-lg leading-tight">
-                  ${formatNumber(billing === "monthly" ? p.priceMonthly : Math.round(p.priceMonthly * 0.8), lang)}
+                  {formatCLP(billing === "monthly" ? p.priceMonthly : Math.round(p.priceMonthly * 0.8))}
                 </p>
                 <p className="text-white/80 text-[11px] leading-tight font-semibold">
                   {lang === "es" ? "CLP/mes" : "CLP/mo"}
@@ -173,7 +187,7 @@ export function PlanComparison() {
             <div className="text-white font-semibold text-2xl">
               {p.priceMonthly ? (
                 <>
-                  ${formatNumber(billing === "monthly" ? p.priceMonthly : Math.round(p.priceMonthly * 0.8), lang)}
+                  {formatCLP(billing === "monthly" ? p.priceMonthly : Math.round(p.priceMonthly * 0.8))}
                   {billing === "yearly" && (
                     <span className="ml-2 align-middle text-[11px] font-semibold text-emerald-400 bg-emerald-500/10 rounded px-1.5 py-0.5">
                       {lang === "es" ? "Ahorra 20%" : "Save 20%"}
