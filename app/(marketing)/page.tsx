@@ -32,7 +32,7 @@ export default function Home() {
 								{
 									name: "Starter",
 									price: String(390_000),
-									yearlyPrice: String(Math.round(390_000 * 12 * 0.8)),
+									yearlyPrice: String(Math.round(390_000 * 0.8)),
 									period: "CLP/mes",
 									features: [
 										"3000 leads verificados",
@@ -48,7 +48,7 @@ export default function Home() {
 								{
 									name: "Core",
 									price: String(790_000),
-									yearlyPrice: String(Math.round(790_000 * 12 * 0.8)),
+									yearlyPrice: String(Math.round(790_000 * 0.8)),
 									period: "CLP/mes",
 									features: [
 										"5000 leads verificados",
@@ -65,7 +65,7 @@ export default function Home() {
 								{
 									name: "Pro",
 									price: String(1_490_000),
-									yearlyPrice: String(Math.round(1_490_000 * 12 * 0.8)),
+									yearlyPrice: String(Math.round(1_490_000 * 0.8)),
 									period: "CLP/mes",
 									features: [
 										"8000–12.000 leads",
