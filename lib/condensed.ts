@@ -75,10 +75,14 @@ export function useCondensedDashboard(tenantId?: number, _daysIgnored = 30) {
     queryFn: async () => {
       if (!tenantId) throw new Error("No tenant");
       // Fetch the comprehensive prod metrics once; UI will slice windows locally
-      let res = await apiGet(`/api/v1/metrics/${tenantId}/prod-comprehensive`);
+      let res = await apiGet(`/api/v1/metrics/${tenantId}/prod-comprehensive`, {
+        headers: { "X-Tenant-ID": String(tenantId) },
+      });
       if (!res.ok) {
         // Fallback to overview(30) if comprehensive isn't available
-        const alt = await apiGet(`/api/v1/metrics/${tenantId}/prod-overview?days=30`);
+        const alt = await apiGet(`/api/v1/metrics/${tenantId}/prod-overview?days=30`, {
+          headers: { "X-Tenant-ID": String(tenantId) },
+        });
         if (!alt.ok) {
           const txt = await res.text();
           const txt2 = await alt.text();
