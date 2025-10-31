@@ -2,10 +2,14 @@
 
 import React from "react";
 import type { CondensedDashboard } from "@/lib/condensed";
+import { getWindowSummary } from "@/lib/condensed";
 import { Gauge, Lightbulb } from "lucide-react";
 
 export function InsightsCard({ data, loading }: { data?: CondensedDashboard; loading?: boolean }) {
-  const grade = data?.overview?.performance_grade;
+  // Derive a simple grade from reply rate of the 30d window when available
+  const win = getWindowSummary(data, 30);
+  const rr = Number(win?.summary?.reply_rate ?? 0);
+  const grade = rr >= 7 ? "A" : rr >= 4 ? "B" : rr >= 2 ? "C" : rr > 0 ? "D" : undefined;
   const insights: string[] = (data as any)?.insights || [];
 
   return (

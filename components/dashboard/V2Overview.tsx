@@ -3,8 +3,10 @@
 import { useState, useMemo } from "react";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { TrendingUp, TrendingDown } from "lucide-react";
-import type { CondensedDashboard } from "@/lib/condensed";
+import type { CondensedDashboard, ProdWindowSummary } from "@/lib/condensed";
+import { getWindowSummary, buildMetricSeries } from "@/lib/condensed";
 import { useI18n } from "@/lib/i18n";
+import CircularProgressBar from "@/components/ui/CircularProgressBar";
 
 type ActivityItem = {
   id: string;
@@ -24,56 +26,63 @@ type Props = {
 
 export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props) {
   const { t } = useI18n();
-  const [metric, setMetric] = useState("open_rate");
+  const [metric, setMetric] = useState("reply_rate");
   const [campaign, setCampaign] = useState("all");
-  const trend = data?.trends?.daily_trends || [];
+  // Select current window summary without re-fetching
+  const win: ProdWindowSummary | undefined = getWindowSummary(data, days);
 
   const kpis = useMemo(() => {
-    const ov = (data?.overview || {}) as any;
-    const series = data?.trends?.daily_trends || [];
-    const last = series[series.length - 1];
-    const prev = series[series.length - 2];
-    const pct = (a?: number, b?: number) => {
-      if (typeof a !== "number" || typeof b !== "number" || b === 0) return undefined as string | undefined;
+    const s = win?.summary || ({} as any);
+    // Build small 4-point spark series based on available windows
+    const emailsSeries = buildMetricSeries(data, "emails_sent").map(p => p.value as number);
+    const repliesSeries = buildMetricSeries(data, "replies").map(p => p.value as number);
+    const meetingsSeries = buildMetricSeries(data, "meetings").map(p => p.value as number);
+    const bounceRateSeries = buildMetricSeries(data, "bounce_rate").map(p => p.value as number);
+
+    const pctDelta = (series: number[]) => {
+      if (!series || series.length < 2) return undefined as string | undefined;
+      const a = series[series.length - 1];
+      const b = series[series.length - 2];
+      if (b === 0) return undefined as string | undefined;
       const d = ((a - b) / Math.abs(b)) * 100;
-      const s = (d >= 0 ? "+" : "") + d.toFixed(0) + "%";
-      return s;
+      return (d >= 0 ? "+" : "") + d.toFixed(0) + "%";
     };
+    const emailsMax = Math.max(1, ...emailsSeries);
     return [
       {
         key: "emails",
         label: t("dashboard.emailsSent"),
-        value: ov.total_emails_sent ?? (last?.opens_count ?? 0),
-        delta: pct(last?.opens_count, prev?.opens_count) || "+12%",
-        accent: "from-sky-500/20 to-sky-300/10",
-        line: series.map((p) => (p as any).emails_sent ?? p.opens_count ?? 0),
+        numberText: (s.emails_sent ?? 0).toLocaleString(),
+        percent: Math.round(((s.emails_sent ?? 0) / emailsMax) * 100),
+        delta: pctDelta(emailsSeries) || undefined,
+        barColor: "#0ea5e9", // sky-500
       },
       {
-        key: "open",
-        label: t("dashboard.openRate"),
-        value: `${(typeof (ov.open_rate ?? last?.open_rate) === 'number' ? Number(ov.open_rate ?? last?.open_rate).toFixed(2) : (ov.open_rate ?? last?.open_rate ?? 0))}%`,
-        delta: pct(last?.open_rate, prev?.open_rate) || "+5%",
-        accent: "from-violet-500/20 to-fuchsia-400/10",
-        line: series.map((p) => p.open_rate ?? 0),
+        key: "reply_rate",
+        label: t("dashboard.replyRate"),
+        numberText: `${Number(s.reply_rate ?? 0).toFixed(2)}%`,
+        percent: Math.max(0, Math.min(100, Number(s.reply_rate ?? 0))),
+        delta: pctDelta(buildMetricSeries(data, "reply_rate").map(p => p.value as number)) || undefined,
+        barColor: "#8b5cf6", // violet-500
       },
       {
-        key: "resp",
-        label: t("dashboard.responseRate"),
-        value: `${ov.fast_response_rate ?? 0}%`,
-        delta: "+2%",
-        accent: "from-emerald-500/20 to-lime-400/10",
-        line: series.map((p) => (p as any).responses ?? 0),
+        key: "meet_rate",
+        label: t("dashboard.meetingRate"),
+        numberText: `${Number(s.meeting_rate ?? 0).toFixed(2)}%`,
+        percent: Math.max(0, Math.min(100, Number(s.meeting_rate ?? 0))),
+        delta: pctDelta(buildMetricSeries(data, "meeting_rate").map(p => p.value as number)) || undefined,
+        barColor: "#10b981", // emerald-500
       },
       {
-        key: "meet",
-        label: t("dashboard.meetingsBooked"),
-        value: ov.meetings ?? 45,
-        delta: "+10%",
-        accent: "from-amber-500/20 to-orange-400/10",
-        line: series.map((p) => (p as any).meetings ?? 0),
+        key: "bounces",
+        label: t("dashboard.bounceRate"),
+        numberText: `${Number(s.bounce_rate ?? 0).toFixed(2)}%`,
+        percent: Math.max(0, Math.min(100, Number(s.bounce_rate ?? 0))),
+        delta: pctDelta(bounceRateSeries) || undefined,
+        barColor: "#f43f5e", // rose-500
       },
     ];
-  }, [data, t]);
+  }, [data, t, win]);
 
   const activities: ActivityItem[] = useMemo(() => {
     // Map recent emails (if available) into the compact activity format
@@ -122,10 +131,10 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
             <KpiCard
               key={k.key}
               label={k.label}
-              value={k.value}
+              numberText={k.numberText as any}
+              percent={k.percent as any}
               delta={k.delta}
-              accent={k.accent}
-              line={k.line}
+              barColor={(k as any).barColor}
             />
           ))}
         </div>
@@ -142,10 +151,10 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
                 onChange={(e) => setMetric(e.target.value)}
                 className="appearance-none bg-[#282c39] text-white text-sm font-medium pl-4 pr-10 py-2 rounded-lg border border-[#282c39] focus:outline-none"
               >
-                <option value="open_rate">{t("dashboard.openRate")}</option>
-                <option value="response_rate">{t("dashboard.responseRate")}</option>
+                <option value="reply_rate">{t("dashboard.replyRate")}</option>
+                <option value="meeting_rate">{t("dashboard.meetingRate")}</option>
+                <option value="bounce_rate">{t("dashboard.bounceRate")}</option>
                 <option value="emails_sent">{t("dashboard.emailsSent")}</option>
-                <option value="meetings">{t("dashboard.meetingsBooked")}</option>
               </select>
               <select
                 value={campaign}
@@ -170,7 +179,7 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
               ))}
             </div>
           </div>
-          <TrendChart metric={metric} series={trend} />
+          <TrendChart dataPoints={buildMetricSeries(data, metric as any)} />
         </div>
       </div>
 
@@ -238,7 +247,7 @@ export function V2Overview({ data, recent = [], days = 30, onChangeDays }: Props
 
 // --- Chart ---
 
-type TrendPoint = { date: string; opens_count?: number; open_rate?: number; responses?: number; meetings?: number };
+type TrendPoint = { name: string; value: number };
 
 function formatDateLabel(iso: string) {
   try {
@@ -252,21 +261,20 @@ function formatDateLabel(iso: string) {
 // --- KPI Card ---
 function KpiCard({
   label,
-  value,
+  numberText,
+  percent,
   delta,
-  accent,
-  line = [],
+  barColor,
 }: {
   label: string;
-  value: string | number;
+  numberText: string | number;
+  percent: number;
   delta?: string;
-  accent: string; // tailwind gradient e.g. from-sky-500/20 to-sky-300/10
-  line?: number[];
+  barColor?: string;
 }) {
   const positive = typeof delta === "string" ? delta.trim().startsWith("+") : true;
   return (
     <div className="relative rounded-2xl p-5 sm:p-6 bg-white dark:bg-gray-900/70 border border-gray-200 dark:border-gray-800 shadow-sm overflow-hidden">
-      {/* removed colored gradient overlay to match theme */}
       <div className="relative">
         <div className="flex items-center justify-between">
           <div className="inline-flex items-center gap-2">
@@ -281,74 +289,28 @@ function KpiCard({
           )}
         </div>
 
-        <div className="mt-3">
-          <div className="text-3xl sm:text-4xl font-black tracking-tight text-gray-900 dark:text-white">{value}</div>
-        </div>
-
-        {/* micro sparkline */}
-        <div className="mt-4 h-10">
-          <MicroSparkline values={line} positive={positive} />
+        <div className="mt-3 flex items-center justify-center">
+          <div className="h-24 w-24">
+            <CircularProgressBar
+              number={numberText}
+              percent={Math.max(0, Math.min(100, percent ?? 0))}
+              strokeWidth={10}
+              barColor={barColor || "#3154F0"}
+              trackColor="#282c39"
+              numberColor="#ffffff"
+              fontSize={22}
+              animate
+              duration={1.0}
+            />
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function MicroSparkline({ values = [], positive }: { values?: number[]; positive?: boolean }) {
-  const width = 140;
-  const height = 40;
-  const min = values.length ? Math.min(...values) : 0;
-  const max = values.length ? Math.max(...values) : 1;
-  const range = max - min || 1;
-  const pts = values.map((v, i) => {
-    const x = (i / Math.max(values.length - 1, 1)) * width;
-    const y = height - ((v - min) / range) * height;
-    return `${x},${y}`;
-  });
-  const d = pts.length ? `M ${pts[0]} L ${pts.slice(1).join(" ")}` : "";
-  const stroke = positive ? "#34d399" : "#fb7185"; // emerald / rose
-  return (
-    <svg viewBox={`0 0 ${width} ${height}`} width="100%" height="100%" className="overflow-visible">
-      <defs>
-        <linearGradient id="kpiLine" x1="0" x2="1" y1="0" y2="0">
-          <stop offset="0%" stopColor={stroke} stopOpacity="0.2" />
-          <stop offset="100%" stopColor={stroke} stopOpacity="0.0" />
-        </linearGradient>
-      </defs>
-      {/* baseline grid */}
-      <path d={`M0 ${height} H ${width}`} stroke="#1f2330" strokeWidth="1" />
-      {/* area fill */}
-      {pts.length >= 2 && (
-        <path
-          d={`${d} L ${width} ${height} L 0 ${height} Z`}
-          fill="url(#kpiLine)"
-          stroke="none"
-        />
-      )}
-      {/* line */}
-      <path d={d} fill="none" stroke={stroke} strokeWidth="2" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function TrendChart({ metric, series }: { metric: string; series: TrendPoint[] }) {
-  // Build data safely; fallbacks if a metric is missing
-  const key = metric === "open_rate" ? "open_rate"
-    : metric === "emails_sent" ? "emails_sent"
-    : metric === "response_rate" ? "responses"
-    : metric === "meetings" ? "meetings"
-    : "open_rate";
-
-  const data = (series || []).map((p) => {
-    const y = (() => {
-      if (key === "open_rate") return p.open_rate ?? 0;
-      if (key === "emails_sent") return (p as any).emails_sent ?? p.opens_count ?? 0; // fallback
-      if (key === "responses") return p.responses ?? 0;
-      if (key === "meetings") return p.meetings ?? 0;
-      return 0;
-    })();
-    return { name: formatDateLabel(p.date), value: y };
-  });
+function TrendChart({ dataPoints }: { dataPoints: TrendPoint[] }) {
+  const data = dataPoints || [];
 
   return (
     <div className="relative w-full h-[260px] mt-4">

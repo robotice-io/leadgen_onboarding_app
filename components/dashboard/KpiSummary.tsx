@@ -17,9 +17,9 @@ type Props = {
 
 export function KpiSummary({ data, loading, days = 30, onChangeDays }: Props) {
   const { t } = useI18n();
-  const ov = data?.overview;
-  const ti = data?.timing;
-  const de = data?.deliverability;
+  const ov = (data as any)?.overview;
+  const ti = (data as any)?.timing;
+  const de = (data as any)?.deliverability;
   const weekly = typeof ov?.weekly_change === 'number' ? `${ov?.weekly_change}${t("dashboard.vsLastWeek")}` : undefined;
   const dynamicTitle = days === 1
     ? t("dashboard.kpiBlock.titleToday")
@@ -73,7 +73,7 @@ export function KpiSummary({ data, loading, days = 30, onChangeDays }: Props) {
         <MiniTrendTile
           title={t("dashboard.openRateTrend")}
           subtitle={days===1 ? t("dashboard.todayShort") : `${days}${t("dashboard.daysShort")}`}
-          data={(data?.trends?.daily_trends || []).map(d => ({ date: d.date, value: Number((d.open_rate ?? 0).toFixed(2)) }))}
+          data={(((data as any)?.trends?.daily_trends) || []).map((d: any) => ({ date: d.date, value: Number((d.open_rate ?? 0).toFixed(2)) }))}
           height={150}
           ySuffix="%"
           maxPoints={Math.min(days, 20)}
