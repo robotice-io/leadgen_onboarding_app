@@ -7,6 +7,15 @@ export type SupportedLang = "es" | "en";
 type Dictionary = Record<string, string>;
 
 const ES: Dictionary = {
+  // Common
+  "common.openMenu": "Abrir menú",
+  "common.search": "Buscar",
+  "common.notifications": "Notificaciones",
+  "common.userMenu": "Menú de usuario",
+  "common.language": "Idioma",
+  "common.theme": "Tema",
+  "common.dark": "Oscuro",
+  "common.light": "Claro",
   brandName: "Robotice",
   tagline: "LeadGen Wizzard",
   stepCompany: "Empresa",
@@ -108,11 +117,18 @@ const ES: Dictionary = {
   "help.connect3": "Se verificará el token con Refresh.",
   
   // Dashboard translations
+  "dashboard.overview": "Resumen",
   "dashboard.title": "Panel de Control",
   "dashboard.welcome": "¡Bienvenido de vuelta! Aquí está lo que está pasando con tus campañas.",
+  "dashboard.emailsSent": "Correos enviados",
   "dashboard.emailsSentToday": "Correos Enviados Hoy",
   "dashboard.opensToday": "Aperturas Hoy",
   "dashboard.openRate": "Tasa de Apertura",
+  "dashboard.responseRate": "Tasa de respuesta",
+  "dashboard.replyRate": "Tasa de respuesta",
+  "dashboard.meetingRate": "Tasa de reuniones",
+  "dashboard.bounceRate": "Tasa de rebote",
+  "dashboard.meetingsBooked": "Reuniones agendadas",
   "dashboard.totalEmails": "Total de correos",
   "dashboard.totalOpens": "Total de aperturas",
   "dashboard.avgOpens": "Aperturas promedio",
@@ -166,6 +182,23 @@ const ES: Dictionary = {
   "dashboard.pleaseLogin": "Por favor inicia sesión nuevamente",
   "dashboard.noDataYet": "Aún no hay datos para mostrar",
   "dashboard.sendFirstEmail": "Envía tu primer correo para empezar a ver estadísticas aquí",
+
+  // Dashboard V2 (Overview page)
+  "dashboard.trendExplorer": "Explorador de tendencias",
+  "dashboard.allCampaigns": "Todas las campañas",
+  "dashboard.recentActivity": "Actividad reciente",
+  "dashboard.campaignComparison": "Comparativa de campañas",
+  "dashboard.campaignLabel": "Campaña",
+  "dashboard.responses": "Respuestas",
+  "dashboard.meetings": "Reuniones",
+  "dashboard.statusLabel": "Estado",
+  "dashboard.paused": "Pausada",
+  "dashboard.stopped": "Detenida",
+  "dashboard.newResponse": "Nueva respuesta",
+  "dashboard.campaignReached20OpenRate": "La campaña alcanzó 20% de tasa de apertura",
+  "dashboard.ago.2h": "hace 2 h",
+  "dashboard.ago.4h": "hace 4 h",
+  "dashboard.ago.6h": "hace 6 h",
   
   // Settings translations
   "settings.title": "Configuración",
@@ -307,13 +340,17 @@ const ES: Dictionary = {
   "verify.resend.soon": "La función de reenviar llegará pronto",
   
   // Landing page – Hero
-  "landing.hero.title": "Genera [hl]leads B2B reales[hl] con automatización e inteligencia artificial.",
-  "landing.hero.subtitle": "LeadGen by Robotice crea y ejecuta campañas hiperpersonalizadas desde tu propia cuenta de e-mail. Sin listas genéricas, sin spam — solo conversaciones reales que generan oportunidades.",
+  "landing.hero.title": "Encuentra, consigue y [hl]gana más clientes[hl] por correo electrónico",
+  "landing.hero.subtitle": "Lead-Gen te ayuda a encontrar clientes potenciales, ampliar las campañas de correo electrónico, llegar a las principales bandejas de entrada, interactuar de forma más inteligente y ganar más con la IA.",
   "landing.hero.bullet1": "Leads verificados",
   "landing.hero.bullet2": "Mensajes escritos por IA",
   "landing.hero.bullet3": "Resultados medibles en tiempo real",
   "landing.hero.primaryCta": "Ver planes",
   "landing.hero.secondaryCta": "Agendar una demo",
+  "landing.hero.watchDemo": "Ver demo",
+  "landing.hero.trustedBy": "Confiado por equipos de ventas",
+  "landing.hero.reassure1": "No se necesita tarjeta de crédito",
+  "landing.hero.reassure2": "Incluye pistas gratuitas",
 
   // Landing – Cómo funciona
   "landing.how.heading": "Un sistema de prospección inteligente que trabaja incluso mientras duermes.",
@@ -523,6 +560,15 @@ const ES: Dictionary = {
 };
 
 const EN: Dictionary = {
+  // Common
+  "common.openMenu": "Open menu",
+  "common.search": "Search",
+  "common.notifications": "Notifications",
+  "common.userMenu": "User menu",
+  "common.language": "Language",
+  "common.theme": "Theme",
+  "common.dark": "Dark",
+  "common.light": "Light",
   brandName: "Robotice",
   tagline: "LeadGen Wizzard",
   stepCompany: "Company",
@@ -624,11 +670,18 @@ const EN: Dictionary = {
   "help.connect3": "Token will be verified via Refresh.",
   
   // Dashboard translations
+  "dashboard.overview": "Overview",
   "dashboard.title": "Dashboard",
   "dashboard.welcome": "Welcome back! Here's what's happening with your campaigns.",
+  "dashboard.emailsSent": "Emails Sent",
   "dashboard.emailsSentToday": "Emails Sent Today",
   "dashboard.opensToday": "Opens Today",
   "dashboard.openRate": "Open Rate",
+  "dashboard.responseRate": "Response Rate",
+  "dashboard.replyRate": "Reply Rate",
+  "dashboard.meetingRate": "Meeting Rate",
+  "dashboard.bounceRate": "Bounce Rate",
+  "dashboard.meetingsBooked": "Meetings Booked",
   "dashboard.totalEmails": "Total emails",
   "dashboard.totalOpens": "Total opens",
   "dashboard.avgOpens": "Average opens",
@@ -682,6 +735,23 @@ const EN: Dictionary = {
   "dashboard.pleaseLogin": "Please log in again",
   "dashboard.noDataYet": "No data to display yet",
   "dashboard.sendFirstEmail": "Send your first email to start seeing stats here",
+
+  // Dashboard V2 (Overview page)
+  "dashboard.trendExplorer": "Interactive Trend Explorer",
+  "dashboard.allCampaigns": "All Campaigns",
+  "dashboard.recentActivity": "Recent Activity",
+  "dashboard.campaignComparison": "Campaign Comparison",
+  "dashboard.campaignLabel": "Campaign",
+  "dashboard.responses": "Responses",
+  "dashboard.meetings": "Meetings",
+  "dashboard.statusLabel": "Status",
+  "dashboard.paused": "Paused",
+  "dashboard.stopped": "Stopped",
+  "dashboard.newResponse": "New Response",
+  "dashboard.campaignReached20OpenRate": "Campaign reached 20% open rate",
+  "dashboard.ago.2h": "2h ago",
+  "dashboard.ago.4h": "4h ago",
+  "dashboard.ago.6h": "6h ago",
   
   // Settings translations
   "settings.title": "Settings",
@@ -823,13 +893,17 @@ const EN: Dictionary = {
   "verify.resend.soon": "Resend functionality coming soon",
   
   // Landing page – Hero
-  "landing.hero.title": "Generate [hl]real B2B leads[hl] with automation and artificial intelligence.",
-  "landing.hero.subtitle": "LeadGen by Robotice builds and runs hyper-personalized campaigns from your own email account. No generic lists, no spam — just real conversations that create opportunities.",
+  "landing.hero.title": "Find, reach, and [hl]win more customers[hl] via email",
+  "landing.hero.subtitle": "Lead‑Gen helps you find prospects, scale email campaigns, land in primary inboxes, engage smarter, and win more with AI.",
   "landing.hero.bullet1": "Verified leads",
   "landing.hero.bullet2": "AI‑written messages",
   "landing.hero.bullet3": "Real-time measurable results",
   "landing.hero.primaryCta": "See plans",
   "landing.hero.secondaryCta": "Schedule a demo",
+  "landing.hero.watchDemo": "Watch demo",
+  "landing.hero.trustedBy": "Trusted by sales teams",
+  "landing.hero.reassure1": "No credit card required",
+  "landing.hero.reassure2": "Includes free leads",
 
   // Landing – How it works
   "landing.how.heading": "An intelligent prospecting system that works even while you sleep.",

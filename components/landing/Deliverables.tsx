@@ -14,40 +14,48 @@ const items = [
 export function Deliverables() {
   const { t } = useI18n();
   return (
-    <section className="relative py-24 md:py-32 bg-gradient-to-b from-[#0f172a] to-[#111827] overflow-hidden">
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_15%_20%,rgba(16,185,129,0.14),transparent_60%)]" />
-      <div className="container mx-auto px-6 relative">
-        <div className="text-center">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-white">
+    <section className="relative py-24 md:py-32 bg-black text-white overflow-hidden">
+      <div className="container mx-auto px-6">
+        <div className="text-center max-w-3xl mx-auto">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight">
             {t("landing.deliver.heading")}
           </h2>
-          <p className="text-slate-400 text-lg mt-3 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-white/70 text-lg mt-3 leading-relaxed">
             {t("landing.deliver.subtitle")}
           </p>
-          <div className="mt-5">
-            <span className="inline-block text-sm font-medium tracking-wide text-emerald-200/90 bg-emerald-500/10 border border-emerald-400/20 rounded-full px-4 py-2 backdrop-blur-sm">
-              {t("landing.deliver.claim")}
-            </span>
-          </div>
         </div>
 
-        <div className="mt-12 max-w-3xl mx-auto space-y-6">
+        <div className="mt-12 max-w-3xl mx-auto space-y-5">
           {items.map((it, i) => (
             <motion.div
               key={it.title}
-              initial={{ opacity: 0, y: 20 }}
+              initial={{ opacity: 0, y: 14 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
-              transition={{ delay: i * 0.12, duration: 0.5, ease: "easeOut" }}
-              className="flex items-start gap-4 bg-slate-800/40 border border-slate-700/40 p-6 rounded-xl hover:scale-[1.02] hover:border-slate-600 transition-all duration-300 backdrop-blur-md"
+              transition={{ delay: i * 0.08, duration: 0.45, ease: "easeOut" }}
+              className="group relative rounded-2xl border border-white/10 bg-white/[0.03] p-6 md:p-7 transition-all duration-300 hover:border-white/20 hover:bg-white/[0.05] hover:-translate-y-[2px]"
             >
-              <div className="text-emerald-400 mt-1">
-                <CheckCircle className="w-6 h-6" />
+              {/* subtle inner ring on hover */}
+              <span className="pointer-events-none absolute inset-0 rounded-[inherit] opacity-0 transition-opacity duration-300 group-hover:opacity-100 after:content-[''] after:absolute after:inset-0 after:rounded-[inherit] after:[box-shadow:inset_0_0_0_1px_rgba(255,255,255,0.15)]" />
+
+              {/* corner accents */}
+              <span className="pointer-events-none absolute top-3 left-3 h-3 w-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 border-t border-l border-white/30" />
+              <span className="pointer-events-none absolute bottom-3 right-3 h-3 w-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100 border-b border-r border-white/30" />
+
+              <div className="flex items-start gap-4">
+                <div className="mt-1 text-emerald-400/90">
+                  <CheckCircle className="w-6 h-6" />
+                </div>
+                <div className="flex-1">
+                  <h3 className="text-[18px] md:text-lg font-semibold leading-snug">
+                    {t(it.title as any)}
+                  </h3>
+                  <p className="text-white/70 text-[15px] md:text-base leading-relaxed">
+                    {t(it.desc as any)}
+                  </p>
+                </div>
               </div>
-              <div>
-                <h3 className="text-white font-semibold text-lg">{t(it.title as any)}</h3>
-                <p className="text-slate-400 text-base leading-relaxed">{t(it.desc as any)}</p>
-              </div>
+
             </motion.div>
           ))}
         </div>

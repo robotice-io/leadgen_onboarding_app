@@ -3,118 +3,117 @@
 import { useQuery } from "@tanstack/react-query";
 import { apiGet } from "@/lib/api";
 
-// Condensed payload type (union de los campos necesarios para el dashboard)
+// New production metrics types (server returns only these KPIs)
+export type ProdWindowSummary = {
+  analysis_period_days: number;
+  summary: {
+    emails_sent: number;
+    hard_bounces: number;
+    replies: number;
+    meetings: number;
+    reply_rate: number; // percentage 0..100
+    bounce_rate: number; // percentage 0..100
+    meeting_rate: number; // percentage 0..100
+  };
+};
+
+export type ProdComprehensive = {
+  tenant_id: number;
+  tenant_name?: string;
+  tenant_email?: string;
+  last_updated?: string;
+  today?: ProdWindowSummary;
+  last_7_days?: ProdWindowSummary;
+  last_14_days?: ProdWindowSummary;
+  last_30_days?: ProdWindowSummary;
+};
+
+// Condensed payload type for the dashboard – now focused on prod metrics
 export type CondensedDashboard = {
-  overview?: {
-    total_emails_sent?: number;
-    total_opens?: number;
-    unique_opens?: number;
-    open_rate?: number; // %
-    avg_opens_per_email?: number;
-    fast_response_rate?: number; // %
-    deliverability_score?: number; // %
-    multi_device_rate?: number; // %
-    engagement_depth?: number; // %
-    weekly_change?: number; // %
-    performance_grade?: string;
-  };
-  timing?: {
-    time_distribution?: Record<string, number>;
-    median_time_to_open_minutes?: number;
-    avg_time_to_open_minutes?: number;
-  };
-  deliverability?: {
-    provider_performance?: Array<{ provider: string; opens_count: number; open_rate: number }>;
-    inbox_placement_score?: number;
-  };
-  platform?: {
-    device_type_distribution?: Record<string, number>;
-  };
-  trends?: {
-    daily_trends?: Array<{ date: string; opens_count: number; open_rate: number; platform_distribution?: Record<string, number> }>;
-  };
+  prod?: ProdComprehensive;
+  // Keep recent_emails for the activity feed
   recent_emails?: Array<any>;
 };
 
-// Mapea la respuesta de /metrics/{tenantId}/comprehensive-analytics al shape CondensedDashboard usado por el Dashboard
-function pickWindow(payload: any, days: number) {
-  if (!payload) return payload;
-  if (days <= 1 && payload.today) return payload.today;
-  if (days <= 7 && payload.last_7_days) return payload.last_7_days;
-  if (days <= 14 && payload.last_14_days) return payload.last_14_days;
-  if (payload.last_30_days) return payload.last_30_days;
-  return payload; // fallback to root (legacy)
+function sortWindows(prod?: ProdComprehensive) {
+  if (!prod) return [] as Array<{ key: string; label: string; win: ProdWindowSummary }>;
+  const entries: Array<{ key: string; label: string; win?: ProdWindowSummary }> = [
+    { key: "today", label: "Today", win: prod.today },
+    { key: "last_7_days", label: "7d", win: prod.last_7_days },
+    { key: "last_14_days", label: "14d", win: prod.last_14_days },
+    { key: "last_30_days", label: "30d", win: prod.last_30_days },
+  ];
+  return entries.filter(e => !!e.win).map(e => ({ key: e.key, label: e.label, win: e.win! }));
 }
 
-function mapComprehensiveToCondensed(payload: any, days: number): CondensedDashboard {
-  const windowed = pickWindow(payload, days) || payload;
-  const overview = windowed?.campaign_overview || windowed?.performance_summary || {};
-  const timing = windowed?.timing_analysis || {};
-  const deliverability = windowed?.deliverability_health || {};
-  const platform = windowed?.platform_intelligence || {};
-  const trends = windowed?.trend_analysis || {};
+// LocalStorage helpers to avoid re-fetching when the user toggles periods
+function lsKey(tenantId: number) { return `robotice-prod-metrics-${tenantId}`; }
 
-  const mapped: CondensedDashboard = {
-    overview: {
-      total_emails_sent: overview.total_emails_sent ?? payload?.core_metrics?.emails_sent ?? 0,
-      total_opens: overview.total_opens ?? payload?.core_metrics?.total_opens ?? 0,
-      unique_opens: overview.unique_opens ?? payload?.core_metrics?.unique_opens ?? 0,
-      avg_opens_per_email: overview.avg_opens_per_email ?? payload?.core_metrics?.avg_opens_per_email,
-      // open_rate puede venir como porcentaje (overview.open_rate = 39.12) o como fracción (core_metrics.open_rate = 0.3912)
-      open_rate: ((): number | undefined => {
-        if (typeof overview.open_rate === 'number') return Number(overview.open_rate.toFixed(2));
-        const frac = payload?.core_metrics?.open_rate;
-        if (typeof frac === 'number') return Number((frac * 100).toFixed(2));
-        return undefined;
-      })(),
-      fast_response_rate: overview.fast_response_rate ?? timing.fast_response_rate,
-      deliverability_score: overview.deliverability_score ?? deliverability.inbox_placement_score,
-      multi_device_rate: overview.multi_device_rate ?? payload?.engagement_patterns?.multi_device_rate,
-      engagement_depth: overview.engagement_depth ?? payload?.engagement_patterns?.engagement_depth_score,
-      weekly_change: overview.weekly_change ?? payload?.trend_analysis?.weekly_change,
-      performance_grade: overview.performance_grade ?? payload?.performance_grade ?? payload?.performance_summary?.overall_grade,
-    },
-    timing: {
-      time_distribution: timing.time_distribution,
-      median_time_to_open_minutes: timing.median_time_to_open_minutes ?? payload?.timing_analysis?.median_time_to_open_minutes,
-      avg_time_to_open_minutes: timing.avg_time_to_open_minutes ?? overview.avg_time_to_open ?? payload?.timing_analysis?.avg_time_to_open_minutes,
-    },
-    deliverability: {
-      provider_performance: deliverability.provider_performance,
-      inbox_placement_score: deliverability.inbox_placement_score,
-    },
-    platform: {
-      device_type_distribution: platform.device_type_distribution ?? payload?.core_metrics?.device_breakdown,
-    },
-    trends: {
-      daily_trends: (trends.daily_trends || []).map((d: any) => ({
-        date: d.date,
-        opens_count: d.opens_count ?? d.open_count ?? 0,
-        open_rate: d.open_rate ?? 0,
-        platform_distribution: d.platform_distribution,
-      })),
-    },
-    recent_emails: payload?.recent_emails || payload?.dashboard_stats?.recent_activity || [],
-  };
-
-  return mapped;
+function readCached(tenantId?: number): ProdComprehensive | null {
+  if (!tenantId || typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(lsKey(tenantId));
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.data ?? null;
+  } catch {
+    return null;
+  }
 }
 
-export function useCondensedDashboard(tenantId?: number, days = 30) {
+function writeCached(tenantId: number, data: ProdComprehensive) {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(lsKey(tenantId), JSON.stringify({ ts: Date.now(), data }));
+  } catch {}
+}
+
+export function useCondensedDashboard(tenantId?: number, _daysIgnored = 30) {
+  const initial = readCached(tenantId || undefined);
   return useQuery<CondensedDashboard>({
-    queryKey: ["dashboard-condensed", tenantId, days],
+    queryKey: ["prod-metrics", tenantId],
     queryFn: async () => {
       if (!tenantId) throw new Error("No tenant");
-      const res = await apiGet(`/metrics/${tenantId}/comprehensive-analytics?days=${days}`);
+      // Fetch the comprehensive prod metrics once; UI will slice windows locally
+      let res = await apiGet(`/api/v1/metrics/${tenantId}/prod-comprehensive`);
       if (!res.ok) {
-        const txt = await res.text();
-        throw new Error(txt || `Failed to fetch condensed dashboard`);
+        // Fallback to overview(30) if comprehensive isn't available
+        const alt = await apiGet(`/api/v1/metrics/${tenantId}/prod-overview?days=30`);
+        if (!alt.ok) {
+          const txt = await res.text();
+          const txt2 = await alt.text();
+          throw new Error(txt2 || txt || `Failed to fetch prod metrics`);
+        }
+        const ov = await alt.json();
+        const json: ProdComprehensive = { tenant_id: tenantId, last_30_days: ov } as any;
+        writeCached(tenantId, json);
+        return { prod: json } as CondensedDashboard;
       }
-      const json = await res.json();
-      return mapComprehensiveToCondensed(json, days);
+      const json = (await res.json()) as ProdComprehensive;
+      writeCached(tenantId, json);
+      return { prod: json } as CondensedDashboard;
     },
     enabled: !!tenantId,
-    staleTime: 60_000,
-    refetchInterval: 60_000,
+    // Use cached value immediately if present to avoid flicker when toggling
+    initialData: initial ? ({ prod: initial } as CondensedDashboard) : undefined,
+    staleTime: 5 * 60_000,
+    refetchInterval: 5 * 60_000,
   });
 }
+
+// Utility accessors used by UI components
+export function getWindowSummary(data: CondensedDashboard | undefined, days: 1 | 7 | 14 | 30) {
+  const prod = data?.prod;
+  if (!prod) return undefined as ProdWindowSummary | undefined;
+  if (days === 1 && prod.today) return prod.today;
+  if (days === 7 && prod.last_7_days) return prod.last_7_days;
+  if (days === 14 && prod.last_14_days) return prod.last_14_days;
+  return prod.last_30_days || prod.last_14_days || prod.last_7_days || prod.today;
+}
+
+export function buildMetricSeries(data: CondensedDashboard | undefined, metric: keyof ProdWindowSummary["summary"]) {
+  const prod = data?.prod;
+  const wins = sortWindows(prod);
+  return wins.map(({ label, win }) => ({ name: label, value: (win.summary as any)[metric] ?? 0 }));
+}
+

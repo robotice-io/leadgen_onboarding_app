@@ -6,10 +6,11 @@ import { PlanComparison } from "@/components/pricing/PlanComparison";
 import { SharedBenefits } from "@/components/pricing/SharedBenefits";
 import { FAQGrowthSection } from "@/components/pricing/FAQGrowthSection";
 import { PricingFinalCTA } from "@/components/pricing/PricingFinalCTA";
+import { MinimalFooter } from "@/components/ui/minimal-footer";
 
 export default function PricingPage() {
 	return (
-		<main className="min-h-screen w-full bg-[#0b1120] text-white">
+		<main className="min-h-screen w-full bg-black text-white">
 			<PricingHero />
 			{/* MiniQuiz / Wizard mejorado */}
 			<GrowthWizard />
@@ -17,6 +18,8 @@ export default function PricingPage() {
 			<SharedBenefits />
 			<FAQGrowthSection />
 			<PricingFinalCTA />
+			{/* Footer (same as landing, includes animations/links) */}
+			<MinimalFooter />
 		</main>
 	);
 }
