@@ -6,6 +6,7 @@ import StepLayout from "@/components/onboarding/StepLayout";
 import { CLIENT_STEPS, nextStepHref, prevStepHref } from "@/components/onboarding/StepperProgress";
 import { useI18n } from "@/lib/i18n";
 import { Input } from "@/components/ui/Input";
+import Select from "@/components/ui/Select";
 
 export default function ClientOnboardingStepPage() {
   const params = useParams<{ step: string }>();
@@ -56,9 +57,9 @@ export default function ClientOnboardingStepPage() {
     <StepLayout title={title} prevHref={step !== "audience" ? prevStepHref(step) : undefined} nextHref={nextStepHref(step)}>
       {step === "audience" && (
         <div className="grid gap-6">
-          <SelectGroup
+          <Select
             label={t("ss.audience.q1")}
-            options={(t("ss.audience.q1.opts") as string).split(",")}
+            options={[("--" as string), ...(t("ss.audience.q1.opts") as string).split(",")]}
             value={local.q1}
             onChange={(v) => setLocal((s) => ({ ...s, q1: v }))}
           />
@@ -112,7 +113,7 @@ export default function ClientOnboardingStepPage() {
             value={local.op2 || ""}
             onChange={(v) => setLocal((s) => ({ ...s, op2: v }))}
           />
-          <SelectGroup
+          <Select
             label={t("ss.operations.q3")}
             options={["Calidad (ticket alto)", "Volumen (más leads)"]}
             value={local.op3}
@@ -123,13 +124,13 @@ export default function ClientOnboardingStepPage() {
 
       {step === "messaging" && (
         <div className="grid gap-6">
-          <SelectGroup
+          <Select
             label={t("ss.messaging.q1")}
             options={(t("ss.messaging.q1.opts") as string).split(",")}
             value={local.m1}
             onChange={(v) => setLocal((s) => ({ ...s, m1: v }))}
           />
-          <SelectGroup
+          <Select
             label={t("ss.messaging.q2")}
             options={(t("ss.messaging.q2.opts") as string).split(",")}
             value={local.m2}
@@ -167,24 +168,4 @@ function TextAreaGroup({ label, value, onChange }: { label: string; value: strin
   );
 }
 
-function SelectGroup({ label, options, value, onChange }: { label: string; options: string[]; value?: string; onChange: (v: string) => void }) {
-  return (
-    <div className="space-y-1">
-      <label className="block text-sm font-medium text-black dark:text-white">{label}</label>
-      <select
-        className="w-full rounded-md border px-3 py-2 outline-none transition-all border-black/10 dark:border-white/15 bg-white dark:bg-black/20"
-        value={value || ""}
-        onChange={(e) => onChange(e.target.value)}
-      >
-        <option value="" disabled>
-          --
-        </option>
-        {options.map((o) => (
-          <option key={o} value={o}>
-            {o}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
+// old SelectGroup removed in favor of custom <Select /> component
