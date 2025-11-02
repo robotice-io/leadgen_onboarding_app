@@ -7,6 +7,49 @@ export type SupportedLang = "es" | "en";
 type Dictionary = Record<string, string>;
 
 const ES: Dictionary = {
+  // Self-serve Onboarding (client wizard)
+  "ss.step.audience": "Público objetivo",
+  "ss.step.offer": "Oferta y posicionamiento",
+  "ss.step.operations": "Operación y capacidad",
+  "ss.step.messaging": "Mensajes y comunicación",
+  "ss.step.summary": "Resumen",
+  "ss.next": "Siguiente",
+  "ss.back": "Atrás",
+  "ss.finish": "Finalizar",
+  "ss.continueToOnboarding": "Continuar al onboarding",
+  // Audience
+  "ss.audience.title": "Público objetivo",
+  "ss.audience.q1": "¿A qué tipo de prospectos quieren llegar?",
+  "ss.audience.q1.opts": "personas naturales,family offices,empresas",
+  "ss.audience.q2": "¿En qué países o regiones enfocarse? ¿Solo Chile o también internacional?",
+  "ss.audience.q3": "¿Cuál es el ticket promedio/mínimo/máximo de inversión que buscan?",
+  "ss.audience.q4": "¿Qué nivel de ingresos o patrimonio debe tener el prospecto ideal?",
+  // Offer & positioning
+  "ss.offer.title": "Oferta y posicionamiento",
+  "ss.offer.q1": "¿Cómo describirían en 2–3 frases su propuesta de valor principal?",
+  "ss.offer.q2": "¿Qué beneficios diferenciales quieren destacar (ej: sostenibilidad, rentabilidad, seguridad)?",
+  "ss.offer.q3": "¿Tienen casos de éxito, métricas o material que podamos usar en el outreach?",
+  // Operations & capacity
+  "ss.operations.title": "Operación y capacidad",
+  "ss.operations.q1": "¿Cuántos clientes nuevos pueden recibir por mes sin afectar la operación?",
+  "ss.operations.q2": "¿Hay restricciones regulatorias o legales en ciertos mercados?",
+  "ss.operations.q3": "¿Prefieren priorizar calidad (ticket alto) o volumen (más leads con tickets menores)?",
+  // Messaging & communication
+  "ss.messaging.title": "Mensajes y comunicación",
+  "ss.messaging.q1": "¿En qué idioma(s) deben enviarse los correos?",
+  "ss.messaging.q1.opts": "español,inglés,ambos",
+  "ss.messaging.q2": "¿Tono de comunicación preferido?",
+  "ss.messaging.q2.opts": "formal,cercano,técnico,comercial",
+  "ss.messaging.q3": "¿Tienen lineamientos de marca o frases clave que debamos incluir?",
+  // Checkout mock pages
+  "checkout.processing.title": "Redirigiendo al pago…",
+  "checkout.processing.subtitle": "Esto tomará unos segundos.",
+  "checkout.success.title": "¡Pago confirmado!",
+  "checkout.success.subtitle": "Tu plan quedó activado. Continuemos.",
+  "checkout.success.cta": "Ir al onboarding",
+  "checkout.cancel.title": "Pago cancelado",
+  "checkout.cancel.subtitle": "Puedes intentarlo nuevamente cuando quieras.",
+  "checkout.cancel.cta": "Volver a precios",
   // Common
   "common.openMenu": "Abrir menú",
   "common.search": "Buscar",
@@ -560,6 +603,49 @@ const ES: Dictionary = {
 };
 
 const EN: Dictionary = {
+  // Self-serve Onboarding (client wizard)
+  "ss.step.audience": "Target audience",
+  "ss.step.offer": "Offer & positioning",
+  "ss.step.operations": "Operations & capacity",
+  "ss.step.messaging": "Messaging & communication",
+  "ss.step.summary": "Summary",
+  "ss.next": "Next",
+  "ss.back": "Back",
+  "ss.finish": "Finish",
+  "ss.continueToOnboarding": "Continue to onboarding",
+  // Audience
+  "ss.audience.title": "Target audience",
+  "ss.audience.q1": "What type of prospects do you want to reach?",
+  "ss.audience.q1.opts": "individuals,family offices,companies",
+  "ss.audience.q2": "Which countries or regions to focus on? Chile only or also international?",
+  "ss.audience.q3": "What investment ticket (avg/min/max) are you targeting?",
+  "ss.audience.q4": "What income level or net worth should the ideal prospect have?",
+  // Offer & positioning
+  "ss.offer.title": "Offer & positioning",
+  "ss.offer.q1": "How would you describe your core value proposition in 2–3 sentences?",
+  "ss.offer.q2": "Which differentiating benefits to highlight (e.g., sustainability, profitability, security)?",
+  "ss.offer.q3": "Do you have success stories, metrics, or materials we can use for outreach?",
+  // Operations & capacity
+  "ss.operations.title": "Operations & capacity",
+  "ss.operations.q1": "How many new clients can you onboard per month without straining operations?",
+  "ss.operations.q2": "Are there regulatory/legal restrictions in certain markets?",
+  "ss.operations.q3": "Do you prefer to prioritize quality (higher ticket) or volume (more leads with lower tickets)?",
+  // Messaging & communication
+  "ss.messaging.title": "Messaging & communication",
+  "ss.messaging.q1": "In which language(s) should emails be sent?",
+  "ss.messaging.q1.opts": "Spanish,English,both",
+  "ss.messaging.q2": "Preferred communication tone?",
+  "ss.messaging.q2.opts": "formal,warm,technical,commercial",
+  "ss.messaging.q3": "Any brand guidelines or key phrases we should include?",
+  // Checkout mock pages
+  "checkout.processing.title": "Redirecting to payment…",
+  "checkout.processing.subtitle": "This will only take a few seconds.",
+  "checkout.success.title": "Payment confirmed!",
+  "checkout.success.subtitle": "Your plan is active. Let's continue.",
+  "checkout.success.cta": "Go to onboarding",
+  "checkout.cancel.title": "Payment canceled",
+  "checkout.cancel.subtitle": "You can try again anytime.",
+  "checkout.cancel.cta": "Back to pricing",
   // Common
   "common.openMenu": "Open menu",
   "common.search": "Search",
