@@ -10,8 +10,10 @@ export default function ClientOnboardingLayout({ children }: { children: React.R
           <StepperProgress />
         </div>
       </div>
-      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 md:px-8 mt-6 pb-10">
-        {children}
+      <div className="mx-auto w-full max-w-5xl px-4 sm:px-6 md:px-8">
+        <div className="min-h-[calc(100vh-110px)] grid place-items-start md:place-items-center py-10 md:py-16 lg:py-20">
+          <div className="w-full">{children}</div>
+        </div>
       </div>
     </div>
   );

@@ -35,7 +35,7 @@ export function PricingFinalCTA() {
           className="mt-8 flex flex-col sm:flex-row gap-4 justify-center"
         >
           <Link
-            href="/checkout/processing?plan=starter"
+            href="/register?next=/precheckout/survey&plan=starter"
             className="inline-flex items-center justify-center px-8 py-3 rounded-full bg-blue-600 hover:bg-blue-500 font-semibold text-white shadow-[0_10px_30px_-15px_rgba(49,84,240,0.8)]"
           >
             {t("pricing.finalCta.primary")}

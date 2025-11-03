@@ -152,13 +152,12 @@ export function PlanComparison() {
         <div className="px-3 py-3" />
         {plans.map((p) => (
           <div key={`cta-${p.key}`} className="px-3 py-3 border-t border-l border-white/10 flex items-center justify-center">
-            <button
-              type="button"
-              onClick={openCalendly}
+            <a
+              href={`/register?next=/precheckout/survey&plan=${p.key}`}
               className="inline-flex items-center justify-center px-3 py-2 rounded-full bg-blue-600 hover:bg-blue-500 font-semibold text-white text-sm"
             >
               {ctaLabel(p.key)}
-            </button>
+            </a>
           </div>
         ))}
       </div>
@@ -242,13 +241,12 @@ export function PlanComparison() {
               </div>
             ))}
             <div className="pt-5">
-              <button
-                type="button"
-                onClick={openCalendly}
+              <a
+                href={`/register?next=/precheckout/survey&plan=${p.key}`}
                 className="inline-flex items-center justify-center w-full px-4 py-2.5 rounded-full bg-blue-600 hover:bg-blue-500 font-semibold text-white"
               >
                 {ctaLabel(p.key)}
-              </button>
+              </a>
             </div>
           </div>
         </div>

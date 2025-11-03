@@ -35,7 +35,7 @@ export default function StepLayout({
   const backLabel = backLabelKey ? (t as any)(backLabelKey) : t("ss.back");
 
   return (
-    <div className="bg-white/90 dark:bg-black/30 backdrop-blur rounded-xl shadow-sm border border-black/5 dark:border-white/10 p-6 sm:p-8">
+    <div className="bg-white/90 dark:bg-black/30 backdrop-blur rounded-xl shadow-sm border border-black/5 dark:border-white/10 p-6 sm:p-8 max-w-3xl mx-auto w-full">
       <div className="mb-6">
         <h2 className="text-2xl font-semibold mb-2">{title}</h2>
         {description && (

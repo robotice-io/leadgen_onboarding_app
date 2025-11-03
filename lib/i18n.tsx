@@ -44,12 +44,25 @@ const ES: Dictionary = {
   // Checkout mock pages
   "checkout.processing.title": "Redirigiendo al pago…",
   "checkout.processing.subtitle": "Esto tomará unos segundos.",
+  // Checkout page (pre-mercado-pago)
+  "checkout.page.title": "Revisa tu plan",
+  "checkout.page.subtitle": "Estos son los detalles del plan seleccionado. Luego podrás completar el pago con Mercado Pago.",
+  "checkout.plan.features": "Características incluidas",
+  "checkout.brick.placeholder": "Aquí irá el Checkout Brick de Mercado Pago",
+  "checkout.secured.by": "Pago seguro con Mercado Pago",
   "checkout.success.title": "¡Pago confirmado!",
   "checkout.success.subtitle": "Tu plan quedó activado. Continuemos.",
   "checkout.success.cta": "Ir al onboarding",
   "checkout.cancel.title": "Pago cancelado",
   "checkout.cancel.subtitle": "Puedes intentarlo nuevamente cuando quieras.",
   "checkout.cancel.cta": "Volver a precios",
+  // Pre‑checkout survey
+  "survey.title": "Queremos conocerte",
+  "survey.subtitle": "Cuéntanos cómo llegaste y podremos ayudarte mejor.",
+  "survey.where": "¿Dónde nos encontraste?",
+  "survey.industry": "¿Qué describe mejor tu industria?",
+  "survey.size": "Tamaño de tu empresa",
+  "survey.next": "Continuar",
   // Common
   "common.openMenu": "Abrir menú",
   "common.search": "Buscar",
@@ -640,12 +653,25 @@ const EN: Dictionary = {
   // Checkout mock pages
   "checkout.processing.title": "Redirecting to payment…",
   "checkout.processing.subtitle": "This will only take a few seconds.",
+  // Checkout page (pre-mercado-pago)
+  "checkout.page.title": "Review your plan",
+  "checkout.page.subtitle": "Here are the details of your selected plan. Then you can complete the payment with Mercado Pago.",
+  "checkout.plan.features": "Included features",
+  "checkout.brick.placeholder": "Mercado Pago Checkout Brick will render here",
+  "checkout.secured.by": "Payment secured by Mercado Pago",
   "checkout.success.title": "Payment confirmed!",
   "checkout.success.subtitle": "Your plan is active. Let's continue.",
   "checkout.success.cta": "Go to onboarding",
   "checkout.cancel.title": "Payment canceled",
   "checkout.cancel.subtitle": "You can try again anytime.",
   "checkout.cancel.cta": "Back to pricing",
+  // Pre‑checkout survey
+  "survey.title": "Let's get to know you",
+  "survey.subtitle": "Tell us how you found us so we can help you better.",
+  "survey.where": "Where did you find us?",
+  "survey.industry": "What best describes your industry?",
+  "survey.size": "Company size",
+  "survey.next": "Continue",
   // Common
   "common.openMenu": "Open menu",
   "common.search": "Search",

@@ -32,7 +32,8 @@ export function StepperProgress() {
   }, [pathname]);
 
   return (
-    <div className="flex items-center justify-center gap-6 py-3">
+    <div className="py-3 overflow-x-auto no-scrollbar">
+      <div className="flex items-center justify-start md:justify-center gap-6 min-w-max">
       {CLIENT_STEPS.map((step, idx) => {
         const active = idx === currentIndex;
         const completed = idx < currentIndex;
@@ -50,7 +51,7 @@ export function StepperProgress() {
             >
               {idx + 1}
             </div>
-            <span className={"text-sm " + (active ? "font-medium" : "text-black/60 dark:text-white/60")}>
+            <span className={"text-sm hidden sm:inline " + (active ? "font-medium" : "text-black/60 dark:text-white/60")}>
               {labelFor(step, t)}
             </span>
             {idx < CLIENT_STEPS.length - 1 && (
@@ -59,6 +60,7 @@ export function StepperProgress() {
           </div>
         );
       })}
+      </div>
     </div>
   );
 }
