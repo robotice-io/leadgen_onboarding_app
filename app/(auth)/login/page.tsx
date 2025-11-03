@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardHeader, CardBody, CardFooter } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
@@ -12,6 +12,7 @@ import { useI18n } from "@/lib/i18n";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { t } = useI18n();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -30,9 +31,14 @@ export default function LoginPage() {
       await login(email, password);
       setToast({ message: t("login.success"), type: "success" });
       
-      // Small delay to show success message, then redirect
+      // After login, go to next if provided, else post-login
+      const next = searchParams.get("next");
       setTimeout(() => {
-        window.location.href = "/post-login";
+        if (next && /^\//.test(next)) {
+          window.location.href = next;
+        } else {
+          window.location.href = "/post-login";
+        }
       }, 800);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Login failed";

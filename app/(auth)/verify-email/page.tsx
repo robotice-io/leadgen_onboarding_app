@@ -76,8 +76,9 @@ function VerifyEmailForm() {
   useEffect(() => {
     if (verified) {
       const id = setTimeout(() => {
-        router.push("/login");
-      }, 1500);
+        // Send user to login with next to onboarding, so after login they land in the wizard
+        router.push("/login?next=/onboarding");
+      }, 1200);
       return () => clearTimeout(id);
     }
   }, [verified, router]);
