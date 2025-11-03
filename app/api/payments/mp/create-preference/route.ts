@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import mercadopago, { PreferenceCreatePayload } from "mercadopago";
+import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export const runtime = "nodejs";
 
@@ -30,7 +30,10 @@ const PLANS: Record<string, { title: string; currency: string; amount: number }>
 export async function POST(req: NextRequest) {
   try {
     const accessToken = assertEnv("MP_ACCESS_TOKEN", process.env.MP_ACCESS_TOKEN);
-    mercadopago.configure({ access_token: accessToken, integrator_id: process.env.MP_INTEGRATOR_ID });
+    const client = new MercadoPagoConfig({
+      accessToken,
+      options: { integratorId: process.env.MP_INTEGRATOR_ID },
+    });
 
     const body = await req.json().catch(() => ({}));
     const plan: string = body?.plan || "starter";
@@ -42,7 +45,7 @@ export async function POST(req: NextRequest) {
     const notifUrl = `${base}/api/payments/mp/webhook`;
 
     const meta = PLANS[plan] || PLANS.starter;
-    const preference: PreferenceCreatePayload = {
+    const preferenceBody = {
       items: [
         {
           title: meta.title,
@@ -57,7 +60,7 @@ export async function POST(req: NextRequest) {
         pending: `${base}/checkout/processing`,
         failure: `${base}/checkout/cancel`,
       },
-      auto_return: "approved",
+      auto_return: "approved" as const,
       notification_url: notifUrl,
       metadata: {
         plan,
@@ -65,9 +68,10 @@ export async function POST(req: NextRequest) {
       },
     };
 
-    const res = await mercadopago.preferences.create(preference as any);
+    const preference = new Preference(client);
+    const res = await preference.create({ body: preferenceBody as any });
     return new Response(
-      JSON.stringify({ id: res.body.id, init_point: res.body.init_point, sandbox_init_point: res.body.sandbox_init_point }),
+      JSON.stringify({ id: (res as any).id, init_point: (res as any).init_point, sandbox_init_point: (res as any).sandbox_init_point }),
       { status: 200, headers: { "content-type": "application/json" } }
     );
   } catch (e: any) {

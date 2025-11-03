@@ -1,5 +1,5 @@
 import { NextRequest } from "next/server";
-import mercadopago from "mercadopago";
+import { MercadoPagoConfig, Payment } from "mercadopago";
 
 export const runtime = "nodejs";
 
@@ -15,13 +15,17 @@ export async function POST(req: NextRequest) {
   try {
     const accessToken = process.env.MP_ACCESS_TOKEN;
     if (!accessToken) throw new Error("Missing MP_ACCESS_TOKEN");
-    mercadopago.configure({ access_token: accessToken, integrator_id: process.env.MP_INTEGRATOR_ID });
+    const client = new MercadoPagoConfig({
+      accessToken,
+      options: { integratorId: process.env.MP_INTEGRATOR_ID },
+    });
 
     if (topic.includes("payment") && dataId) {
       // Fetch payment detail to confirm status
-      const payment = await mercadopago.payment.findById(Number(dataId)).catch(() => null);
-      const status = (payment as any)?.body?.status || (payment as any)?.response?.status;
-      const metadata = (payment as any)?.body?.metadata || {};
+      const paymentResource = new Payment(client);
+      const payment = await paymentResource.get({ id: String(dataId) }).catch(() => null as any);
+      const status = (payment as any)?.status;
+      const metadata = (payment as any)?.metadata || {};
       // TODO: persist order/tenant status in your DB using metadata.tenant_id
       console.log("[MP webhook] payment", { id: dataId, status, metadata });
     } else {
