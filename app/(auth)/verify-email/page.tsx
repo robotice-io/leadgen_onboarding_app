@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardHeader, CardBody, CardFooter } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
 import { Toast } from "@/components/ui/Toast";
 import { Mail, CheckCircle, KeyRound } from "lucide-react";
 import { verifyEmail } from "@/lib/auth-client";
@@ -20,7 +21,7 @@ function VerifyEmailForm() {
   const [resending, setResending] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [tokenInUrl, setTokenInUrl] = useState<boolean>(false);
-  const [emailFromSignup, setEmailFromSignup] = useState<string>("");
+  const [codeInput, setCodeInput] = useState<string>("");
   const [pending, setPending] = useState<boolean>(false);
 
   // Check if verification code is in URL parameters
@@ -28,43 +29,31 @@ function VerifyEmailForm() {
     const code = searchParams.get('token') || searchParams.get('code');
     const p = searchParams.get('pending');
     setPending(!!p);
+
+    // Persist params into state/inputs
     if (code) {
       setTokenInUrl(true);
       setVerificationCode(code);
-      let stored = "";
-      try {
-        stored = sessionStorage.getItem('signup_email') || localStorage.getItem('signup_email') || "";
-        setEmailFromSignup(stored);
-      } catch {}
-      // Use the stored value directly to avoid race with setState
-      if (stored) {
-        handleVerify(code, stored);
-      }
-    } else {
-      try {
-        const stored = sessionStorage.getItem('signup_email') || localStorage.getItem('signup_email') || "";
-        setEmailFromSignup(stored);
-      } catch {}
+      setCodeInput(code);
+    }
+    // Auto‑verify when we have code only (email not required)
+    if (code) {
+      handleVerify(code);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  async function handleVerify(code?: string, email?: string) {
-    const codeToUse = code || verificationCode;
+  async function handleVerify(code?: string) {
+    const codeToUse = code || verificationCode || codeInput;
     if (!codeToUse) {
       setToast({ message: "Please enter a verification code", type: "error" });
-      return;
-    }
-    const emailToUse = email || emailFromSignup;
-    if (!emailToUse) {
-      setToast({ message: "Missing signup email to verify", type: "error" });
       return;
     }
 
     setVerifying(true);
     
     try {
-  const response = await verifyEmail(codeToUse, emailToUse);
+  const response = await verifyEmail(codeToUse);
       
       setVerified(true);
       setToast({ 
@@ -110,14 +99,14 @@ function VerifyEmailForm() {
           <h1 className="text-2xl font-semibold text-center mb-2">
             {verified
               ? t("verify.title.success" as any)
-              : tokenInUrl
+              : (verifying || tokenInUrl)
                 ? t("verify.verifying.title" as any)
                 : t("verify.title" as any)}
           </h1>
           <p className="text-sm text-black/60 dark:text-white/70 text-center">
             {verified
               ? t("verify.subtitle.success" as any)
-              : tokenInUrl
+              : (verifying || tokenInUrl)
                 ? t("verify.verifying.subtitle" as any)
                 : t("verify.subtitle" as any)}
           </p>
@@ -147,18 +136,23 @@ function VerifyEmailForm() {
             </div>
           ) : (
             <div className="space-y-5">
+              {/* Case A: User opened direct link (has token), but we DON'T have the email. Ask for it. */}
               {!tokenInUrl ? (
+                // Case B: No token param; allow manual code + email verification
                 <>
-                  <div className="text-center space-y-2">
-                    <h2 className="text-xl font-semibold">{t("verify.title" as any)}</h2>
-                    <p className="text-sm text-black/60 dark:text-white/70">
-                      {t("verify.subtitle" as any)}
-                    </p>
-                    {emailFromSignup && (
-                      <p className="text-sm text-black/70 dark:text-white/80">
-                        <span className="font-medium">{emailFromSignup}</span>
-                      </p>
-                    )}
+                  <div className="space-y-3">
+                    <Input
+                      label={t("verify.code.label" as any)}
+                      placeholder={t("verify.code.placeholder" as any)}
+                      value={codeInput}
+                      onChange={(e) => {
+                        setCodeInput(e.target.value);
+                        setVerificationCode(e.target.value);
+                      }}
+                    />
+                    <Button onClick={() => handleVerify()} loading={verifying} className="w-full">
+                      {t("verify.verifying.title" as any)}
+                    </Button>
                   </div>
                   <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                     <div className="flex gap-3">
@@ -189,6 +183,7 @@ function VerifyEmailForm() {
                   </div>
                 </>
               ) : (
+                // Case C: token present; we are auto-verifying, just show message
                 <div className="text-center py-6">
                   <p className="text-sm text-black/60 dark:text-white/70">
                     {t("verify.verifying.subtitle" as any)}

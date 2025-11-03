@@ -335,13 +335,14 @@ export async function register(
   return response;
 }
 
-export async function verifyEmail(verificationCode: string, email: string): Promise<any> {
+export async function verifyEmail(verificationCode: string): Promise<any> {
   // Force proxy for verify-email to ensure server API key is used
   const url = getRequestUrl("/api/v1/auth/verify-email", true);
   const res = await fetch(url, {
     method: "POST",
     headers: buildHeaders(true),
-    body: JSON.stringify({ verification_code: verificationCode, email }),
+    // Backend expects only the token
+    body: JSON.stringify({ token: verificationCode }),
   });
 
   if (!res.ok) {
