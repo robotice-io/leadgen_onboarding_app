@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardHeader, CardBody, CardFooter } from "@/components/ui/Card";
@@ -10,7 +10,7 @@ import { Toast } from "@/components/ui/Toast";
 import { login } from "@/lib/auth-client";
 import { useI18n } from "@/lib/i18n";
 
-export default function LoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useI18n();
@@ -138,5 +138,13 @@ export default function LoginPage() {
         />
       )}
     </>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="p-6 text-center text-sm text-black/60 dark:text-white/70">Loading…</div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
