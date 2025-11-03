@@ -22,6 +22,8 @@ function VerifyEmailForm() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [tokenInUrl, setTokenInUrl] = useState<boolean>(false);
   const [codeInput, setCodeInput] = useState<string>("");
+  const [emailInput, setEmailInput] = useState<string>("");
+  const [showEmailField, setShowEmailField] = useState<boolean>(false);
   const [pending, setPending] = useState<boolean>(false);
 
   // Check if verification code is in URL parameters
@@ -53,18 +55,20 @@ function VerifyEmailForm() {
     setVerifying(true);
     
     try {
-  const response = await verifyEmail(codeToUse);
+  const response = await verifyEmail(codeToUse, emailInput || undefined);
       
       setVerified(true);
       setToast({ 
         message: response.message || t("verify.success" as any), 
         type: "success" 
       });
+      setShowEmailField(false);
     } catch (err) {
-      setToast({ 
-        message: err instanceof Error ? err.message : t("verify.failed" as any), 
-        type: "error" 
-      });
+      const msg = err instanceof Error ? err.message : t("verify.failed" as any);
+      setToast({ message: msg, type: "error" });
+      if (/email required/i.test(String(msg))) {
+        setShowEmailField(true);
+      }
     } finally {
       setVerifying(false);
     }
@@ -150,6 +154,13 @@ function VerifyEmailForm() {
                         setVerificationCode(e.target.value);
                       }}
                     />
+                    <Input
+                      label="Email"
+                      type="email"
+                      placeholder="you@example.com"
+                      value={emailInput}
+                      onChange={(e) => setEmailInput(e.target.value)}
+                    />
                     <Button onClick={() => handleVerify()} loading={verifying} className="w-full">
                       {t("verify.verifying.title" as any)}
                     </Button>
@@ -188,6 +199,20 @@ function VerifyEmailForm() {
                   <p className="text-sm text-black/60 dark:text-white/70">
                     {t("verify.verifying.subtitle" as any)}
                   </p>
+                  {showEmailField && (
+                    <div className="mt-4 max-w-md mx-auto space-y-3">
+                      <Input
+                        label="Email"
+                        type="email"
+                        placeholder="you@example.com"
+                        value={emailInput}
+                        onChange={(e) => setEmailInput(e.target.value)}
+                      />
+                      <Button onClick={() => handleVerify()} loading={verifying} className="w-full">
+                        {t("verify.verifying.title" as any)}
+                      </Button>
+                    </div>
+                  )}
                 </div>
               )}
             </div>

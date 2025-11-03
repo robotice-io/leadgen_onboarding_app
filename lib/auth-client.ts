@@ -335,10 +335,31 @@ export async function register(
   return response;
 }
 
-export async function verifyEmail(verificationCode: string): Promise<any> {
+function getEmailFromContext(): string | "" {
+  try {
+    // 1) URL param
+    const url = typeof window !== "undefined" ? new URL(window.location.href) : null;
+    const pEmail = url?.searchParams.get("email");
+    if (pEmail) return pEmail;
+    // 2) signup helper storages
+    const ss = typeof window !== "undefined" ? window.sessionStorage?.getItem("signup_email") : "";
+    if (ss) return ss;
+    const ls = typeof window !== "undefined" ? window.localStorage?.getItem("signup_email") : "";
+    if (ls) return ls;
+    // 3) stored user
+    const userStr = typeof window !== "undefined" ? window.localStorage?.getItem("robotice_user") : null;
+    if (userStr) {
+      try { const u = JSON.parse(userStr); if (u?.email) return String(u.email); } catch {}
+    }
+  } catch {}
+  return "";
+}
+
+export async function verifyEmail(verificationCode: string, email?: string): Promise<any> {
   // Force proxy for verify-email to ensure server API key is used
   const url = getRequestUrl("/api/v1/auth/verify-email", true);
-  const res = await fetch(url, {
+  // Attempt 1: token-only (new backend shape)
+  let res = await fetch(url, {
     method: "POST",
     headers: buildHeaders(true),
     // Backend expects only the token
@@ -350,12 +371,37 @@ export async function verifyEmail(verificationCode: string): Promise<any> {
       throw new Error("[429] Too many attempts. Try again in a minute.");
     }
     const errorText = await res.text();
-    let errorMessage = "Email verification failed";
-    try {
-      const errorJson = JSON.parse(errorText);
-      errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
-    } catch {}
-    throw new Error(`[${res.status}] ${errorMessage}`);
+    let errorJson: any = null;
+    try { errorJson = JSON.parse(errorText); } catch {}
+
+    const details = Array.isArray(errorJson?.detail) ? errorJson.detail : [];
+    const needsEmail = details.some((d: any) => (d?.loc || []).join("/").includes("email"));
+    const needsVerificationCode = details.some((d: any) => (d?.loc || []).join("/").includes("verification_code"));
+
+    // Attempt 2: fallback to legacy body { verification_code, email }
+    const fallbackEmail = email || getEmailFromContext();
+    if (needsEmail || needsVerificationCode) {
+      if (!fallbackEmail) {
+        throw new Error("Email required to verify. Please enter your email.");
+      }
+      res = await fetch(url, {
+        method: "POST",
+        headers: buildHeaders(true),
+        body: JSON.stringify({ verification_code: verificationCode, email: fallbackEmail }),
+      });
+      if (!res.ok) {
+        const et = await res.text();
+        let msg = "Email verification failed";
+        try { const ej = JSON.parse(et); msg = ej?.detail || ej?.message || msg; } catch {}
+        throw new Error(`[${res.status}] ${msg}`);
+      }
+    } else {
+      let errorMessage = "Email verification failed";
+      try {
+        errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
+      } catch {}
+      throw new Error(`[${res.status}] ${errorMessage}`);
+    }
   }
 
   // Return the verification response for UI feedback
