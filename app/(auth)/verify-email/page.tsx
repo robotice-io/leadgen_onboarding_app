@@ -4,7 +4,6 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardHeader, CardBody, CardFooter } from "@/components/ui/Card";
-import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
 import { Mail, CheckCircle, KeyRound } from "lucide-react";
@@ -73,6 +72,16 @@ function VerifyEmailForm() {
     }
   }
 
+  // Auto-redirect to login after successful verification
+  useEffect(() => {
+    if (verified) {
+      const id = setTimeout(() => {
+        router.push("/login");
+      }, 1500);
+      return () => clearTimeout(id);
+    }
+  }, [verified, router]);
+
   return (
     <>
       <Card>
@@ -89,13 +98,18 @@ function VerifyEmailForm() {
             </div>
           </div>
           <h1 className="text-2xl font-semibold text-center mb-2">
-            {verified ? t("verify.title.success" as any) : t("verify.title" as any)}
+            {verified
+              ? t("verify.title.success" as any)
+              : tokenInUrl
+                ? t("verify.verifying.title" as any)
+                : t("verify.title" as any)}
           </h1>
           <p className="text-sm text-black/60 dark:text-white/70 text-center">
-            {verified 
+            {verified
               ? t("verify.subtitle.success" as any)
-              : t("verify.subtitle" as any)
-            }
+              : tokenInUrl
+                ? t("verify.verifying.subtitle" as any)
+                : t("verify.subtitle" as any)}
           </p>
         </CardHeader>
 
@@ -123,44 +137,52 @@ function VerifyEmailForm() {
             </div>
           ) : (
             <div className="space-y-5">
-              <div className="text-center space-y-2">
-                <h2 className="text-xl font-semibold">{t("verify.title" as any)}</h2>
-                <p className="text-sm text-black/60 dark:text-white/70">
-                  {pending ? t("verify.subtitle" as any) : t("verify.subtitle" as any)}
-                </p>
-                {emailFromSignup && (
-                  <p className="text-sm text-black/70 dark:text-white/80">
-                    <span className="font-medium">{emailFromSignup}</span>
-                  </p>
-                )}
-              </div>
-              <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                <div className="flex gap-3">
-                  <KeyRound className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                  <div className="text-sm text-blue-900 dark:text-blue-100">
-                    <p className="font-medium mb-1">{t("verify.how.title" as any)}</p>
-                    <ol className="list-decimal list-inside space-y-1 text-blue-800 dark:text-blue-200">
-                      <li>{t("verify.how.s1" as any)}</li>
-                      <li>{t("verify.how.s2" as any)}</li>
-                      <li>{t("verify.how.s3" as any)}</li>
-                    </ol>
+              {!tokenInUrl ? (
+                <>
+                  <div className="text-center space-y-2">
+                    <h2 className="text-xl font-semibold">{t("verify.title" as any)}</h2>
+                    <p className="text-sm text-black/60 dark:text-white/70">
+                      {t("verify.subtitle" as any)}
+                    </p>
+                    {emailFromSignup && (
+                      <p className="text-sm text-black/70 dark:text-white/80">
+                        <span className="font-medium">{emailFromSignup}</span>
+                      </p>
+                    )}
                   </div>
-                </div>
-              </div>
-              {!tokenInUrl && (
-                <div className="text-center">
-                  <p className="text-sm text-black/60 dark:text-white/70 mb-3">
-                    {t("verify.resend.prompt" as any)}
+                  <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
+                    <div className="flex gap-3">
+                      <KeyRound className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                      <div className="text-sm text-blue-900 dark:text-blue-100">
+                        <p className="font-medium mb-1">{t("verify.how.title" as any)}</p>
+                        <ol className="list-decimal list-inside space-y-1 text-blue-800 dark:text-blue-200">
+                          <li>{t("verify.how.s1" as any)}</li>
+                          <li>{t("verify.how.s2" as any)}</li>
+                          <li>{t("verify.how.s3" as any)}</li>
+                        </ol>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-sm text-black/60 dark:text-white/70 mb-3">
+                      {t("verify.resend.prompt" as any)}
+                    </p>
+                    <Button
+                      variant="outline"
+                      onClick={() => {
+                        setToast({ message: t("verify.resend.soon" as any), type: "error" });
+                      }}
+                      loading={resending}
+                    >
+                      {t("verify.resend.cta" as any)}
+                    </Button>
+                  </div>
+                </>
+              ) : (
+                <div className="text-center py-6">
+                  <p className="text-sm text-black/60 dark:text-white/70">
+                    {t("verify.verifying.subtitle" as any)}
                   </p>
-                  <Button
-                    variant="outline"
-                    onClick={() => {
-                      setToast({ message: t("verify.resend.soon" as any), type: "error" });
-                    }}
-                    loading={resending}
-                  >
-                    {t("verify.resend.cta" as any)}
-                  </Button>
                 </div>
               )}
             </div>
