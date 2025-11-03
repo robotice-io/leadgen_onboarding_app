@@ -358,12 +358,15 @@ function getEmailFromContext(): string | "" {
 export async function verifyEmail(verificationCode: string, email?: string): Promise<any> {
   // Force proxy for verify-email to ensure server API key is used
   const url = getRequestUrl("/api/v1/auth/verify-email", true);
-  // Attempt 1: token-only (new backend shape)
-  let res = await fetch(url, {
+  // Always send the backend-required payload: { email, verification_code }
+  const resolvedEmail = email || getEmailFromContext();
+  if (!resolvedEmail) {
+    throw new Error("Email required to verify. Please enter your email.");
+  }
+  const res = await fetch(url, {
     method: "POST",
     headers: buildHeaders(true),
-    // Backend expects only the token
-    body: JSON.stringify({ token: verificationCode }),
+    body: JSON.stringify({ verification_code: verificationCode, email: resolvedEmail }),
   });
 
   if (!res.ok) {
@@ -371,37 +374,12 @@ export async function verifyEmail(verificationCode: string, email?: string): Pro
       throw new Error("[429] Too many attempts. Try again in a minute.");
     }
     const errorText = await res.text();
-    let errorJson: any = null;
-    try { errorJson = JSON.parse(errorText); } catch {}
-
-    const details = Array.isArray(errorJson?.detail) ? errorJson.detail : [];
-    const needsEmail = details.some((d: any) => (d?.loc || []).join("/").includes("email"));
-    const needsVerificationCode = details.some((d: any) => (d?.loc || []).join("/").includes("verification_code"));
-
-    // Attempt 2: fallback to legacy body { verification_code, email }
-    const fallbackEmail = email || getEmailFromContext();
-    if (needsEmail || needsVerificationCode) {
-      if (!fallbackEmail) {
-        throw new Error("Email required to verify. Please enter your email.");
-      }
-      res = await fetch(url, {
-        method: "POST",
-        headers: buildHeaders(true),
-        body: JSON.stringify({ verification_code: verificationCode, email: fallbackEmail }),
-      });
-      if (!res.ok) {
-        const et = await res.text();
-        let msg = "Email verification failed";
-        try { const ej = JSON.parse(et); msg = ej?.detail || ej?.message || msg; } catch {}
-        throw new Error(`[${res.status}] ${msg}`);
-      }
-    } else {
-      let errorMessage = "Email verification failed";
-      try {
-        errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
-      } catch {}
-      throw new Error(`[${res.status}] ${errorMessage}`);
-    }
+    let errorMessage = "Email verification failed";
+    try {
+      const errorJson = JSON.parse(errorText);
+      errorMessage = errorJson?.detail || errorJson?.message || errorMessage;
+    } catch {}
+    throw new Error(`[${res.status}] ${errorMessage}`);
   }
 
   // Return the verification response for UI feedback
