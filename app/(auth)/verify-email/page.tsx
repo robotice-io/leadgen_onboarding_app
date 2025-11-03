@@ -76,9 +76,9 @@ function VerifyEmailForm() {
   useEffect(() => {
     if (verified) {
       const id = setTimeout(() => {
-        // Send user to login with next to onboarding, so after login they land in the wizard
-        router.push("/login?next=/onboarding");
-      }, 1200);
+        // After successful email verification, go straight to pre‑checkout survey
+        router.push("/precheckout/survey");
+      }, 600);
       return () => clearTimeout(id);
     }
   }, [verified, router]);
