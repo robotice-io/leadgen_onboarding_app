@@ -288,23 +288,33 @@ export async function login(email: string, password: string): Promise<AuthTokens
   return { access_token: "", token_type: "api-key" } as AuthTokens;
 }
 
+export type RegisterRequest = {
+  email: string;
+  password: string;
+  business_name?: string;
+  first_name?: string;
+  last_name?: string;
+};
+
 export async function register(
-  email: string, 
-  password: string, 
+  email: string,
+  password: string,
   firstName?: string,
-  lastName?: string
+  lastName?: string,
+  businessName?: string
 ): Promise<any> {
   // Force proxy for register to ensure server API key is used
   const url = getRequestUrl("/api/v1/auth/register", true);
   const res = await fetch(url, {
     method: "POST",
     headers: buildHeaders(true),
-    body: JSON.stringify({ 
-      email, 
+    body: JSON.stringify({
+      email,
       password,
+      business_name: businessName,
       first_name: firstName,
-      last_name: lastName
-    }),
+      last_name: lastName,
+    } as RegisterRequest),
   });
 
   if (!res.ok) {

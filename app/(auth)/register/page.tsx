@@ -28,9 +28,13 @@ export default function RegisterPage() {
     const confirmPassword = formData.get("confirmPassword") as string;
     const firstName = formData.get("firstName") as string;
     const lastName = formData.get("lastName") as string;
+    const businessName = formData.get("businessName") as string;
 
     // Validation
     const newErrors: Record<string, string> = {};
+    if (!businessName || !businessName.trim()) {
+      newErrors.businessName = t("register.error.businessNameRequired" as any);
+    }
     
     if (password.length < 8) {
       newErrors.password = t("register.error.passwordMin" as any);
@@ -47,12 +51,19 @@ export default function RegisterPage() {
     }
 
     try {
-      const response = await register(email, password, firstName, lastName);
+      const response = await register(email, password, firstName, lastName, businessName);
       
       setToast({ 
         message: response.message || t("register.success" as any), 
         type: "success" 
       });
+      // Persist helpers for verification and (optionally) onboarding
+      try {
+        sessionStorage.setItem("signup_email", email);
+        if (response?.tenant_id != null) {
+          sessionStorage.setItem("tenant_id", String(response.tenant_id));
+        }
+      } catch {}
       
       setTimeout(() => {
         try { sessionStorage.setItem("signup_email", email); } catch {}
@@ -94,6 +105,16 @@ export default function RegisterPage() {
                 autoComplete="family-name"
               />
             </div>
+
+            <Input
+              name="businessName"
+              type="text"
+              label={t("register.businessName" as any)}
+              placeholder={t("register.businessName.placeholder" as any)}
+              required
+              autoComplete="organization"
+              error={errors.businessName}
+            />
 
             <Input
               name="email"
