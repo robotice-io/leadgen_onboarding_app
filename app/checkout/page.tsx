@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { useI18n } from "@/lib/i18n";
 
 type PlanKey = "starter" | "core" | "pro" | "enterprise";
@@ -15,6 +16,38 @@ export default function CheckoutPage() {
   } catch {}
 
   const planMeta = useMemo(() => getPlanMeta(plan, lang), [plan, lang]);
+
+  const [prefId, setPrefId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const inited = useRef(false);
+
+  useEffect(() => {
+    const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY;
+    if (!pk) {
+      setError("Mercado Pago not configured");
+      return;
+    }
+    if (!inited.current) {
+      try { initMercadoPago(pk, { locale: lang === "es" ? "es-CL" : "es-CL" }); } catch {}
+      inited.current = true;
+    }
+
+    (async () => {
+      try {
+        setError(null);
+        const res = await fetch("/api/payments/mp/create-preference", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ plan }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || "Failed to create preference");
+        setPrefId(String(data.id));
+      } catch (e: any) {
+        setError(e?.message || "Failed to initialize payment");
+      }
+    })();
+  }, [plan, lang]);
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -50,14 +83,19 @@ export default function CheckoutPage() {
             </div>
           </section>
 
-          {/* MP Brick placeholder */}
-          <section className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-6 md:p-8">
-            <div className="min-h-[360px] grid place-items-center text-center">
-              <div>
-                <div id="mp-checkout-brick" className="h-[280px] w-full" />
-                <p className="text-white/60 text-sm mt-4">{t("checkout.brick.placeholder")}</p>
-                <p className="text-white/50 text-xs mt-1">{t("checkout.secured.by")}</p>
-              </div>
+          {/* MP Wallet Brick */}
+          <section className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
+            <div className="min-h-[360px]">
+              {error && (
+                <div className="text-sm text-red-400">{error}</div>
+              )}
+              {!error && prefId && (
+                <Wallet initialization={{ preferenceId: prefId }} />
+              )}
+              {!error && !prefId && (
+                <div className="h-[280px] grid place-items-center text-center text-white/70">Loading payment…</div>
+              )}
+              <p className="text-white/50 text-xs mt-4">{t("checkout.secured.by")}</p>
             </div>
           </section>
         </div>
