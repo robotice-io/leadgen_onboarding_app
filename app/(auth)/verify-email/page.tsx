@@ -20,17 +20,25 @@ function VerifyEmailForm() {
   const [verified, setVerified] = useState(false);
   const [resending, setResending] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
+  const [tokenInUrl, setTokenInUrl] = useState<boolean>(false);
+  const [emailFromSignup, setEmailFromSignup] = useState<string>("");
 
   // Check if verification code is in URL parameters
   useEffect(() => {
-    const code = searchParams.get('code');
+    const code = searchParams.get('token') || searchParams.get('code');
     if (code) {
+      setTokenInUrl(true);
       setVerificationCode(code);
-      handleVerify(code);
+      try {
+        const stored = sessionStorage.getItem('signup_email') || localStorage.getItem('signup_email') || "";
+        setEmailFromSignup(stored);
+      } catch {}
+      handleVerify(code, emailFromSignup || undefined);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
-  async function handleVerify(code?: string) {
+  async function handleVerify(code?: string, email?: string) {
     const codeToUse = code || verificationCode;
     if (!codeToUse) {
       setToast({ message: "Please enter a verification code", type: "error" });
@@ -40,7 +48,7 @@ function VerifyEmailForm() {
     setVerifying(true);
     
     try {
-      const response = await verifyEmail(codeToUse);
+      const response = await verifyEmail(codeToUse, emailFromSignup || email);
       
       setVerified(true);
       setToast({ 
@@ -106,28 +114,13 @@ function VerifyEmailForm() {
               </div>
             </div>
           ) : (
-            <div className="space-y-4">
-              <div className="space-y-3">
-                <Input
-                  name="verificationCode"
-                  type="text"
-                  label={t("verify.code.label" as any)}
-                  placeholder={t("verify.code.placeholder" as any)}
-                  value={verificationCode}
-                  onChange={(e) => setVerificationCode(e.target.value)}
-                  required
-                />
-                
-                <Button 
-                  type="button"
-                  onClick={() => handleVerify()}
-                  loading={verifying}
-                  fullWidth
-                >
-                  {t("verify.cta" as any)}
-                </Button>
+            <div className="space-y-5">
+              <div className="text-center space-y-2">
+                <h2 className="text-xl font-semibold">{t("verify.title" as any)}</h2>
+                <p className="text-sm text-black/60 dark:text-white/70">
+                  {t("verify.subtitle" as any)}
+                </p>
               </div>
-
               <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                 <div className="flex gap-3">
                   <KeyRound className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
@@ -141,22 +134,22 @@ function VerifyEmailForm() {
                   </div>
                 </div>
               </div>
-
-              <div className="text-center">
-                <p className="text-sm text-black/60 dark:text-white/70 mb-3">
-                  {t("verify.resend.prompt" as any)}
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    // TODO: Implement resend verification email API call
-                    setToast({ message: t("verify.resend.soon" as any), type: "error" });
-                  }}
-                  loading={resending}
-                >
-                  {t("verify.resend.cta" as any)}
-                </Button>
-              </div>
+              {!tokenInUrl && (
+                <div className="text-center">
+                  <p className="text-sm text-black/60 dark:text-white/70 mb-3">
+                    {t("verify.resend.prompt" as any)}
+                  </p>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setToast({ message: t("verify.resend.soon" as any), type: "error" });
+                    }}
+                    loading={resending}
+                  >
+                    {t("verify.resend.cta" as any)}
+                  </Button>
+                </div>
+              )}
             </div>
           )}
         </CardBody>

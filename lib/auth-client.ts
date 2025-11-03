@@ -325,13 +325,13 @@ export async function register(
   return response;
 }
 
-export async function verifyEmail(verificationCode: string): Promise<any> {
+export async function verifyEmail(verificationCode: string, email?: string): Promise<any> {
   // Force proxy for verify-email to ensure server API key is used
   const url = getRequestUrl("/api/v1/auth/verify-email", true);
   const res = await fetch(url, {
     method: "POST",
     headers: buildHeaders(true),
-    body: JSON.stringify({ verification_code: verificationCode }),
+    body: JSON.stringify({ verification_code: verificationCode, email }),
   });
 
   if (!res.ok) {
@@ -429,11 +429,17 @@ export async function getUserTenant(): Promise<any> {
 }
 
 export async function logout(): Promise<void> {
-  removeTenant();
-  try {
-    localStorage.removeItem("robotice-tenant-id");
-  } catch {}
+  try { removeToken(); } catch {}
+  try { removeRefreshToken(); } catch {}
+  try { removeTenant(); } catch {}
+  try { localStorage.removeItem("robotice-tenant-id"); } catch {}
   try { clearTenantCookie(); } catch {}
+  // Defensive: clear user storage key explicitly in case removeToken changes
+  try { localStorage.removeItem("robotice_user"); } catch {}
+  // Clear any signup helpers used during verification
+  try { sessionStorage.removeItem("signup_email"); } catch {}
+  // Optional: clear any onboarding temp cache keys
+  try { localStorage.removeItem("robotice-oauth-state"); } catch {}
   window.location.href = "/login";
 }
 

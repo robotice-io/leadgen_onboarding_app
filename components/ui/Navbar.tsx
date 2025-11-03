@@ -36,6 +36,24 @@ export function Navbar() {
     try { setAuthed(isAuthenticated()); } catch { setAuthed(false); }
   }, []);
 
+  // Re-evaluate auth when route/path changes and close any open menus
+  useEffect(() => {
+    try { setAuthed(isAuthenticated()); } catch { setAuthed(false); }
+    setOpen(false);
+  }, [pathname]);
+
+  // Listen to storage changes (logout/login in other tabs or same tab code)
+  useEffect(() => {
+    function onStorage(e: StorageEvent) {
+      if (!e.key || ["robotice_user", "robotice_auth_token", "robotice-tenant-id"].includes(e.key)) {
+        try { setAuthed(isAuthenticated()); } catch { setAuthed(false); }
+        setOpen(false);
+      }
+    }
+    window.addEventListener("storage", onStorage);
+    return () => window.removeEventListener("storage", onStorage);
+  }, []);
+
   useEffect(() => {
     function update() {
       const y = latestY.current;
@@ -127,7 +145,7 @@ export function Navbar() {
     <div className={shellClasses}>
   <nav className="flex items-center justify-between px-4 sm:px-6 py-3">
           <div className="flex items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
+            <Link href="/" className="flex items-center gap-2" onClick={() => setOpen(false)}>
               <Image src="/landing_logo.png" alt="Robotice" width={160} height={40} className="h-8 sm:h-9 w-auto" />
             </Link>
             {/* Mobile hamburger on the left for better balance */}
