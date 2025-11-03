@@ -1,12 +1,15 @@
+import {heroui} from '@heroui/theme';
 import type { Config } from 'tailwindcss'
 
 // Minimal Tailwind config to enable class-based dark mode toggling
 export default {
   darkMode: 'class',
   content: [
-    './app/**/*.{ts,tsx}',
-    './components/**/*.{ts,tsx}',
-    './lib/**/*.{ts,tsx}',
+    "./app/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./lib/**/*.{ts,tsx}",
+    // Scan HeroUI theme tokens and all component styles
+    "./node_modules/@heroui/theme/dist/**/*.{js,ts,jsx,tsx}"
   ],
   theme: {
     extend: {
@@ -28,5 +31,5 @@ export default {
       },
     },
   },
-  plugins: [],
+  plugins: [heroui()],
 } satisfies Config

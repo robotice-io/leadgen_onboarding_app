@@ -59,7 +59,7 @@ export default function ClientOnboardingStepPage() {
         <div className="grid gap-6">
           <Select
             label={t("ss.audience.q1")}
-            options={[("--" as string), ...(t("ss.audience.q1.opts") as string).split(",")]}
+            options={["--", ...(t("ss.audience.q1.opts") as string).split(",")]}
             value={local.q1}
             onChange={(v) => setLocal((s) => ({ ...s, q1: v }))}
           />
@@ -167,5 +167,7 @@ function TextAreaGroup({ label, value, onChange }: { label: string; value: strin
     </div>
   );
 }
+
+// Removed custom input/textarea helpers in favor of HeroUI components
 
 // old SelectGroup removed in favor of custom <Select /> component
