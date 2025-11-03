@@ -31,11 +31,15 @@ function VerifyEmailForm() {
     if (code) {
       setTokenInUrl(true);
       setVerificationCode(code);
+      let stored = "";
       try {
-        const stored = sessionStorage.getItem('signup_email') || localStorage.getItem('signup_email') || "";
+        stored = sessionStorage.getItem('signup_email') || localStorage.getItem('signup_email') || "";
         setEmailFromSignup(stored);
       } catch {}
-      handleVerify(code, emailFromSignup || undefined);
+      // Use the stored value directly to avoid race with setState
+      if (stored) {
+        handleVerify(code, stored);
+      }
     } else {
       try {
         const stored = sessionStorage.getItem('signup_email') || localStorage.getItem('signup_email') || "";
@@ -51,11 +55,16 @@ function VerifyEmailForm() {
       setToast({ message: "Please enter a verification code", type: "error" });
       return;
     }
+    const emailToUse = email || emailFromSignup;
+    if (!emailToUse) {
+      setToast({ message: "Missing signup email to verify", type: "error" });
+      return;
+    }
 
     setVerifying(true);
     
     try {
-      const response = await verifyEmail(codeToUse, emailFromSignup || email);
+  const response = await verifyEmail(codeToUse, emailToUse);
       
       setVerified(true);
       setToast({ 

@@ -335,7 +335,7 @@ export async function register(
   return response;
 }
 
-export async function verifyEmail(verificationCode: string, email?: string): Promise<any> {
+export async function verifyEmail(verificationCode: string, email: string): Promise<any> {
   // Force proxy for verify-email to ensure server API key is used
   const url = getRequestUrl("/api/v1/auth/verify-email", true);
   const res = await fetch(url, {
