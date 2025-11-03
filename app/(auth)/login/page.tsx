@@ -35,7 +35,14 @@ export default function LoginPage() {
         window.location.href = "/post-login";
       }, 800);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      const msg = err instanceof Error ? err.message : "Login failed";
+      // If backend enforces verified-only and returns a message like "Email not verified"
+      if (/not\s*verified|verify\s*your\s*email/i.test(msg)) {
+        try { sessionStorage.setItem("signup_email", String(formData.get("email") || "")); } catch {}
+        window.location.href = "/verify-email?pending=1";
+        return;
+      }
+      setError(msg);
       setLoading(false);
     }
   }

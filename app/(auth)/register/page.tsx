@@ -55,7 +55,8 @@ export default function RegisterPage() {
       });
       
       setTimeout(() => {
-        window.location.href = "/verify-email";
+        try { sessionStorage.setItem("signup_email", email); } catch {}
+        window.location.href = "/verify-email?pending=1";
       }, 2000);
     } catch (err) {
       setToast({

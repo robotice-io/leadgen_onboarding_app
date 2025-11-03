@@ -22,10 +22,13 @@ function VerifyEmailForm() {
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
   const [tokenInUrl, setTokenInUrl] = useState<boolean>(false);
   const [emailFromSignup, setEmailFromSignup] = useState<string>("");
+  const [pending, setPending] = useState<boolean>(false);
 
   // Check if verification code is in URL parameters
   useEffect(() => {
     const code = searchParams.get('token') || searchParams.get('code');
+    const p = searchParams.get('pending');
+    setPending(!!p);
     if (code) {
       setTokenInUrl(true);
       setVerificationCode(code);
@@ -34,6 +37,11 @@ function VerifyEmailForm() {
         setEmailFromSignup(stored);
       } catch {}
       handleVerify(code, emailFromSignup || undefined);
+    } else {
+      try {
+        const stored = sessionStorage.getItem('signup_email') || localStorage.getItem('signup_email') || "";
+        setEmailFromSignup(stored);
+      } catch {}
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
@@ -118,8 +126,13 @@ function VerifyEmailForm() {
               <div className="text-center space-y-2">
                 <h2 className="text-xl font-semibold">{t("verify.title" as any)}</h2>
                 <p className="text-sm text-black/60 dark:text-white/70">
-                  {t("verify.subtitle" as any)}
+                  {pending ? t("verify.subtitle" as any) : t("verify.subtitle" as any)}
                 </p>
+                {emailFromSignup && (
+                  <p className="text-sm text-black/70 dark:text-white/80">
+                    <span className="font-medium">{emailFromSignup}</span>
+                  </p>
+                )}
               </div>
               <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
                 <div className="flex gap-3">
