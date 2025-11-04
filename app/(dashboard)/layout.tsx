@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isAuthenticated, getUser, getUserTenant, getTenant, logout } from "@/lib/auth-client";
+import { isAuthenticated, getUser, getUserTenant, getTenant, setTenant as setTenantStore, logout } from "@/lib/auth-client";
+import { apiGet } from "@/lib/api";
 import { DashboardSidebar } from "@/components/dashboard/Sidebar";
 import DashboardNavbar from "@/components/dashboard/DashboardNavbar";
 import { User } from "@/types/types";
@@ -29,24 +30,48 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           return;
         }
       
-        // Get tenant data from API
+        // Get tenant data, then refresh from backend to avoid stale flags
+        let currentTenant: any = null;
         try {
-          const tenantData = await getUserTenant();
-          setUser(userData);
-          setTenant(tenantData);
-        } catch (error) {
-          console.warn("[DashboardLayout] Failed to fetch tenant data:", error);
-          // Try to get tenant from localStorage as fallback
-          try {
-            const localTenant = getTenant();
-            setUser(userData);
-            setTenant(localTenant);
-          } catch (localError) {
-            console.warn("[DashboardLayout] No tenant data available:", localError);
-            setUser(userData);
-            setTenant(null);
-          }
+          currentTenant = await getUserTenant();
+        } catch (e) {
+          currentTenant = getTenant();
         }
+
+        // Attempt refresh from backend tenant-info (injects API key via proxy)
+        try {
+          const res = await apiGet("/auth/tenant-info");
+          if (res.ok) {
+            const info = await res.json();
+            // Merge known flags into tenant structure we keep
+            currentTenant = {
+              ...(currentTenant || {}),
+              billing_paid: info?.billing_paid ?? currentTenant?.billing_paid,
+              onboarded: info?.onboarded ?? currentTenant?.onboarded,
+              google_token_live: info?.google_token_live ?? currentTenant?.google_token_live,
+              onboarding_status: info?.onboarding_status ?? currentTenant?.onboarding_status,
+              onboarding_step: info?.onboarding_step ?? currentTenant?.onboarding_step,
+            };
+            try { setTenantStore(currentTenant); } catch {}
+          }
+        } catch (e) {
+          console.warn("[DashboardLayout] tenant-info refresh failed", e);
+        }
+
+        setUser(userData);
+        setTenant(currentTenant);
+
+        // Enforce paywall: unpaid -> /pay; paid and not onboarded -> onboarding; onboarded -> dashboard
+        try {
+          if (!currentTenant?.billing_paid) {
+            window.location.replace("/pay");
+            return;
+          }
+          if (!currentTenant?.onboarded) {
+            window.location.replace("/onboarding");
+            return;
+          }
+        } catch {}
       setLoading(false);
     };
     
