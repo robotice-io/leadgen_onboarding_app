@@ -13,7 +13,7 @@ export default function PayPage() {
   }, []);
 
   const plan = (query.get("plan") || "starter").toLowerCase();
-  const unitPrice = Number(query.get("price") || 49);
+  const unitPrice = Number(query.get("price") || 1);
 
   // Redirect to the full two-column checkout with plan carousel (keeps this page as fallback)
   useEffect(() => {

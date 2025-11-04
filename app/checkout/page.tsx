@@ -168,15 +168,15 @@ function getPlanMeta(plan: PlanKey, lang: "es" | "en") {
     enterprise: lang === "es" ? "Free — Schedule a call" : "Free — Schedule a call",
   };
   const prices: Record<PlanKey, string> = {
-    starter: lang === "es" ? "CLP 390.000 / mes" : "CLP 390,000 / mo",
-    core: lang === "es" ? "CLP 790.000 / mes" : "CLP 790,000 / mo",
-    pro: lang === "es" ? "CLP 1.490.000 / mes" : "CLP 1,490,000 / mo",
+    starter: lang === "es" ? "CLP 1 / mes" : "CLP 1 / mo",
+    core: lang === "es" ? "CLP 1 / mes" : "CLP 1 / mo",
+    pro: lang === "es" ? "CLP 1 / mes" : "CLP 1 / mo",
     enterprise: lang === "es" ? "Gratis" : "Free",
   };
   const amounts: Record<PlanKey, number> = {
-    starter: 390000,
-    core: 790000,
-    pro: 1490000,
+    starter: 1,
+    core: 1,
+    pro: 1,
     enterprise: 0,
   };
   const featuresBase = [
