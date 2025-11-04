@@ -2,24 +2,40 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CardPayment, initMercadoPago } from "@mercadopago/sdk-react";
+import { loadMercadoPago } from "@mercadopago/sdk-js";
 
 export function MercadoPagoCard({ amount, plan, locale, email }: { amount: number; plan: string; locale?: string; email?: string }) {
   const [result, setResult] = useState<{ id?: string; status?: string; status_detail?: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState<boolean>(false);
   const extRefRef = useRef<string | undefined>(undefined);
+  const mountedRef = useRef<boolean>(false);
+  const useJsFallback = useRef<boolean>(false);
+  const brickControllerRef = useRef<any>(null);
 
   const loc = useMemo(() => (locale || "es-CL") as any, [locale]);
 
   useEffect(() => {
     const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || (process.env as any).NEXT_PUBLIC_MP_PUBLIC_KEY_PROD;
     if (!pk) { setError("Mercado Pago not configured"); return; }
-    try { initMercadoPago(pk, { locale: loc }); setReady(true); } catch (e: any) { setError(e?.message || "Failed to init Mercado Pago"); }
+    try {
+      initMercadoPago(pk, { locale: loc });
+      setReady(true);
+      // If nothing mounted within 2s, try JS fallback bricks
+      const t = setTimeout(() => {
+        if (!mountedRef.current) {
+          useJsFallback.current = true;
+          setReady(false); // stop rendering React brick
+        }
+      }, 2000);
+      return () => clearTimeout(t);
+    } catch (e: any) { setError(e?.message || "Failed to init Mercado Pago"); }
   }, [loc]);
 
   return (
     <div>
-      {!result && ready && !error && (
+      {/* React Brick path */}
+      {!result && ready && !error && !useJsFallback.current && (
         <CardPayment
           locale={loc}
           initialization={{ amount, payer: email ? { email } : undefined }}
@@ -99,11 +115,26 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
               throw e; // allow Brick to keep the button state consistent
             }
           }}
-          onReady={() => {}}
+          onReady={() => { mountedRef.current = true; }}
           onError={(brErr) => {
             console.error('MercadoPago Card Brick error', brErr);
+            setError(brErr?.message || 'Brick error');
           }}
         />
+      )}
+
+      {/* JS fallback Brick (mounts into a div) */}
+      {!result && !error && useJsFallback.current && (
+        <div id="mp-card-brick-fallback" className="min-h-[280px]">
+          <FallbackBrick
+            amount={amount}
+            plan={plan}
+            locale={loc}
+            email={email}
+            onMounted={() => { mountedRef.current = true; }}
+            onError={(msg) => setError(msg)}
+          />
+        </div>
       )}
 
       {error && <div className="text-sm text-red-400 mt-3">{error}</div>}
@@ -125,4 +156,69 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
       )}
     </div>
   );
+}
+
+// Lightweight fallback using sdk-js bricksBuilder
+function FallbackBrick({ amount, plan, locale, email, onMounted, onError }: { amount: number; plan: string; locale: string; email?: string; onMounted: () => void; onError: (msg: string) => void }) {
+  const extRefRef = useRef<string | undefined>(undefined);
+  const ctrlRef = useRef<any>(null);
+
+  useEffect(() => {
+    (async () => {
+      const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || (process.env as any).NEXT_PUBLIC_MP_PUBLIC_KEY_PROD;
+      if (!pk) { onError('Mercado Pago not configured'); return; }
+      try {
+        await loadMercadoPago();
+        // @ts-ignore
+        const mp = new window.MercadoPago(pk, { locale });
+        const bricksBuilder = mp.bricks();
+        if (!extRefRef.current) {
+          try {
+            const key = 'mp_external_reference';
+            const existing = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
+            if (existing) extRefRef.current = existing; else {
+              const tenantId = typeof window !== 'undefined' ? window.localStorage.getItem('robotice-tenant-id') : null;
+              const generated = `lg-${tenantId || 'anon'}-${String(plan).toLowerCase()}-${Date.now()}`;
+              extRefRef.current = generated;
+              if (typeof window !== 'undefined') window.localStorage.setItem(key, generated);
+            }
+          } catch {}
+        }
+        ctrlRef.current = await bricksBuilder.create('cardPayment', 'mp-card-brick-fallback', {
+          initialization: { amount, payer: email ? { email } : undefined },
+          callbacks: {
+            onReady: () => onMounted(),
+            onError: (e: any) => onError(e?.message || 'Brick error'),
+            onSubmit: async (formData: any) => {
+              try {
+                const payload = {
+                  token: formData?.token,
+                  transaction_amount: Number(amount || 0),
+                  description: `LeadGen ${String(plan).toUpperCase()} plan`,
+                  installments: Number(formData?.installments || 1),
+                  payment_method_id: formData?.payment_method_id ?? formData?.paymentMethodId,
+                  issuer_id: formData?.issuer_id ?? formData?.issuerId,
+                  three_d_secure_mode: 'optional' as const,
+                  external_reference: extRefRef.current,
+                  payer: { email: formData?.payer?.email || email, identification: formData?.payer?.identification },
+                };
+                const res = await fetch('/api/bridge/api/v1/billing/mp/payments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+                const ok = res.ok;
+                if (!ok) throw new Error((await res.text()) || 'Payment failed');
+                return Promise.resolve();
+              } catch (e: any) {
+                onError(e?.message || 'Payment failed');
+                throw e;
+              }
+            }
+          }
+        });
+      } catch (e: any) {
+        onError(e?.message || 'Failed to load Mercado Pago');
+      }
+    })();
+    return () => { try { ctrlRef.current?.unmount?.(); } catch {} };
+  }, [amount, plan, locale, email, onMounted, onError]);
+
+  return null;
 }
