@@ -15,17 +15,18 @@ const nextConfig: NextConfig = {
     const checkoutCsp = [
       "default-src 'self'",
       // Allow MP SDK + GTM + Calendly scripts
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://sdk.mercadopago.com https://www.googletagmanager.com https://assets.calendly.com",
+      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://sdk.mercadopago.com https://www.googletagmanager.com https://assets.calendly.com https://http2.mlstatic.com",
       // Some browsers use script-src-elem separately
-      "script-src-elem 'self' 'unsafe-inline' https://sdk.mercadopago.com https://www.googletagmanager.com https://assets.calendly.com",
+      "script-src-elem 'self' 'unsafe-inline' https://sdk.mercadopago.com https://www.googletagmanager.com https://assets.calendly.com https://http2.mlstatic.com",
       // MP secure-fields uses api-static and api domains; telemetry goes to mercadolibre domains
-      "connect-src 'self' https://api.mercadopago.com https://sdk.mercadopago.com https://api-static.mercadopago.com https://api.mercadolibre.com https://www.mercadolibre.com https://www.googletagmanager.com https://www.google-analytics.com data: blob:",
+      "connect-src 'self' https://api.mercadopago.com https://sdk.mercadopago.com https://api-static.mercadopago.com https://api.mercadolibre.com https://www.mercadolibre.com https://www.googletagmanager.com https://www.google-analytics.com https://http2.mlstatic.com data: blob:",
       // Allow MP iframes and mercadolibre postMessage targets; Calendly embeds if used
       "frame-src 'self' https://sdk.mercadopago.com https://api.mercadopago.com https://www.mercadolibre.com https://assets.calendly.com",
       // Basic resource directives
-      "style-src 'self' 'unsafe-inline'",
-      "img-src 'self' data: blob:",
-      "font-src 'self' data:",
+      "style-src 'self' 'unsafe-inline' https://assets.calendly.com https://fonts.googleapis.com",
+      "style-src-elem 'self' 'unsafe-inline' https://assets.calendly.com https://fonts.googleapis.com",
+      "img-src 'self' data: blob: https://www.mercadolibre.com https://http2.mlstatic.com https://www.mercadolivre.com",
+      "font-src 'self' data: https://fonts.gstatic.com",
       "object-src 'none'",
       "base-uri 'self'",
     ].join('; ');
