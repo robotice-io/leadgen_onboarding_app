@@ -217,7 +217,24 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
           identification: idType && idNumber ? { type: idType, number: idNumber } : undefined,
           first_name: holderName?.split(' ')?.[0] || undefined,
           last_name: holderName?.split(' ')?.slice(1).join(' ') || undefined,
-        }
+        },
+        // Redundant flattened fields (defensive): in case upstream service maps from flat keys
+        payer_email: email || undefined,
+        payer_first_name: holderName?.split(' ')?.[0] || undefined,
+        payer_last_name: holderName?.split(' ')?.slice(1).join(' ') || undefined,
+        payer_identification_type: idType || undefined,
+        payer_identification_number: idNumber || undefined,
+        // Enrich for risk scoring
+        additional_info: {
+          items: [
+            {
+              quantity: 1,
+              category_id: 'services',
+              title: `LeadGen ${String(plan).toUpperCase()}`,
+              unit_price: Number(amount || 0),
+            },
+          ],
+        },
       };
 
       // Quick client logging for diagnosis

@@ -59,10 +59,12 @@ async function proxy(req: NextRequest) {
   }
   
   headers.delete("content-length");
+  // Read body once to allow diagnostics and integrity checks
+  const rawBody = req.method === "GET" || req.method === "HEAD" ? undefined : await req.text();
   const init: RequestInit = {
     method: req.method,
     headers,
-    body: req.method === "GET" || req.method === "HEAD" ? undefined : await req.text(),
+    body: rawBody,
   };
 
   // Add a timeout to avoid hanging requests
@@ -77,8 +79,21 @@ async function proxy(req: NextRequest) {
     resHeaders.delete("content-length");
     resHeaders.delete("transfer-encoding");
     resHeaders.delete("content-encoding");
-    // Add debug header with upstream target for easier troubleshooting
+    // Add debug headers with upstream target and request body diagnostics (length + sha256)
     resHeaders.set("X-Proxy-Target", String((global as any).__proxyLastTarget || target));
+    try {
+      if (rawBody) {
+        const enc = new TextEncoder();
+        const data = enc.encode(rawBody);
+        // @ts-ignore Node crypto is available in nodejs runtime
+        const { createHash } = await import('crypto');
+        const hash = createHash('sha256').update(Buffer.from(data)).digest('hex');
+        resHeaders.set('X-Proxy-Body-Length', String(data.byteLength));
+        resHeaders.set('X-Proxy-Body-Sha256', hash);
+        const ct = headers.get('Content-Type') || headers.get('content-type') || '';
+        if (ct) resHeaders.set('X-Proxy-Content-Type', ct);
+      }
+    } catch {}
     return new Response(body, { status: res.status, headers: resHeaders });
   } catch (err: any) {
     const payload = {
