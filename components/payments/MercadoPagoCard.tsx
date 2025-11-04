@@ -1,50 +1,63 @@
 "use client";
 
-import { useState } from "react";
-import { CardPayment } from "@mercadopago/sdk-react";
+import { useEffect, useMemo, useState } from "react";
+import { CardPayment, initMercadoPago } from "@mercadopago/sdk-react";
 
 export function MercadoPagoCard({ amount, plan, locale, email }: { amount: number; plan: string; locale?: string; email?: string }) {
   const [result, setResult] = useState<{ id?: string; status?: string; status_detail?: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [ready, setReady] = useState<boolean>(false);
+
+  const loc = useMemo(() => (locale || "es-CL") as any, [locale]);
+
+  useEffect(() => {
+    const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || (process.env as any).NEXT_PUBLIC_MP_PUBLIC_KEY_PROD;
+    if (!pk) { setError("Mercado Pago not configured"); return; }
+    try { initMercadoPago(pk, { locale: loc }); setReady(true); } catch (e: any) { setError(e?.message || "Failed to init Mercado Pago"); }
+  }, [loc]);
 
   return (
     <div>
-      {!result && (
+      {!result && ready && !error && (
         <CardPayment
-          locale={locale as any}
+          locale={loc}
           initialization={{ amount, payer: email ? { email } : undefined }}
           customization={{
-            paymentMethods: {
-              maxInstallments: 1,
-            },
-            visual: {
-              style: {
-                theme: "dark" as const,
-              },
-            },
+            paymentMethods: { maxInstallments: 1 },
+            visual: { style: { theme: "dark" as const } },
           }}
           onSubmit={async (formData) => {
             setError(null);
             try {
-              const res = await fetch("/api/payments/mp/create-payment", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ plan, formData }),
+              // Map Brick formData to our bridge payload
+              const payload = {
+                token: (formData as any)?.token,
+                transaction_amount: Number(amount || 0),
+                description: `LeadGen ${String(plan).toUpperCase()} plan`,
+                installments: Number((formData as any)?.installments || 1),
+                payment_method_id: (formData as any)?.payment_method_id,
+                payer: {
+                  email: (formData as any)?.payer?.email || email,
+                  identification: (formData as any)?.payer?.identification,
+                },
+              };
+
+              const res = await fetch('/api/bridge/api/v1/billing/mp/payments', {
+                method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
               });
-              const data = await res.json();
-              if (!res.ok) throw new Error(data?.error || "Payment failed");
-              setResult({ id: data.id, status: data.status, status_detail: data.status_detail });
+              const data = await res.json().catch(() => ({}));
+              if (!res.ok) throw new Error(data?.error || data?.message || 'Payment failed');
+              setResult({ id: data?.id, status: data?.status, status_detail: data?.status_detail });
               return data;
             } catch (e: any) {
-              const msg = e?.message || "Payment failed";
+              const msg = e?.message || 'Payment failed';
               setError(msg);
-              throw e; // let Brick handle UI state
+              throw e; // allow Brick to keep the button state consistent
             }
           }}
           onReady={() => {}}
           onError={(brErr) => {
-            // SDK level errors
-            console.error("MercadoPago Card Brick error", brErr);
+            console.error('MercadoPago Card Brick error', brErr);
           }}
         />
       )}

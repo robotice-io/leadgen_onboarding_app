@@ -147,3 +147,17 @@ html {
 .animate-fade-out {
   animation: fade-out-basic 200ms ease-in both;
 }
+
+/* Mercado Pago Secure Fields sizing guardrails (core methods, not Bricks) */
+#mp-card-number,
+#mp-expiration,
+#mp-cvc {
+  height: 48px;
+  overflow: hidden;
+  border-radius: 0.5rem;
+}
+#mp-card-number *,
+#mp-expiration *,
+#mp-cvc * {
+  max-height: 48px !important;
+}

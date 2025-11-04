@@ -4,6 +4,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { MpCoreForm } from "@/components/payments/MpCoreForm";
 import { openCalendly } from "@/lib/calendly";
+import PaymentRadio, { PaymentOption } from "@/components/ui/payment-option";
+import { motion, AnimatePresence } from "framer-motion";
 
 type PlanKey = "starter" | "core" | "pro" | "enterprise";
 
@@ -20,6 +22,7 @@ export default function CheckoutPage() {
   const planMeta = useMemo(() => getPlanMeta(plan, lang), [plan, lang]);
 
   const [error, setError] = useState<string | null>(null);
+  const [method, setMethod] = useState<string>("");
 
   useEffect(() => {
     const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || (process.env as any).NEXT_PUBLIC_MP_PUBLIC_KEY_PROD;
@@ -100,7 +103,7 @@ export default function CheckoutPage() {
 
           {/* Payment */}
           <section className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
-            <div className="min-h-[380px]">
+            <div className="min-h-[420px]">
               {error && <div className="text-sm text-red-400">{error}</div>}
 
               {!error && (
@@ -111,7 +114,40 @@ export default function CheckoutPage() {
                     <button onClick={() => openCalendly()} className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500">Schedule a call</button>
                   </div>
                 ) : (
-                  <MpCoreForm amount={planMeta.amount} plan={plan} locale={lang === "es" ? "es-CL" : "es-CL"} />
+                  <div>
+                    <AnimatePresence mode="wait">
+                      {!method && (
+                        <motion.div
+                          key="selector"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.22 }}
+                        >
+                          <PaymentRadio
+                            onChange={(v) => setMethod(v)}
+                            options={getPaymentOptions()}
+                            className="mx-auto"
+                          />
+                        </motion.div>
+                      )}
+                      {method === "mercadopago" && (
+                        <motion.div
+                          key="mp-form"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: -6 }}
+                          transition={{ duration: 0.25 }}
+                        >
+                          <div className="mb-4 flex items-center justify-between">
+                            <div className="text-sm text-white/70">Selected: Mercado Pago</div>
+                            <button className="text-xs text-white/70 hover:text-white" onClick={() => setMethod("")}>Change method</button>
+                          </div>
+                          <MpCoreForm amount={planMeta.amount} plan={plan} locale={lang === "es" ? "es-CL" : "es-CL"} />
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 )
               )}
 
@@ -175,4 +211,23 @@ function cyclePlan(delta: number, setPlan: (p: PlanKey) => void) {
     // fallback just switch locally
     setPlan((delta > 0 ? "core" : "enterprise") as PlanKey);
   }
+}
+
+function getPaymentOptions(): PaymentOption[] {
+  return [
+    {
+      id: 'mercadopago',
+      label: 'Mercado Pago',
+      value: 'mercadopago',
+      icon: (
+        <svg width="32" height="32" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="currentColor" className="text-blue-400">
+          <rect x="4" y="10" width="40" height="28" rx="6" className="fill-blue-600/20" />
+          <path d="M12 24c3-5 9-5 12 0 3-5 9-5 12 0" stroke="currentColor" strokeWidth="2" fill="none" />
+        </svg>
+      ),
+    },
+    { id: 'apple', label: 'Apple Pay', value: 'apple', disabled: true, icon: <span className="text-white/60"></span> },
+    { id: 'google', label: 'Google Pay', value: 'google', disabled: true, icon: <span className="text-white/60">G</span> },
+    { id: 'paypal', label: 'PayPal', value: 'paypal', disabled: true, icon: <span className="text-white/60">P</span> },
+  ];
 }

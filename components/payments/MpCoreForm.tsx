@@ -165,7 +165,8 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
     <div>
       {/* Custom form */}
       <div className="grid gap-4">
-        <div className="grid grid-cols-2 gap-3">
+        {/* Top inputs */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs text-white/60 mb-1">Cardholder name</label>
             <input value={holderName} onChange={(e) => setHolderName(e.target.value)} placeholder="John Doe" className="w-full rounded-md bg-black/40 border border-white/10 px-3 py-2 text-sm" />
@@ -175,7 +176,8 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
             <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" className="w-full rounded-md bg-black/40 border border-white/10 px-3 py-2 text-sm" />
           </div>
         </div>
-        <div className="grid grid-cols-3 gap-3">
+        {/* Identification & installments */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           <div>
             <label className="block text-xs text-white/60 mb-1">ID Type</label>
             <select value={idType} onChange={(e) => setIdType(e.target.value)} className="w-full rounded-md bg-black/40 border border-white/10 px-3 py-2 text-sm">
@@ -198,16 +200,17 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
         </div>
         <div>
           <label className="block text-xs text-white/60 mb-1">Card number</label>
-          <div id="mp-card-number" className="h-10 rounded-md bg-black/40 border border-white/10 px-3 grid items-center" />
+          {/* Mercado Pago field containers sometimes render a tall iframe; hide overflow to avoid overlaying other inputs */}
+          <div id="mp-card-number" className="h-12 rounded-md bg-black/40 border border-white/10 px-3 grid items-center overflow-hidden" />
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
           <div>
             <label className="block text-xs text-white/60 mb-1">Expiration</label>
-            <div id="mp-expiration" className="h-10 rounded-md bg-black/40 border border-white/10 px-3 grid items-center" />
+            <div id="mp-expiration" className="h-12 rounded-md bg-black/40 border border-white/10 px-3 grid items-center overflow-hidden" />
           </div>
           <div>
             <label className="block text-xs text-white/60 mb-1">CVC</label>
-            <div id="mp-cvc" className="h-10 rounded-md bg-black/40 border border-white/10 px-3 grid items-center" />
+            <div id="mp-cvc" className="h-12 rounded-md bg-black/40 border border-white/10 px-3 grid items-center overflow-hidden" />
           </div>
         </div>
         <button disabled={loading} onClick={handlePay} className="mt-2 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50">
