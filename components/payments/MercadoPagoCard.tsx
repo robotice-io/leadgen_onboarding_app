@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { CardPayment, initMercadoPago } from "@mercadopago/sdk-react";
 
 export function MercadoPagoCard({ amount, plan, locale, email }: { amount: number; plan: string; locale?: string; email?: string }) {
   const [result, setResult] = useState<{ id?: string; status?: string; status_detail?: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [ready, setReady] = useState<boolean>(false);
+  const extRefRef = useRef<string | undefined>(undefined);
 
   const loc = useMemo(() => (locale || "es-CL") as any, [locale]);
 
@@ -29,6 +30,22 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
           onSubmit={async (formData) => {
             setError(null);
             try {
+              // Build/persist a stable external reference per session
+              if (!extRefRef.current) {
+                try {
+                  const key = 'mp_external_reference';
+                  const existing = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
+                  if (existing) {
+                    extRefRef.current = existing;
+                  } else {
+                    const tenantId = typeof window !== 'undefined' ? window.localStorage.getItem('robotice-tenant-id') : null;
+                    const generated = `lg-${tenantId || 'anon'}-${String(plan).toLowerCase()}-${Date.now()}`;
+                    extRefRef.current = generated;
+                    if (typeof window !== 'undefined') window.localStorage.setItem(key, generated);
+                  }
+                } catch {}
+              }
+
               // Map Brick formData to our bridge payload
               const payload = {
                 token: (formData as any)?.token,
@@ -36,18 +53,45 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
                 description: `LeadGen ${String(plan).toUpperCase()} plan`,
                 installments: Number((formData as any)?.installments || 1),
                 payment_method_id: (formData as any)?.payment_method_id,
+                issuer_id: (formData as any)?.issuer_id,
+                three_d_secure_mode: 'optional' as const,
+                external_reference: extRefRef.current,
                 payer: {
                   email: (formData as any)?.payer?.email || email,
                   identification: (formData as any)?.payer?.identification,
                 },
+                // additional redundancy to help upstream mapping
+                payer_email: (formData as any)?.payer?.email || email,
+                payer_first_name: (formData as any)?.payer?.first_name,
+                payer_last_name: (formData as any)?.payer?.last_name,
+                payer_identification_type: (formData as any)?.payer?.identification?.type,
+                payer_identification_number: (formData as any)?.payer?.identification?.number,
+                additional_info: {
+                  items: [
+                    { quantity: 1, category_id: 'services', title: `LeadGen ${String(plan).toUpperCase()}`, unit_price: Number(amount || 0) },
+                  ],
+                },
               };
+
+              try {
+                // eslint-disable-next-line no-console
+                console.log('[MP][Brick] payload snapshot', {
+                  payment_method_id: payload.payment_method_id,
+                  issuer_id: payload.issuer_id,
+                  installments: payload.installments,
+                  payer: { email: payload.payer.email, identification: payload.payer.identification },
+                  external_reference: payload.external_reference,
+                });
+              } catch {}
 
               const res = await fetch('/api/bridge/api/v1/billing/mp/payments', {
                 method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
               });
+              const proxyTarget = res.headers.get('x-proxy-target');
               const data = await res.json().catch(() => ({}));
               if (!res.ok) throw new Error(data?.error || data?.message || 'Payment failed');
               setResult({ id: data?.id, status: data?.status, status_detail: data?.status_detail });
+              try { console.log('[MP][Brick] payment response', { id: data?.id, status: data?.status, status_detail: data?.status_detail, proxyTarget }); } catch {}
               return data;
             } catch (e: any) {
               const msg = e?.message || 'Payment failed';

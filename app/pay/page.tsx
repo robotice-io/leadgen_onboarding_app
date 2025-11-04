@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { MpCoreForm } from "@/components/payments/MpCoreForm";
+import { MercadoPagoCard } from "@/components/payments/MercadoPagoCard";
 import { openCalendly } from "@/lib/calendly";
 
 export default function PayPage() {
@@ -14,6 +15,7 @@ export default function PayPage() {
 
   const plan = (query.get("plan") || "starter").toLowerCase();
   const unitPrice = Number(query.get("price") || 49);
+  const useBrick = (process.env.NEXT_PUBLIC_MP_USE_BRICK || "").toString() === "true";
 
   return (
     <main className="min-h-screen bg-black text-white">
@@ -31,7 +33,11 @@ export default function PayPage() {
                   <button onClick={() => openCalendly()} className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500">Schedule a call</button>
                 </div>
               ) : (
-                <MpCoreForm amount={unitPrice} plan={plan} />
+                useBrick ? (
+                  <MercadoPagoCard amount={unitPrice} plan={plan} />
+                ) : (
+                  <MpCoreForm amount={unitPrice} plan={plan} />
+                )
               )
             )}
             <p className="text-white/50 text-xs mt-4">Payment secured by Mercado Pago</p>

@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useI18n } from "@/lib/i18n";
 import { MpCoreForm } from "@/components/payments/MpCoreForm";
+import { MercadoPagoCard } from "@/components/payments/MercadoPagoCard";
 import { openCalendly } from "@/lib/calendly";
 import PaymentRadio, { PaymentOption } from "@/components/ui/payment-option";
 import { motion, AnimatePresence } from "framer-motion";
@@ -23,6 +24,7 @@ export default function CheckoutPage() {
 
   const [error, setError] = useState<string | null>(null);
   const [method, setMethod] = useState<string>("");
+  const useBrick = (process.env.NEXT_PUBLIC_MP_USE_BRICK || "").toString() === "true";
 
   useEffect(() => {
     const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || (process.env as any).NEXT_PUBLIC_MP_PUBLIC_KEY_PROD;
@@ -143,7 +145,11 @@ export default function CheckoutPage() {
                             <div className="text-sm text-white/70">Selected: Mercado Pago</div>
                             <button className="text-xs text-white/70 hover:text-white" onClick={() => setMethod("")}>Change method</button>
                           </div>
-                          <MpCoreForm amount={planMeta.amount} plan={plan} locale={lang === "es" ? "es-CL" : "es-CL"} />
+                          {useBrick ? (
+                            <MercadoPagoCard amount={planMeta.amount} plan={plan} locale={lang === "es" ? "es-CL" : "es-CL"} />
+                          ) : (
+                            <MpCoreForm amount={planMeta.amount} plan={plan} locale={lang === "es" ? "es-CL" : "es-CL"} />
+                          )}
                         </motion.div>
                       )}
                     </AnimatePresence>
