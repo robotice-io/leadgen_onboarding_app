@@ -87,19 +87,15 @@ async function proxy(req: NextRequest) {
     resHeaders.delete("content-length");
     resHeaders.delete("transfer-encoding");
     resHeaders.delete("content-encoding");
-    // Add debug header in non-production to see upstream target
-    const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
-    if (!isProd) {
-      resHeaders.set("X-Proxy-Target", String((global as any).__proxyLastTarget || target));
-    }
+    // Add debug header with upstream target for easier troubleshooting
+    resHeaders.set("X-Proxy-Target", String((global as any).__proxyLastTarget || target));
     return new Response(body, { status: res.status, headers: resHeaders });
   } catch (err: any) {
-    const isProd = process.env.VERCEL_ENV === "production" || process.env.NODE_ENV === "production";
     const payload = {
       error: "Upstream fetch failed",
       code: err?.name || "FETCH_ERROR",
-      message: isProd ? undefined : (err?.message || String(err)),
-      target: isProd ? undefined : target,
+      message: err?.message || String(err),
+      target,
     };
     return new Response(JSON.stringify(payload), { status: 502, headers: { "content-type": "application/json" } });
   } finally {

@@ -1,13 +1,11 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
-import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
-import { getAppBaseUrl } from "@/lib/api";
+import { useMemo, useState } from "react";
+import { MpCoreForm } from "@/components/payments/MpCoreForm";
+import { openCalendly } from "@/lib/calendly";
 
 export default function PayPage() {
-  const [prefId, setPrefId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const inited = useRef(false);
 
   const query = useMemo(() => {
     if (typeof window === "undefined") return new URLSearchParams();
@@ -17,44 +15,6 @@ export default function PayPage() {
   const plan = (query.get("plan") || "starter").toLowerCase();
   const unitPrice = Number(query.get("price") || 49);
 
-  useEffect(() => {
-  const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || (process.env as any).NEXT_PUBLIC_MP_PUBLIC_KEY_PROD;
-    if (!pk) {
-      setError("Mercado Pago not configured");
-      return;
-    }
-    if (!inited.current) {
-      try { initMercadoPago(pk, { locale: "es-CL" }); } catch {}
-      inited.current = true;
-    }
-
-    (async () => {
-      try {
-        setError(null);
-        const tenantId = typeof window !== "undefined" ? localStorage.getItem("robotice-tenant-id") : null;
-        if (!tenantId) throw new Error("Missing tenant context");
-        const base = getAppBaseUrl() || (typeof window !== "undefined" ? window.location.origin : "");
-        const res = await fetch("/api/bridge/api/v1/billing/mp/preference", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json", "X-Tenant-ID": String(tenantId) },
-          body: JSON.stringify({
-            tenant_id: Number(tenantId),
-            plan,
-            unit_price: unitPrice,
-            success_url: `${base}/pay/success?plan=${encodeURIComponent(plan)}`,
-            cancel_url: `${base}/pay/cancel`,
-          }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || data?.message || "Failed to create preference");
-        if (!data?.preference_id) throw new Error("Missing preference id");
-        setPrefId(String(data.preference_id));
-      } catch (e: any) {
-        setError(e?.message || "Failed to initialize payment");
-      }
-    })();
-  }, [plan, unitPrice]);
-
   return (
     <main className="min-h-screen bg-black text-white">
       <div className="max-w-xl mx-auto px-6 py-14 md:py-20">
@@ -62,14 +22,17 @@ export default function PayPage() {
         <p className="text-white/70 mb-6">You're almost there. Finish checkout to unlock onboarding.</p>
         <section className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
           <div className="min-h-[360px]">
-            {error && (
-              <div className="text-sm text-red-400">{error}</div>
-            )}
-            {!error && prefId && (
-              <Wallet initialization={{ preferenceId: prefId }} />
-            )}
-            {!error && !prefId && (
-              <div className="h-[280px] grid place-items-center text-center text-white/70">Preparing checkout…</div>
+            {error && <div className="text-sm text-red-400">{error}</div>}
+            {!error && (
+              plan === "enterprise" ? (
+                <div className="flex flex-col items-center justify-center h-[280px] text-center">
+                  <div className="text-2xl font-semibold">Free</div>
+                  <p className="text-white/70 mt-1 mb-4">Schedule a call to activate</p>
+                  <button onClick={() => openCalendly()} className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500">Schedule a call</button>
+                </div>
+              ) : (
+                <MpCoreForm amount={unitPrice} plan={plan} />
+              )
             )}
             <p className="text-white/50 text-xs mt-4">Payment secured by Mercado Pago</p>
           </div>

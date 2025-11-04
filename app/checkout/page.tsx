@@ -1,9 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { useI18n } from "@/lib/i18n";
-import { MercadoPagoCard } from "@/components/payments/MercadoPagoCard";
+import { MpCoreForm } from "@/components/payments/MpCoreForm";
 import { openCalendly } from "@/lib/calendly";
 
 type PlanKey = "starter" | "core" | "pro" | "enterprise";
@@ -20,38 +19,11 @@ export default function CheckoutPage() {
 
   const planMeta = useMemo(() => getPlanMeta(plan, lang), [plan, lang]);
 
-  const [prefId, setPrefId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const inited = useRef(false);
-  const [mode, setMode] = useState<"card" | "wallet">("card");
 
   useEffect(() => {
-  const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || (process.env as any).NEXT_PUBLIC_MP_PUBLIC_KEY_PROD;
-    if (!pk) {
-      setError("Mercado Pago not configured");
-      return;
-    }
-    if (!inited.current) {
-      try { initMercadoPago(pk, { locale: lang === "es" ? "es-CL" : "es-CL" }); } catch {}
-      inited.current = true;
-    }
-
-    (async () => {
-      if (plan === "enterprise") { setPrefId(null); return; }
-      try {
-        setError(null);
-        const res = await fetch("/api/payments/mp/create-preference", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ plan }),
-        });
-        const data = await res.json();
-        if (!res.ok) throw new Error(data?.error || "Failed to create preference");
-        setPrefId(String(data.id));
-      } catch (e: any) {
-        setError(e?.message || "Failed to initialize payment");
-      }
-    })();
+    const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || (process.env as any).NEXT_PUBLIC_MP_PUBLIC_KEY_PROD;
+    if (!pk) setError("Mercado Pago not configured"); else setError(null);
   }, [plan, lang]);
 
   return (
@@ -126,50 +98,20 @@ export default function CheckoutPage() {
             </div>
           </section>
 
-          {/* Payment methods */}
+          {/* Payment */}
           <section className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
-            <div className="flex items-center gap-2 mb-4">
-              <button
-                className={`px-3 py-1.5 rounded-full text-sm border ${mode === "card" ? "bg-blue-600 border-blue-600" : "border-white/15"}`}
-                onClick={() => setMode("card")}
-              >
-                Pay with card
-              </button>
-              <button
-                className={`px-3 py-1.5 rounded-full text-sm border ${mode === "wallet" ? "bg-blue-600 border-blue-600" : "border-white/15"}`}
-                onClick={() => setMode("wallet")}
-              >
-                Mercado Pago checkout
-              </button>
-            </div>
             <div className="min-h-[380px]">
               {error && <div className="text-sm text-red-400">{error}</div>}
 
-              {!error && mode === "card" && (
+              {!error && (
                 plan === "enterprise" ? (
                   <div className="flex flex-col items-center justify-center h-[280px] text-center">
                     <div className="text-2xl font-semibold">Free</div>
                     <p className="text-white/70 mt-1 mb-4">Schedule a call to activate</p>
                     <button onClick={() => openCalendly()} className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500">Schedule a call</button>
                   </div>
-                ) : planMeta.amount > 0 ? (
-                  <MercadoPagoCard amount={planMeta.amount} plan={plan} locale={lang === "es" ? "es-CL" : "es-CL"} />
                 ) : (
-                  <div className="text-white/70 text-sm">Contact sales to purchase this plan.</div>
-                )
-              )}
-
-              {!error && mode === "wallet" && (
-                plan === "enterprise" ? (
-                  <div className="flex flex-col items-center justify-center h-[280px] text-center">
-                    <div className="text-2xl font-semibold">Free</div>
-                    <p className="text-white/70 mt-1 mb-4">Schedule a call to activate</p>
-                    <button onClick={() => openCalendly()} className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500">Schedule a call</button>
-                  </div>
-                ) : prefId ? (
-                  <Wallet initialization={{ preferenceId: prefId }} />
-                ) : (
-                  <div className="h-[280px] grid place-items-center text-center text-white/70">Loading payment…</div>
+                  <MpCoreForm amount={planMeta.amount} plan={plan} locale={lang === "es" ? "es-CL" : "es-CL"} />
                 )
               )}
 
