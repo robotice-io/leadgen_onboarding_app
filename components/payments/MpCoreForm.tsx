@@ -12,6 +12,7 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
   const [mp, setMp] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [fieldsReady, setFieldsReady] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [statusDetail, setStatusDetail] = useState<string | null>(null);
@@ -20,9 +21,14 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
   const [installments, setInstallments] = useState<number>(1);
   const [installmentOptions, setInstallmentOptions] = useState<Array<{ label: string; value: number }>>([]);
   const [idTypes, setIdTypes] = useState<Array<{ id: string; name: string }>>([]);
+  const [issuerId, setIssuerId] = useState<string | undefined>(undefined);
+  const [issuers, setIssuers] = useState<Array<{ id: string; name: string }>>([]);
+  const requireIssuer = (process.env.NEXT_PUBLIC_MP_REQUIRE_ISSUER || '').toString() === 'true';
 
   const refs = useRef<{ cardNumber?: any; exp?: any; cvc?: any } | null>(null);
   const binTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const currentBinRef = useRef<string | undefined>(undefined);
+  const extRefRef = useRef<string | undefined>(undefined);
 
   const defaultEmail = useMemo(() => {
     try {
@@ -86,17 +92,32 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
   setFieldsReady(true);
 
         // Listen BIN changes to get payment method and installments
-        let currentBin: string | undefined;
         cardNumber.on('binChange', ({ bin }: any) => {
-          if (!bin || bin === currentBin) return;
-          currentBin = bin;
+          if (!bin || bin === currentBinRef.current) return;
+          currentBinRef.current = bin;
           if (binTimer.current) clearTimeout(binTimer.current);
           binTimer.current = setTimeout(async () => {
             try {
               const pm = await instance.getPaymentMethods({ bin });
               const method = (pm?.results && pm.results[0]) ? pm.results[0] : null;
               if (method?.id) setPaymentMethodId(method.id);
-              const inst = await instance.getInstallments({ amount: amount || 0, bin, paymentTypeId: 'credit_card' });
+
+              // Fetch issuers for this payment method + bin
+              try {
+                const issuerRes = method?.id ? await instance.getIssuers({ paymentMethodId: method.id, bin }) : [];
+                const issuerList: Array<{ id: string; name: string }> = Array.isArray(issuerRes) ? issuerRes.map((i: any) => ({ id: String(i?.id), name: String(i?.name || i?.processing_mode || 'Issuer') })) : [];
+                setIssuers(issuerList);
+                if (issuerList.length === 1) {
+                  setIssuerId(issuerList[0].id);
+                } else {
+                  setIssuerId(undefined);
+                }
+              } catch {
+                setIssuers([]);
+                setIssuerId(undefined);
+              }
+
+              const inst = await instance.getInstallments({ amount: amount || 0, bin, paymentTypeId: 'credit_card', issuerId: issuerId || undefined });
               const costs = (inst && inst[0]?.payer_costs) || [];
               const options = costs.map((c: any) => ({ label: c.recommended_message || `${c.installments} x`, value: Number(c.installments || 1) }));
               setInstallmentOptions(options.length ? options : [{ label: '1 cuota', value: 1 }]);
@@ -116,16 +137,35 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, locale]);
 
+  // Recalculate installments when issuer changes (and BIN available)
+  useEffect(() => {
+    const bin = currentBinRef.current;
+    if (!mp || !bin) return;
+    (async () => {
+      try {
+        const inst = await mp.getInstallments({ amount: amount || 0, bin, paymentTypeId: 'credit_card', issuerId: issuerId || undefined });
+        const costs = (inst && inst[0]?.payer_costs) || [];
+        const options = costs.map((c: any) => ({ label: c.recommended_message || `${c.installments} x`, value: Number(c.installments || 1) }));
+        setInstallmentOptions(options.length ? options : [{ label: '1 cuota', value: 1 }]);
+        setInstallments(options[0]?.value || 1);
+      } catch {
+        // keep existing
+      }
+    })();
+  }, [issuerId, mp, amount]);
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     if (!mp) return;
     setError(null);
     setStatus(null);
     setStatusDetail(null);
+    setSubmitting(true);
 
     // Required values before tokenization
     if (!holderName?.trim() || !idType || !idNumber?.trim()) {
       setError('Please complete cardholder and ID information');
+      setSubmitting(false);
       return;
     }
 
@@ -148,17 +188,49 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
 
       const tenantId = typeof window !== 'undefined' ? localStorage.getItem('robotice-tenant-id') : null;
 
+      // Build a stable external reference for this order attempt (persist per session if absent)
+      if (!extRefRef.current) {
+        try {
+          const key = 'mp_external_reference';
+          const existing = typeof window !== 'undefined' ? window.localStorage.getItem(key) : null;
+          if (existing) {
+            extRefRef.current = existing;
+          } else {
+            const generated = `lg-${tenantId || 'anon'}-${String(plan).toLowerCase()}-${Date.now()}`;
+            extRefRef.current = generated;
+            if (typeof window !== 'undefined') window.localStorage.setItem(key, generated);
+          }
+        } catch {}
+      }
+
       const payload = {
         token,
         transaction_amount: Number(amount || 0),
         description: `LeadGen ${String(plan).toUpperCase()} plan`,
         installments: Number(installments || 1),
         payment_method_id: paymentMethodId || undefined,
+        issuer_id: issuerId ? (isNaN(Number(issuerId)) ? issuerId : Number(issuerId)) as any : undefined,
+        three_d_secure_mode: 'optional' as const,
+        external_reference: extRefRef.current,
         payer: {
           email: email,
           identification: idType && idNumber ? { type: idType, number: idNumber } : undefined,
+          first_name: holderName?.split(' ')?.[0] || undefined,
+          last_name: holderName?.split(' ')?.slice(1).join(' ') || undefined,
         }
       };
+
+      // Quick client logging for diagnosis
+      try {
+        // eslint-disable-next-line no-console
+        console.log('[MP] sending payload snapshot', {
+          payment_method_id: payload.payment_method_id,
+          issuer_id: payload.issuer_id,
+          installments: payload.installments,
+          payer: { email: payload.payer.email, identification: payload.payer.identification },
+          external_reference: payload.external_reference,
+        });
+      } catch {}
 
       const res = await fetch('/api/bridge/api/v1/billing/mp/payments', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
@@ -176,6 +248,11 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
       setStatus(data?.status || 'unknown');
       setStatusDetail(data?.status_detail || '');
 
+      try {
+        // eslint-disable-next-line no-console
+        console.log('[MP] payment response', { id: data?.id, status: data?.status, status_detail: data?.status_detail });
+      } catch {}
+
       // Best-effort: mark paid on approved
       try {
         if (String(data?.status) === 'approved' && tenantId) {
@@ -191,6 +268,8 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
     } catch (e: any) {
       console.error('Token/payment error:', e?.error || e?.message, (e as any)?.cause || e);
       setError(e?.message || 'Payment failed');
+    } finally {
+      setSubmitting(false);
     }
   }
 
@@ -220,7 +299,12 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
           </div>
           <div>
             <label className="block text-xs text-white/60 mb-1">ID Number</label>
-            <input value={idNumber} onChange={(e) => setIdNumber(e.target.value)} className="w-full rounded-md bg-black/40 border border-white/10 px-3 py-2 text-sm" />
+            <input
+              value={idNumber}
+              onChange={(e) => setIdNumber(e.target.value.trimStart())}
+              inputMode="text"
+              className="w-full rounded-md bg-black/40 border border-white/10 px-3 py-2 text-sm"
+            />
           </div>
           <div>
             <label className="block text-xs text-white/60 mb-1">Installments</label>
@@ -231,6 +315,18 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
             </select>
           </div>
         </div>
+        {/* Issuer selector when multiple available */}
+        {issuers.length > 1 && (
+          <div>
+            <label className="block text-xs text-white/60 mb-1">Issuer</label>
+            <select value={issuerId || ''} onChange={(e) => setIssuerId(e.target.value || undefined)} className="w-full rounded-md bg-black/40 border border-white/10 px-3 py-2 text-sm">
+              <option value="">Select issuer</option>
+              {issuers.map(i => (
+                <option key={i.id} value={i.id}>{i.name}</option>
+              ))}
+            </select>
+          </div>
+        )}
         <div>
           <label className="block text-xs text-white/60 mb-1">Card number</label>
           {/* Mercado Pago field containers sometimes render a tall iframe; hide overflow to avoid overlaying other inputs */}
@@ -247,8 +343,8 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
           </div>
         </div>
         <input id="token" name="token" type="hidden" />
-        <button type="submit" disabled={loading || !fieldsReady || !holderName.trim() || !email.trim() || !idType || !idNumber.trim()} className="mt-2 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50">
-          {loading ? 'Loading…' : `Pay ${new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(amount)}`}
+        <button type="submit" disabled={loading || submitting || !fieldsReady || !holderName.trim() || !email.trim() || !idType || !idNumber.trim() || (requireIssuer && issuers.length > 1 && !issuerId)} className="mt-2 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50">
+          {loading ? 'Loading…' : submitting ? 'Processing…' : `Pay ${new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(amount)}`}
         </button>
       </div>
 
@@ -258,6 +354,9 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
           <div className="text-sm text-white/80">Payment result</div>
           <div className="mt-1 text-white">Status: <span className="font-semibold capitalize">{status}</span></div>
           {statusDetail && <div className="text-white/70 text-xs mt-1">{statusDetail}</div>}
+          {status === 'pending' && statusDetail === 'pending_challenge' && (
+            <div className="text-xs text-white/60 mt-2">Additional verification required. If your bank prompts a 3D Secure challenge, follow the instructions. You'll remain on this page.</div>
+          )}
           {status === 'approved' && (
             <button onClick={() => (window.location.href = '/onboarding')} className="mt-3 px-3 py-1.5 rounded-md bg-green-600 text-sm">Continue to onboarding</button>
           )}
