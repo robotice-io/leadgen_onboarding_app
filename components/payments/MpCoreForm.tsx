@@ -107,19 +107,32 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [amount, locale]);
 
-  async function handlePay() {
+  async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
     if (!mp) return;
     setError(null);
     setStatus(null);
     setStatusDetail(null);
+
+    // Required values before tokenization
+    if (!holderName?.trim() || !idType || !idNumber?.trim()) {
+      setError('Please complete cardholder and ID information');
+      return;
+    }
+
     try {
       const tokenData = await mp.fields.createCardToken({
-        cardholderName: holderName,
+        cardholderName: holderName.trim(),
         identificationType: idType,
-        identificationNumber: idNumber,
+        identificationNumber: idNumber.trim(),
       });
       const token = tokenData?.id;
       if (!token) throw new Error('Failed to tokenize card');
+      if (typeof document !== 'undefined') {
+        const hidden = document.getElementById('token') as HTMLInputElement | null;
+        if (hidden) hidden.value = token;
+      }
+
       const tenantId = typeof window !== 'undefined' ? localStorage.getItem('robotice-tenant-id') : null;
 
       const payload = {
@@ -134,7 +147,6 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
         }
       };
 
-      // Use server bridge to inject X-API-Key
       const res = await fetch('/api/bridge/api/v1/billing/mp/payments', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
       });
@@ -157,12 +169,13 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
         }
       } catch {}
     } catch (e: any) {
+      console.error('createCardToken error', e?.message, (e as any)?.cause, e);
       setError(e?.message || 'Payment failed');
     }
   }
 
   return (
-    <div>
+    <form id="form-checkout" onSubmit={handleSubmit} noValidate>
       {/* Custom form */}
       <div className="grid gap-4">
         {/* Top inputs */}
@@ -213,7 +226,8 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
             <div id="mp-cvc" className="h-12 rounded-md bg-black/40 border border-white/10 px-3 grid items-center overflow-hidden" />
           </div>
         </div>
-        <button disabled={loading} onClick={handlePay} className="mt-2 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50">
+        <input id="token" name="token" type="hidden" />
+        <button type="submit" disabled={loading} className="mt-2 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50">
           {loading ? 'Loading…' : `Pay ${new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(amount)}`}
         </button>
       </div>
@@ -229,6 +243,6 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
           )}
         </div>
       )}
-    </div>
+    </form>
   );
 }
