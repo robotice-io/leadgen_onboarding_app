@@ -12,6 +12,7 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
   const mountedRef = useRef<boolean>(false);
   const useJsFallback = useRef<boolean>(false);
   const brickControllerRef = useRef<any>(null);
+  const [phase, setPhase] = useState<string>('init');
 
   const loc = useMemo(() => (locale || "es-CL") as any, [locale]);
 
@@ -20,12 +21,16 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
     if (!pk) { setError("Mercado Pago not configured"); return; }
     try {
       initMercadoPago(pk, { locale: loc });
+      try { console.log('[MP][Brick] initMercadoPago OK'); } catch {}
       setReady(true);
+      setPhase('react-brick');
       // If nothing mounted within 2s, try JS fallback bricks
       const t = setTimeout(() => {
         if (!mountedRef.current) {
           useJsFallback.current = true;
           setReady(false); // stop rendering React brick
+          setPhase('js-fallback');
+          try { console.log('[MP][Brick] switching to JS fallback'); } catch {}
         }
       }, 2000);
       return () => clearTimeout(t);
@@ -115,7 +120,7 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
               throw e; // allow Brick to keep the button state consistent
             }
           }}
-          onReady={() => { mountedRef.current = true; }}
+          onReady={() => { mountedRef.current = true; setPhase('react-mounted'); }}
           onError={(brErr) => {
             console.error('MercadoPago Card Brick error', brErr);
             setError(brErr?.message || 'Brick error');
@@ -135,6 +140,10 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
             onError={(msg) => setError(msg)}
           />
         </div>
+      )}
+
+      {!result && !error && (
+        <div className="text-xs text-white/50 mt-2">{phase === 'react-brick' ? 'Loading payment form…' : phase === 'js-fallback' ? 'Loading fallback payment form…' : null}</div>
       )}
 
       {error && <div className="text-sm text-red-400 mt-3">{error}</div>}
