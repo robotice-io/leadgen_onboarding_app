@@ -7,7 +7,7 @@ import { Card, CardHeader, CardBody, CardFooter } from "@/components/ui/Card";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 import { Toast } from "@/components/ui/Toast";
-import { login } from "@/lib/auth-client";
+import { login, getUserTenant } from "@/lib/auth-client";
 import { useI18n } from "@/lib/i18n";
 
 function LoginForm() {
@@ -30,16 +30,31 @@ function LoginForm() {
     try {
       await login(email, password);
       setToast({ message: t("login.success"), type: "success" });
-      
-      // After login, go to next if provided, else post-login
-      const next = searchParams.get("next");
-      setTimeout(() => {
+      // After login, gate by paywall and connection status
+      try {
+        const tenant = await getUserTenant();
+        const next = searchParams.get("next");
+        // Respect explicit next if present
         if (next && /^\//.test(next)) {
           window.location.href = next;
-        } else {
-          window.location.href = "/post-login";
+          return;
         }
-      }, 800);
+        // Backend should block unpaid logins; keep defensive fallback
+        if (!tenant?.billing_paid) {
+          window.location.href = "/pay";
+          return;
+        }
+        // If onboarded -> dashboard (regardless of google token state)
+        if (tenant?.onboarded) {
+          window.location.href = "/dashboard";
+          return;
+        }
+        // Paid but not onboarded -> onboarding wizard
+        window.location.href = "/onboarding";
+      } catch {
+        // Fallback to existing post-login route
+        window.location.href = "/post-login";
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Login failed";
       // If backend enforces verified-only and returns a message like "Email not verified"

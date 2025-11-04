@@ -17,8 +17,18 @@ export default function PostLoginGate() {
             setError(null);
             
             const tenant = await getUserTenant();
-            // New flow: always go to dashboard; wizard is launched from there if user wants
-            router.replace("/dashboard");
+            // Defensive: unpaid shouldn't reach here per backend; route to /pay if it happens
+            if (!tenant?.billing_paid) {
+              router.replace("/pay");
+              return;
+            }
+            // If onboarded -> dashboard (even if Google token expired)
+            if (tenant?.onboarded) {
+              router.replace("/dashboard");
+              return;
+            }
+            // Paid but not onboarded -> onboarding wizard
+            router.replace("/onboarding");
           } catch (e) {
         console.error("[PostLoginGate] Failed to check onboarding status:", e);
         console.error("[PostLoginGate] Error details:", e);

@@ -266,6 +266,7 @@ export async function login(email: string, password: string): Promise<AuthTokens
   const onboardingStatus = tenantData?.onboarding_status;
   const onboardingStep = tenantData?.onboarding_step;
   const googleTokenLive = tenantData?.google_token_live;
+  const onboarded = tenantData?.onboarded;
   
   if (!userData) {
     throw new Error("Login response missing user data");
@@ -277,7 +278,13 @@ export async function login(email: string, password: string): Promise<AuthTokens
   
   // Store user and tenant data from login response
   setUser(userData);
-  setTenant({ ...tenantData, onboarding_status: onboardingStatus, onboarding_step: onboardingStep, google_token_live: googleTokenLive });
+  setTenant({
+    ...tenantData,
+    onboarding_status: onboardingStatus,
+    onboarding_step: onboardingStep,
+    google_token_live: googleTokenLive,
+    onboarded,
+  });
   
   // Store tenant ID in localStorage for API calls
   localStorage.setItem("robotice-tenant-id", tenantId.toString());
@@ -358,15 +365,15 @@ function getEmailFromContext(): string | "" {
 export async function verifyEmail(verificationCode: string, email?: string): Promise<any> {
   // Force proxy for verify-email to ensure server API key is used
   const url = getRequestUrl("/api/v1/auth/verify-email", true);
-  // Always send the backend-required payload: { email, verification_code }
+  // Prefer sending email if we can infer it, but allow token-only flow
   const resolvedEmail = email || getEmailFromContext();
-  if (!resolvedEmail) {
-    throw new Error("Email required to verify. Please enter your email.");
-  }
+  const payload = resolvedEmail
+    ? { verification_code: verificationCode, email: resolvedEmail }
+    : { verification_code: verificationCode } as any;
   const res = await fetch(url, {
     method: "POST",
     headers: buildHeaders(true),
-    body: JSON.stringify({ verification_code: verificationCode, email: resolvedEmail }),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {

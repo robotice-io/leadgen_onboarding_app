@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { useI18n } from "@/lib/i18n";
+import { MercadoPagoCard } from "@/components/payments/MercadoPagoCard";
 
 type PlanKey = "starter" | "core" | "pro" | "enterprise";
 
@@ -20,6 +21,7 @@ export default function CheckoutPage() {
   const [prefId, setPrefId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const inited = useRef(false);
+  const [mode, setMode] = useState<"card" | "wallet">("card");
 
   useEffect(() => {
     const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY;
@@ -83,18 +85,41 @@ export default function CheckoutPage() {
             </div>
           </section>
 
-          {/* MP Wallet Brick */}
+          {/* Payment methods */}
           <section className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
-            <div className="min-h-[360px]">
-              {error && (
-                <div className="text-sm text-red-400">{error}</div>
+            <div className="flex items-center gap-2 mb-4">
+              <button
+                className={`px-3 py-1.5 rounded-full text-sm border ${mode === "card" ? "bg-blue-600 border-blue-600" : "border-white/15"}`}
+                onClick={() => setMode("card")}
+              >
+                Pay with card
+              </button>
+              <button
+                className={`px-3 py-1.5 rounded-full text-sm border ${mode === "wallet" ? "bg-blue-600 border-blue-600" : "border-white/15"}`}
+                onClick={() => setMode("wallet")}
+              >
+                Mercado Pago checkout
+              </button>
+            </div>
+            <div className="min-h-[380px]">
+              {error && <div className="text-sm text-red-400">{error}</div>}
+
+              {!error && mode === "card" && (
+                planMeta.amount > 0 ? (
+                  <MercadoPagoCard amount={planMeta.amount} plan={plan} locale={lang === "es" ? "es-CL" : "es-CL"} />
+                ) : (
+                  <div className="text-white/70 text-sm">Contact sales to purchase this plan.</div>
+                )
               )}
-              {!error && prefId && (
-                <Wallet initialization={{ preferenceId: prefId }} />
+
+              {!error && mode === "wallet" && (
+                prefId ? (
+                  <Wallet initialization={{ preferenceId: prefId }} />
+                ) : (
+                  <div className="h-[280px] grid place-items-center text-center text-white/70">Loading payment…</div>
+                )
               )}
-              {!error && !prefId && (
-                <div className="h-[280px] grid place-items-center text-center text-white/70">Loading payment…</div>
-              )}
+
               <p className="text-white/50 text-xs mt-4">{t("checkout.secured.by")}</p>
             </div>
           </section>
@@ -117,6 +142,12 @@ function getPlanMeta(plan: PlanKey, lang: "es" | "en") {
     pro: lang === "es" ? "CLP 1.490.000 / mes" : "CLP 1,490,000 / mo",
     enterprise: lang === "es" ? "A medida" : "Custom",
   };
+  const amounts: Record<PlanKey, number> = {
+    starter: 390000,
+    core: 790000,
+    pro: 1490000,
+    enterprise: 0,
+  };
   const featuresBase = [
     lang === "es" ? "Envío desde tu cuenta OAuth" : "Sending from your OAuth account",
     lang === "es" ? "Copys por IA + revisión humana" : "AI copy + human review",
@@ -129,5 +160,5 @@ function getPlanMeta(plan: PlanKey, lang: "es" | "en") {
     enterprise: [lang === "es" ? "SLA garantizado" : "Guaranteed SLA", lang === "es" ? "Integraciones personalizadas" : "Custom integrations", ...featuresBase],
   };
   const badge = plan === "core" ? (lang === "es" ? "Más elegido" : "Most chosen") : undefined;
-  return { title: titles[plan], priceText: prices[plan], features: featuresByPlan[plan], badge } as const;
+  return { title: titles[plan], priceText: prices[plan], features: featuresByPlan[plan], badge, amount: amounts[plan] } as const;
 }

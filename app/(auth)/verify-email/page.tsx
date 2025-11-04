@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Card, CardHeader, CardBody, CardFooter } from "@/components/ui/Card";
 import { Button } from "@/components/ui/Button";
-import { Input } from "@/components/ui/Input";
 import { Toast } from "@/components/ui/Toast";
 import { Mail, CheckCircle, KeyRound } from "lucide-react";
 import { verifyEmail } from "@/lib/auth-client";
@@ -15,60 +14,39 @@ function VerifyEmailForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { t } = useI18n();
-  const [verificationCode, setVerificationCode] = useState("");
+  const [token, setToken] = useState("");
   const [verifying, setVerifying] = useState(false);
   const [verified, setVerified] = useState(false);
   const [resending, setResending] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" } | null>(null);
-  const [tokenInUrl, setTokenInUrl] = useState<boolean>(false);
-  const [codeInput, setCodeInput] = useState<string>("");
-  const [emailInput, setEmailInput] = useState<string>("");
-  const [showEmailField, setShowEmailField] = useState<boolean>(false);
   const [pending, setPending] = useState<boolean>(false);
+  const [invalidLink, setInvalidLink] = useState<boolean>(false);
 
   // Check if verification code is in URL parameters
   useEffect(() => {
     const code = searchParams.get('token') || searchParams.get('code');
     const p = searchParams.get('pending');
     setPending(!!p);
-
-    // Persist params into state/inputs
-    if (code) {
-      setTokenInUrl(true);
-      setVerificationCode(code);
-      setCodeInput(code);
-    }
-    // Auto‑verify when we have code only (email not required)
-    if (code) {
+    if (code && code.length > 0) {
+      setToken(code);
       handleVerify(code);
+    } else {
+      setInvalidLink(true);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
   async function handleVerify(code?: string) {
-    const codeToUse = code || verificationCode || codeInput;
-    if (!codeToUse) {
-      setToast({ message: "Please enter a verification code", type: "error" });
-      return;
-    }
-
+    const codeToUse = code || token;
+    if (!codeToUse) return;
     setVerifying(true);
-    
     try {
-  const response = await verifyEmail(codeToUse, emailInput || undefined);
-      
+      const response = await verifyEmail(codeToUse);
       setVerified(true);
-      setToast({ 
-        message: response.message || t("verify.success" as any), 
-        type: "success" 
-      });
-      setShowEmailField(false);
+      setToast({ message: response.message || t("verify.success" as any), type: "success" });
     } catch (err) {
       const msg = err instanceof Error ? err.message : t("verify.failed" as any);
       setToast({ message: msg, type: "error" });
-      if (/email required/i.test(String(msg))) {
-        setShowEmailField(true);
-      }
     } finally {
       setVerifying(false);
     }
@@ -78,8 +56,8 @@ function VerifyEmailForm() {
   useEffect(() => {
     if (verified) {
       const id = setTimeout(() => {
-        // After successful email verification, go straight to pre‑checkout survey
-        router.push("/precheckout/survey");
+        // After successful email verification, go to sign-in
+        router.push("/login");
       }, 600);
       return () => clearTimeout(id);
     }
@@ -101,23 +79,30 @@ function VerifyEmailForm() {
             </div>
           </div>
           <h1 className="text-2xl font-semibold text-center mb-2">
-            {verified
-              ? t("verify.title.success" as any)
-              : (verifying || tokenInUrl)
-                ? t("verify.verifying.title" as any)
-                : t("verify.title" as any)}
+            {verified ? t("verify.title.success" as any) : t("verify.verifying.title" as any)}
           </h1>
           <p className="text-sm text-black/60 dark:text-white/70 text-center">
-            {verified
-              ? t("verify.subtitle.success" as any)
-              : (verifying || tokenInUrl)
-                ? t("verify.verifying.subtitle" as any)
-                : t("verify.subtitle" as any)}
+            {verified ? t("verify.subtitle.success" as any) : t("verify.verifying.subtitle" as any)}
           </p>
         </CardHeader>
 
         <CardBody>
-          {verified ? (
+          {invalidLink ? (
+            <div className="space-y-4 text-center">
+              <div className="py-4">
+                <div className="p-4 rounded-lg bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800">
+                  <div className="text-sm text-red-900 dark:text-red-100">
+                    {t("verify.failed" as any)}
+                  </div>
+                </div>
+              </div>
+              <div>
+                <Link href="/login" className="inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700">
+                  {t("verify.backToSignIn" as any)}
+                </Link>
+              </div>
+            </div>
+          ) : verified ? (
             <div className="space-y-4 text-center">
               <div className="py-4">
                 <div className="p-4 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
@@ -139,82 +124,19 @@ function VerifyEmailForm() {
               </div>
             </div>
           ) : (
-            <div className="space-y-5">
-              {/* Case A: User opened direct link (has token), but we DON'T have the email. Ask for it. */}
-              {!tokenInUrl ? (
-                // Case B: No token param; allow manual code + email verification
-                <>
-                  <div className="space-y-3">
-                    <Input
-                      label={t("verify.code.label" as any)}
-                      placeholder={t("verify.code.placeholder" as any)}
-                      value={codeInput}
-                      onChange={(e) => {
-                        setCodeInput(e.target.value);
-                        setVerificationCode(e.target.value);
-                      }}
-                    />
-                    <Input
-                      label="Email"
-                      type="email"
-                      placeholder="you@example.com"
-                      value={emailInput}
-                      onChange={(e) => setEmailInput(e.target.value)}
-                    />
-                    <Button onClick={() => handleVerify()} loading={verifying} className="w-full">
-                      {t("verify.verifying.title" as any)}
-                    </Button>
-                  </div>
-                  <div className="p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800">
-                    <div className="flex gap-3">
-                      <KeyRound className="h-5 w-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                      <div className="text-sm text-blue-900 dark:text-blue-100">
-                        <p className="font-medium mb-1">{t("verify.how.title" as any)}</p>
-                        <ol className="list-decimal list-inside space-y-1 text-blue-800 dark:text-blue-200">
-                          <li>{t("verify.how.s1" as any)}</li>
-                          <li>{t("verify.how.s2" as any)}</li>
-                          <li>{t("verify.how.s3" as any)}</li>
-                        </ol>
-                      </div>
-                    </div>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-sm text-black/60 dark:text-white/70 mb-3">
-                      {t("verify.resend.prompt" as any)}
-                    </p>
-                    <Button
-                      variant="outline"
-                      onClick={() => {
-                        setToast({ message: t("verify.resend.soon" as any), type: "error" });
-                      }}
-                      loading={resending}
-                    >
-                      {t("verify.resend.cta" as any)}
-                    </Button>
-                  </div>
-                </>
-              ) : (
-                // Case C: token present; we are auto-verifying, just show message
-                <div className="text-center py-6">
-                  <p className="text-sm text-black/60 dark:text-white/70">
-                    {t("verify.verifying.subtitle" as any)}
-                  </p>
-                  {showEmailField && (
-                    <div className="mt-4 max-w-md mx-auto space-y-3">
-                      <Input
-                        label="Email"
-                        type="email"
-                        placeholder="you@example.com"
-                        value={emailInput}
-                        onChange={(e) => setEmailInput(e.target.value)}
-                      />
-                      <Button onClick={() => handleVerify()} loading={verifying} className="w-full">
-                        {t("verify.verifying.title" as any)}
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              )}
+            <div className="text-center py-6">
+              <p className="text-sm text-black/60 dark:text-white/70 mb-4">
+                {t("verify.verifying.subtitle" as any)}
+              </p>
+              <div>
+                <Button
+                  variant="outline"
+                  onClick={() => handleVerify()}
+                  loading={verifying || resending}
+                >
+                  {t("verify.resend.cta" as any)}
+                </Button>
+              </div>
             </div>
           )}
         </CardBody>
