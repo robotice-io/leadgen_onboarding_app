@@ -20,8 +20,8 @@ const nextConfig: NextConfig = {
       "script-src-elem 'self' 'unsafe-inline' https://sdk.mercadopago.com https://www.googletagmanager.com https://assets.calendly.com https://http2.mlstatic.com",
       // MP secure-fields uses api-static and api domains; telemetry goes to mercadolibre domains
       "connect-src 'self' https://api.mercadopago.com https://sdk.mercadopago.com https://api-static.mercadopago.com https://api.mercadolibre.com https://www.mercadolibre.com https://www.googletagmanager.com https://www.google-analytics.com https://http2.mlstatic.com data: blob:",
-      // Allow MP iframes and mercadolibre postMessage targets; Calendly embeds if used
-      "frame-src 'self' https://sdk.mercadopago.com https://api.mercadopago.com https://www.mercadolibre.com https://assets.calendly.com",
+  // Allow MP iframes and mercadolibre postMessage targets; Calendly embeds if used
+  "frame-src 'self' https://sdk.mercadopago.com https://api.mercadopago.com https://api-static.mercadopago.com https://http2.mlstatic.com https://www.mercadolibre.com https://www.mercadolivre.com https://assets.calendly.com",
       // Basic resource directives
       "style-src 'self' 'unsafe-inline' https://assets.calendly.com https://fonts.googleapis.com",
       "style-src-elem 'self' 'unsafe-inline' https://assets.calendly.com https://fonts.googleapis.com",
