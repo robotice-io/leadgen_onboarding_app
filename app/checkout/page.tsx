@@ -26,7 +26,7 @@ export default function CheckoutPage() {
   const [mode, setMode] = useState<"card" | "wallet">("card");
 
   useEffect(() => {
-    const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY;
+  const pk = process.env.NEXT_PUBLIC_MP_PUBLIC_KEY || (process.env as any).NEXT_PUBLIC_MP_PUBLIC_KEY_PROD;
     if (!pk) {
       setError("Mercado Pago not configured");
       return;

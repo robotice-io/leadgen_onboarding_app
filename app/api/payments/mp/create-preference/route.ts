@@ -4,15 +4,12 @@ import { MercadoPagoConfig, Preference } from "mercadopago";
 export const runtime = "nodejs";
 
 function getBaseUrl() {
-  return (
-    process.env.NEXT_PUBLIC_APP_BASE_URL ||
-    process.env.APP_BASE_URL ||
-    process.env.VERCEL_PROJECT_PRODUCTION_URL?.startsWith("http")
-      ? process.env.VERCEL_PROJECT_PRODUCTION_URL!
-      : process.env.VERCEL_URL
-        ? `https://${process.env.VERCEL_URL}`
-        : "http://localhost:3000"
-  );
+  const explicit = process.env.NEXT_PUBLIC_APP_BASE_URL || process.env.APP_BASE_URL;
+  if (explicit) return explicit;
+  const vercelProjectUrl = process.env.VERCEL_PROJECT_PRODUCTION_URL;
+  if (vercelProjectUrl && vercelProjectUrl.startsWith("http")) return vercelProjectUrl;
+  if (process.env.VERCEL_URL) return `https://${process.env.VERCEL_URL}`;
+  return "http://localhost:3000";
 }
 
 function assertEnv(name: string, value: string | undefined): string {
@@ -29,10 +26,13 @@ const PLANS: Record<string, { title: string; currency: string; amount: number }>
 
 export async function POST(req: NextRequest) {
   try {
-    const accessToken = assertEnv("MP_ACCESS_TOKEN", process.env.MP_ACCESS_TOKEN);
+    const accessToken = assertEnv(
+      "MP_ACCESS_TOKEN",
+      process.env.MP_ACCESS_TOKEN || process.env.MP_ACCESS_TOKEN_PROD
+    );
     const client = new MercadoPagoConfig({
       accessToken,
-      options: { integratorId: process.env.MP_INTEGRATOR_ID },
+      options: { integratorId: process.env.MP_INTEGRATOR_ID || process.env.MP_INTEGRATOR_ID_PROD },
     });
 
     const body = await req.json().catch(() => ({}));

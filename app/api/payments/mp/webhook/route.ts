@@ -13,11 +13,11 @@ export async function POST(req: NextRequest) {
   const dataId = body?.data?.id || body?.data_id || body?.id || new URL(req.url).searchParams.get("data.id");
 
   try {
-    const accessToken = process.env.MP_ACCESS_TOKEN;
+    const accessToken = process.env.MP_ACCESS_TOKEN || process.env.MP_ACCESS_TOKEN_PROD;
     if (!accessToken) throw new Error("Missing MP_ACCESS_TOKEN");
     const client = new MercadoPagoConfig({
       accessToken,
-      options: { integratorId: process.env.MP_INTEGRATOR_ID },
+      options: { integratorId: process.env.MP_INTEGRATOR_ID || process.env.MP_INTEGRATOR_ID_PROD },
     });
 
     if (topic.includes("payment") && dataId) {
