@@ -67,20 +67,8 @@ async function proxy(req: NextRequest) {
   const ac = new AbortController();
   const timeout = setTimeout(() => ac.abort(), 15000);
   try {
-    let res = await fetch(target, { ...init, signal: ac.signal });
-    // If upstream returns 404 and path included '/api/v1', retry once stripping the prefix
-    if (res.status === 404 && path.startsWith('/api/v1/')) {
-      const altTarget = `${apiBase}${path.replace(/^\/api\/v1/, '')}${url.search}`;
-      try {
-        res = await fetch(altTarget, { ...init, signal: ac.signal });
-        // Replace target for debug header if fallback used
-        (global as any).__proxyLastTarget = altTarget;
-      } catch (e) {
-        // keep original res if fallback fetch fails at network level
-      }
-    } else {
-      (global as any).__proxyLastTarget = target;
-    }
+    const res = await fetch(target, { ...init, signal: ac.signal });
+    (global as any).__proxyLastTarget = target;
     const body = await res.arrayBuffer();
     // Sanitize response headers to avoid forbidden/hop-by-hop headers issues
     const resHeaders = new Headers(res.headers);
