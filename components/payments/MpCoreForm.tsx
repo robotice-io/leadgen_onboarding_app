@@ -11,6 +11,7 @@ declare global {
 export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: string; locale?: string }) {
   const [mp, setMp] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [fieldsReady, setFieldsReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [status, setStatus] = useState<string | null>(null);
   const [statusDetail, setStatusDetail] = useState<string | null>(null);
@@ -21,6 +22,7 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
   const [idTypes, setIdTypes] = useState<Array<{ id: string; name: string }>>([]);
 
   const refs = useRef<{ cardNumber?: any; exp?: any; cvc?: any } | null>(null);
+  const binTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const defaultEmail = useMemo(() => {
     try {
@@ -67,36 +69,43 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
     async function fetchBasics(instance: any) {
       try {
         const types = await instance.getIdentificationTypes();
-        setIdTypes(types || []);
-      } catch {}
+        const list = (types && Array.isArray(types) ? types : []) as Array<{ id: string; name: string }>;
+        setIdTypes(list.length ? list : [{ id: 'RUT', name: 'RUT' }]);
+      } catch {
+        // fallback for CL
+        setIdTypes([{ id: 'RUT', name: 'RUT' }]);
+      }
     }
 
     async function setupFields(instance: any) {
       try {
-        const cardNumber = instance.fields.create('cardNumber', { placeholder: '•••• •••• •••• ••••' }).mount('mp-card-number');
-        const expiration = instance.fields.create('expirationDate', { placeholder: 'MM/YY' }).mount('mp-expiration');
-        const security = instance.fields.create('securityCode', { placeholder: 'CVC' }).mount('mp-cvc');
-        refs.current = { cardNumber, exp: expiration, cvc: security };
+  const cardNumber = instance.fields.create('cardNumber', { placeholder: '•••• •••• •••• ••••' }).mount('mp-card-number');
+  const expiration = instance.fields.create('expirationDate', { placeholder: 'MM/YY' }).mount('mp-expiration');
+  const security = instance.fields.create('securityCode', { placeholder: 'CVC' }).mount('mp-cvc');
+  refs.current = { cardNumber, exp: expiration, cvc: security };
+  setFieldsReady(true);
 
         // Listen BIN changes to get payment method and installments
         let currentBin: string | undefined;
-        cardNumber.on('binChange', async ({ bin }: any) => {
+        cardNumber.on('binChange', ({ bin }: any) => {
           if (!bin || bin === currentBin) return;
           currentBin = bin;
-          try {
-            const pm = await instance.getPaymentMethods({ bin });
-            const method = (pm?.results && pm.results[0]) ? pm.results[0] : null;
-            if (method?.id) setPaymentMethodId(method.id);
-            // Installments for given amount+bin
-            const inst = await instance.getInstallments({ amount: amount || 0, bin, paymentTypeId: 'credit_card' });
-            const costs = (inst && inst[0]?.payer_costs) || [];
-            setInstallmentOptions(costs.map((c: any) => ({ label: c.recommended_message || `${c.installments} x`, value: Number(c.installments || 1) })));
-            setInstallments(costs[0]?.installments ? Number(costs[0].installments) : 1);
-          } catch (e) {
-            // silent fail; user can still try 1 installment
-            setInstallmentOptions([{ label: '1 cuota', value: 1 }]);
-            setInstallments(1);
-          }
+          if (binTimer.current) clearTimeout(binTimer.current);
+          binTimer.current = setTimeout(async () => {
+            try {
+              const pm = await instance.getPaymentMethods({ bin });
+              const method = (pm?.results && pm.results[0]) ? pm.results[0] : null;
+              if (method?.id) setPaymentMethodId(method.id);
+              const inst = await instance.getInstallments({ amount: amount || 0, bin, paymentTypeId: 'credit_card' });
+              const costs = (inst && inst[0]?.payer_costs) || [];
+              const options = costs.map((c: any) => ({ label: c.recommended_message || `${c.installments} x`, value: Number(c.installments || 1) }));
+              setInstallmentOptions(options.length ? options : [{ label: '1 cuota', value: 1 }]);
+              setInstallments(options[0]?.value || 1);
+            } catch (e) {
+              setInstallmentOptions([{ label: '1 cuota', value: 1 }]);
+              setInstallments(1);
+            }
+          }, 180);
         });
       } catch (e: any) {
         setError(e?.message || 'Failed to mount card fields');
@@ -128,6 +137,10 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
       });
       const token = tokenData?.id;
       if (!token) throw new Error('Failed to tokenize card');
+      if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
+        console.log('[MP] token created', tokenData);
+      }
       if (typeof document !== 'undefined') {
         const hidden = document.getElementById('token') as HTMLInputElement | null;
         if (hidden) hidden.value = token;
@@ -147,9 +160,17 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
         }
       };
 
-      const res = await fetch('/api/bridge/api/v1/billing/mp/payments', {
+      let res = await fetch('/api/bridge/api/v1/billing/mp/payments', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
       });
+      // Fallback for proxies that strip /api/v1 in the bridge
+      if (!res.ok && res.status === 404) {
+        try {
+          res = await fetch('/api/bridge/billing/mp/payments', {
+            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+          });
+        } catch {}
+      }
       const data = await res.json().catch(() => ({}));
       if (!res.ok) throw new Error(data?.error || data?.message || 'Payment failed');
 
@@ -227,7 +248,7 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
           </div>
         </div>
         <input id="token" name="token" type="hidden" />
-        <button type="submit" disabled={loading} className="mt-2 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50">
+        <button type="submit" disabled={loading || !fieldsReady || !holderName.trim() || !email.trim() || !idType || !idNumber.trim()} className="mt-2 inline-flex items-center justify-center rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50">
           {loading ? 'Loading…' : `Pay ${new Intl.NumberFormat('es-CL', { style: 'currency', currency: 'CLP' }).format(amount)}`}
         </button>
       </div>
