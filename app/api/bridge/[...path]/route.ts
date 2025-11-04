@@ -24,8 +24,10 @@ function getApiKey(): string {
 async function proxy(req: NextRequest) {
   const apiBase = getApiBase();
   const url = new URL(req.url);
-  const path = url.pathname.replace(/^\/api\/bridge/, "");
-  const target = `${apiBase}${path}${url.search}`;
+  // Preserve /api/v1 when present. If client omitted it (e.g., /api/bridge/billing/..), prepend /api/v1.
+  const subPath = url.pathname.replace(/^\/api\/bridge/, "");
+  const upstreamPath = subPath.startsWith("/api/") ? subPath : `/api/v1${subPath}`;
+  const target = `${apiBase}${upstreamPath}${url.search}`;
   // Build sanitized upstream headers (avoid hop-by-hop/forbidden headers)
   const headers = new Headers();
   const contentType = req.headers.get("content-type");
