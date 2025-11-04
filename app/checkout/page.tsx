@@ -4,17 +4,19 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { initMercadoPago, Wallet } from "@mercadopago/sdk-react";
 import { useI18n } from "@/lib/i18n";
 import { MercadoPagoCard } from "@/components/payments/MercadoPagoCard";
+import { openCalendly } from "@/lib/calendly";
 
 type PlanKey = "starter" | "core" | "pro" | "enterprise";
 
 export default function CheckoutPage() {
   const { t, lang } = useI18n();
-  let plan = "starter" as PlanKey;
-  try {
-    const search = typeof window !== "undefined" ? window.location.search : "";
-    const p = new URLSearchParams(search);
-    plan = ((p.get("plan") as PlanKey) || "starter");
-  } catch {}
+  const [plan, setPlan] = useState<PlanKey>(() => {
+    try {
+      const search = typeof window !== "undefined" ? window.location.search : "";
+      const p = new URLSearchParams(search);
+      return ((p.get("plan") as PlanKey) || "starter");
+    } catch { return "starter"; }
+  });
 
   const planMeta = useMemo(() => getPlanMeta(plan, lang), [plan, lang]);
 
@@ -35,6 +37,7 @@ export default function CheckoutPage() {
     }
 
     (async () => {
+      if (plan === "enterprise") { setPrefId(null); return; }
       try {
         setError(null);
         const res = await fetch("/api/payments/mp/create-preference", {
@@ -54,13 +57,26 @@ export default function CheckoutPage() {
   return (
     <main className="min-h-screen bg-black text-white">
       <div className="max-w-6xl mx-auto px-6 py-14 md:py-20">
+        {/* Back */}
+        <div className="mb-6">
+          <button
+            className="inline-flex items-center gap-2 text-sm text-white/80 hover:text-white"
+            onClick={() => {
+              if (typeof window !== "undefined" && window.history.length > 1) window.history.back();
+              else window.location.href = "/";
+            }}
+          >
+            <span className="inline-block h-5 w-5 rotate-180">➔</span>
+            Back
+          </button>
+        </div>
         <div className="max-w-2xl mb-8">
           <h1 className="text-3xl md:text-4xl font-bold">{t("checkout.page.title")}</h1>
           <p className="text-white/70 mt-2">{t("checkout.page.subtitle")}</p>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6 md:gap-10">
-          {/* Plan summary */}
+          {/* Plan picker + summary */}
           <section className="rounded-2xl border border-white/10 bg-white/5 p-6 md:p-8">
             <div className="flex items-center justify-between">
               <div>
@@ -70,6 +86,31 @@ export default function CheckoutPage() {
               {planMeta.badge && (
                 <span className="text-xs font-semibold rounded-full px-2.5 py-1 bg-blue-600">{planMeta.badge}</span>
               )}
+            </div>
+
+            {/* Vertical plan selector */}
+            <div className="mt-6">
+              <div className="flex items-center justify-between mb-3">
+                <div className="text-sm font-semibold text-white/80">Choose your plan</div>
+                <div className="flex gap-2">
+                  <button className="h-8 w-8 grid place-items-center rounded-md border border-white/15 hover:bg-white/10" onClick={() => cyclePlan(-1, setPlan)} aria-label="Previous plan">▲</button>
+                  <button className="h-8 w-8 grid place-items-center rounded-md border border-white/15 hover:bg-white/10" onClick={() => cyclePlan(1, setPlan)} aria-label="Next plan">▼</button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                {(["starter","core","pro","enterprise"] as PlanKey[]).map((key) => (
+                  <button
+                    key={key}
+                    onClick={() => setPlan(key)}
+                    className={`w-full text-left rounded-xl px-4 py-3 border ${plan===key?"border-blue-500 bg-blue-500/10":"border-white/10 bg-white/5 hover:bg-white/10"}`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="font-medium capitalize">{getPlanMeta(key, lang).title}</div>
+                      <div className="text-sm text-white/70">{getPlanMeta(key, lang).priceText}</div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="mt-6">
@@ -105,7 +146,13 @@ export default function CheckoutPage() {
               {error && <div className="text-sm text-red-400">{error}</div>}
 
               {!error && mode === "card" && (
-                planMeta.amount > 0 ? (
+                plan === "enterprise" ? (
+                  <div className="flex flex-col items-center justify-center h-[280px] text-center">
+                    <div className="text-2xl font-semibold">Free</div>
+                    <p className="text-white/70 mt-1 mb-4">Schedule a call to activate</p>
+                    <button onClick={() => openCalendly()} className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500">Schedule a call</button>
+                  </div>
+                ) : planMeta.amount > 0 ? (
                   <MercadoPagoCard amount={planMeta.amount} plan={plan} locale={lang === "es" ? "es-CL" : "es-CL"} />
                 ) : (
                   <div className="text-white/70 text-sm">Contact sales to purchase this plan.</div>
@@ -113,7 +160,13 @@ export default function CheckoutPage() {
               )}
 
               {!error && mode === "wallet" && (
-                prefId ? (
+                plan === "enterprise" ? (
+                  <div className="flex flex-col items-center justify-center h-[280px] text-center">
+                    <div className="text-2xl font-semibold">Free</div>
+                    <p className="text-white/70 mt-1 mb-4">Schedule a call to activate</p>
+                    <button onClick={() => openCalendly()} className="px-4 py-2 rounded-full bg-blue-600 hover:bg-blue-500">Schedule a call</button>
+                  </div>
+                ) : prefId ? (
                   <Wallet initialization={{ preferenceId: prefId }} />
                 ) : (
                   <div className="h-[280px] grid place-items-center text-center text-white/70">Loading payment…</div>
@@ -134,13 +187,13 @@ function getPlanMeta(plan: PlanKey, lang: "es" | "en") {
     starter: lang === "es" ? "Starter" : "Starter",
     core: lang === "es" ? "Core" : "Core",
     pro: lang === "es" ? "Pro" : "Pro",
-    enterprise: lang === "es" ? "Enterprise" : "Enterprise",
+    enterprise: lang === "es" ? "Free — Schedule a call" : "Free — Schedule a call",
   };
   const prices: Record<PlanKey, string> = {
     starter: lang === "es" ? "CLP 390.000 / mes" : "CLP 390,000 / mo",
     core: lang === "es" ? "CLP 790.000 / mes" : "CLP 790,000 / mo",
     pro: lang === "es" ? "CLP 1.490.000 / mes" : "CLP 1,490,000 / mo",
-    enterprise: lang === "es" ? "A medida" : "Custom",
+    enterprise: lang === "es" ? "Gratis" : "Free",
   };
   const amounts: Record<PlanKey, number> = {
     starter: 390000,
@@ -161,4 +214,23 @@ function getPlanMeta(plan: PlanKey, lang: "es" | "en") {
   };
   const badge = plan === "core" ? (lang === "es" ? "Más elegido" : "Most chosen") : undefined;
   return { title: titles[plan], priceText: prices[plan], features: featuresByPlan[plan], badge, amount: amounts[plan] } as const;
+}
+
+function cyclePlan(delta: number, setPlan: (p: PlanKey) => void) {
+  const order: PlanKey[] = ["starter","core","pro","enterprise"];
+  if (typeof window === "undefined") return;
+  try {
+    const search = new URLSearchParams(window.location.search);
+    const cur = (search.get("plan") as PlanKey) || "starter";
+    const idx = order.indexOf(cur);
+    const next = order[(idx + delta + order.length) % order.length];
+    // push state for UX
+    search.set("plan", next);
+    const url = `${window.location.pathname}?${search.toString()}`;
+    window.history.replaceState({}, "", url);
+    setPlan(next);
+  } catch {
+    // fallback just switch locally
+    setPlan((delta > 0 ? "core" : "enterprise") as PlanKey);
+  }
 }
