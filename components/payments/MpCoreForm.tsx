@@ -160,19 +160,18 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
         }
       };
 
-      let res = await fetch('/api/bridge/api/v1/billing/mp/payments', {
+      const res = await fetch('/api/bridge/api/v1/billing/mp/payments', {
         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
       });
-      // Fallback for proxies that strip /api/v1 in the bridge
-      if (!res.ok && res.status === 404) {
-        try {
-          res = await fetch('/api/bridge/billing/mp/payments', {
-            method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
-          });
-        } catch {}
+      const proxyTarget = res.headers.get('x-proxy-target');
+      const text = await res.text();
+      let data: any = {};
+      try { data = JSON.parse(text); } catch { data = { raw: text }; }
+      if (!res.ok) {
+        const msg = data?.error || data?.message || `Payment failed (${res.status})`;
+        const detail = proxyTarget ? ` — upstream: ${proxyTarget}` : '';
+        throw new Error(`${msg}${detail}`);
       }
-      const data = await res.json().catch(() => ({}));
-      if (!res.ok) throw new Error(data?.error || data?.message || 'Payment failed');
 
       setStatus(data?.status || 'unknown');
       setStatusDetail(data?.status_detail || '');
@@ -190,7 +189,7 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
         }
       } catch {}
     } catch (e: any) {
-      console.error('createCardToken error', e?.message, (e as any)?.cause, e);
+      console.error('Token/payment error:', e?.error || e?.message, (e as any)?.cause || e);
       setError(e?.message || 'Payment failed');
     }
   }
