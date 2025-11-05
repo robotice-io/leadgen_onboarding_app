@@ -33,10 +33,18 @@ export default function PrecheckoutSurveyPage() {
   const { t } = useI18n();
   const router = useRouter();
   let plan = "starter";
+  let nextPath = "/checkout";
   try {
     const search = typeof window !== "undefined" ? window.location.search : "";
     const p = new URLSearchParams(search);
     plan = p.get("plan") || "starter";
+    // Allow overriding next step so we can reuse this page after payment
+    const next = p.get("next");
+    if (next) {
+      nextPath = next;
+    } else {
+      nextPath = `/checkout?plan=${encodeURIComponent(plan)}`;
+    }
   } catch {}
 
   const [source, setSource] = useState<string | null>(null);
@@ -81,7 +89,7 @@ export default function PrecheckoutSurveyPage() {
 
           <div className="mt-10">
             <Button
-              onPress={() => router.push(`/checkout?plan=${encodeURIComponent(plan)}`)}
+              onPress={() => router.push(nextPath)}
               isDisabled={!canContinue}
             >
               {t("survey.next")}

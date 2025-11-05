@@ -113,6 +113,11 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
               if (!res.ok) throw new Error(data?.error || data?.message || 'Payment failed');
               setResult({ id: data?.id, status: data?.status, status_detail: data?.status_detail });
               try { console.log('[MP][Brick] payment response', { id: data?.id, status: data?.status, status_detail: data?.status_detail, proxyTarget }); } catch {}
+              // Redirect flow on approved payments: survey -> onboarding
+              if (String(data?.status) === 'approved') {
+                const surveyUrl = `/precheckout/survey?plan=${encodeURIComponent(String(plan))}&next=${encodeURIComponent('/onboarding')}`;
+                window.location.href = surveyUrl;
+              }
               return data;
             } catch (e: any) {
               const msg = e?.message || 'Payment failed';
@@ -212,8 +217,13 @@ function FallbackBrick({ amount, plan, locale, email, onMounted, onError }: { am
                   payer: { email: formData?.payer?.email || email, identification: formData?.payer?.identification },
                 };
                 const res = await fetch('/api/bridge/api/v1/billing/mp/payments', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-                const ok = res.ok;
-                if (!ok) throw new Error((await res.text()) || 'Payment failed');
+                const text = await res.text();
+                let data: any = {}; try { data = JSON.parse(text); } catch {}
+                if (!res.ok) throw new Error((data?.error || data?.message || text || 'Payment failed'));
+                if (String(data?.status) === 'approved') {
+                  const surveyUrl = `/precheckout/survey?plan=${encodeURIComponent(String(plan))}&next=${encodeURIComponent('/onboarding')}`;
+                  window.location.href = surveyUrl;
+                }
                 return Promise.resolve();
               } catch (e: any) {
                 onError(e?.message || 'Payment failed');
