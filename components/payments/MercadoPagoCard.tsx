@@ -115,7 +115,7 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
               try { console.log('[MP][Brick] payment response', { id: data?.id, status: data?.status, status_detail: data?.status_detail, proxyTarget }); } catch {}
               // Redirect flow on approved payments: survey -> onboarding
               if (String(data?.status) === 'approved') {
-                const surveyUrl = `/precheckout/survey?plan=${encodeURIComponent(String(plan))}&next=${encodeURIComponent('/onboarding')}`;
+                const surveyUrl = `/precheckout/survey?plan=${encodeURIComponent(String(plan))}&next=${encodeURIComponent('/onboarding/audience')}`;
                 window.location.href = surveyUrl;
               }
               return data;
@@ -221,7 +221,7 @@ function FallbackBrick({ amount, plan, locale, email, onMounted, onError }: { am
                 let data: any = {}; try { data = JSON.parse(text); } catch {}
                 if (!res.ok) throw new Error((data?.error || data?.message || text || 'Payment failed'));
                 if (String(data?.status) === 'approved') {
-                  const surveyUrl = `/precheckout/survey?plan=${encodeURIComponent(String(plan))}&next=${encodeURIComponent('/onboarding')}`;
+                  const surveyUrl = `/precheckout/survey?plan=${encodeURIComponent(String(plan))}&next=${encodeURIComponent('/onboarding/audience')}`;
                   window.location.href = surveyUrl;
                 }
                 return Promise.resolve();
