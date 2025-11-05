@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CardPayment, initMercadoPago } from "@mercadopago/sdk-react";
 import { loadMercadoPago } from "@mercadopago/sdk-js";
+import { apiPost } from "@/lib/api";
 
 export function MercadoPagoCard({ amount, plan, locale, email }: { amount: number; plan: string; locale?: string; email?: string }) {
   const [result, setResult] = useState<{ id?: string; status?: string; status_detail?: string } | null>(null);
@@ -115,6 +116,18 @@ export function MercadoPagoCard({ amount, plan, locale, email }: { amount: numbe
               try { console.log('[MP][Brick] payment response', { id: data?.id, status: data?.status, status_detail: data?.status_detail, proxyTarget }); } catch {}
               // Redirect flow on approved payments: survey -> onboarding
               if (String(data?.status) === 'approved') {
+                try {
+                  const tenantId = typeof window !== 'undefined' ? window.localStorage.getItem('robotice-tenant-id') : null;
+                  if (tenantId) {
+                    await apiPost('/billing/mp/mark-paid', {
+                      tenant_id: Number(tenantId),
+                      provider: 'mercadopago',
+                      amount: Number(amount || 0),
+                      currency: 'CLP',
+                      reference: String(data?.id || data?.payment_id || 'mp_unknown'),
+                    });
+                  }
+                } catch {}
                 const surveyUrl = `/precheckout/survey?plan=${encodeURIComponent(String(plan))}&next=${encodeURIComponent('/onboarding/audience')}`;
                 window.location.href = surveyUrl;
               }
@@ -221,6 +234,18 @@ function FallbackBrick({ amount, plan, locale, email, onMounted, onError }: { am
                 let data: any = {}; try { data = JSON.parse(text); } catch {}
                 if (!res.ok) throw new Error((data?.error || data?.message || text || 'Payment failed'));
                 if (String(data?.status) === 'approved') {
+                  try {
+                    const tenantId = typeof window !== 'undefined' ? window.localStorage.getItem('robotice-tenant-id') : null;
+                    if (tenantId) {
+                      await apiPost('/billing/mp/mark-paid', {
+                        tenant_id: Number(tenantId),
+                        provider: 'mercadopago',
+                        amount: Number(amount || 0),
+                        currency: 'CLP',
+                        reference: String(data?.id || data?.payment_id || 'mp_unknown'),
+                      });
+                    }
+                  } catch {}
                   const surveyUrl = `/precheckout/survey?plan=${encodeURIComponent(String(plan))}&next=${encodeURIComponent('/onboarding/audience')}`;
                   window.location.href = surveyUrl;
                 }

@@ -34,8 +34,19 @@ export default function ClientOnboardingStepPage() {
   // Local-only mock state (no API yet)
   const [local, setLocal] = useState<Record<string, any>>({});
 
-  const handleFinish = () => {
-    router.push("/dashboard");
+  const handleFinish = async () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.localStorage.setItem('client-onboarded', '1');
+      }
+      // Optional: attempt to notify backend if an endpoint exists
+      try {
+        const res = await fetch('/api/bridge/api/v1/auth/mark-onboarded', { method: 'POST' });
+        // ignore response; best-effort
+      } catch {}
+    } finally {
+      router.push("/dashboard");
+    }
   };
 
   if (!CLIENT_STEPS.includes(step as any)) {
