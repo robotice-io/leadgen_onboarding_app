@@ -61,16 +61,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         setUser(userData);
         setTenant(currentTenant);
 
-        // Enforce paywall: unpaid -> /pay; paid and not onboarded -> onboarding (unless local client-onboarded flag)
+        // Enforce paywall using backend flags only:
+        // unpaid -> /checkout; paid and not onboarded -> /onboarding/audience; onboarded -> dashboard
         try {
           if (!currentTenant?.billing_paid) {
-            window.location.replace("/pay");
+            window.location.replace("/checkout");
             return;
           }
-          let clientDone = false;
-          try { clientDone = typeof window !== 'undefined' && window.localStorage.getItem('client-onboarded') === '1'; } catch {}
-          if (!currentTenant?.onboarded && !clientDone) {
-            window.location.replace("/onboarding");
+          if (!currentTenant?.onboarded) {
+            window.location.replace("/onboarding/audience");
             return;
           }
         } catch {}

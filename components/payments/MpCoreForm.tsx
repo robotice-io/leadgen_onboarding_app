@@ -375,7 +375,7 @@ export function MpCoreForm({ amount, plan, locale }: { amount: number; plan: str
             <div className="text-xs text-white/60 mt-2">Additional verification required. If your bank prompts a 3D Secure challenge, follow the instructions. You'll remain on this page.</div>
           )}
           {status === 'approved' && (
-            <button onClick={() => (window.location.href = '/onboarding')} className="mt-3 px-3 py-1.5 rounded-md bg-green-600 text-sm">Continue to onboarding</button>
+            <button onClick={() => (window.location.href = '/onboarding/audience')} className="mt-3 px-3 py-1.5 rounded-md bg-green-600 text-sm">Continue to onboarding</button>
           )}
         </div>
       )}

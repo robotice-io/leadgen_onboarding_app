@@ -17,18 +17,18 @@ export default function PostLoginGate() {
             setError(null);
             
             const tenant = await getUserTenant();
-            // Defensive: unpaid shouldn't reach here per backend; route to /pay if it happens
+            // Unpaid -> checkout
             if (!tenant?.billing_paid) {
-              router.replace("/pay");
+              router.replace("/checkout");
               return;
             }
-            // If onboarded -> dashboard (even if Google token expired)
+            // Paid and completed onboarding -> dashboard
             if (tenant?.onboarded) {
               router.replace("/dashboard");
               return;
             }
-            // Paid but not onboarded -> onboarding wizard
-            router.replace("/onboarding");
+            // Paid but not onboarded -> client onboarding wizard
+            router.replace("/onboarding/audience");
           } catch (e) {
         console.error("[PostLoginGate] Failed to check onboarding status:", e);
         console.error("[PostLoginGate] Error details:", e);

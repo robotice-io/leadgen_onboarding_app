@@ -39,18 +39,16 @@ function LoginForm() {
           window.location.href = next;
           return;
         }
-        // Backend should block unpaid logins; keep defensive fallback
+        // Defensive gating based on login response
         if (!tenant?.billing_paid) {
-          window.location.href = "/pay";
+          window.location.href = "/checkout";
           return;
         }
-        // If onboarded -> dashboard (regardless of google token state)
-        if (tenant?.onboarded) {
-          window.location.href = "/dashboard";
+        if (!tenant?.onboarded) {
+          window.location.href = "/onboarding/audience";
           return;
         }
-        // Paid but not onboarded -> onboarding wizard
-        window.location.href = "/onboarding";
+        window.location.href = "/dashboard";
       } catch {
         // Fallback to existing post-login route
         window.location.href = "/post-login";

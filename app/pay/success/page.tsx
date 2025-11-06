@@ -26,7 +26,7 @@ export default function PaySuccessPage() {
         setStatus("done");
         setMessage("Payment confirmed. Redirecting…");
         setTimeout(() => {
-          window.location.href = "/onboarding";
+          window.location.href = "/onboarding/audience";
         }, 800);
       } catch (e: any) {
         setStatus("error");
