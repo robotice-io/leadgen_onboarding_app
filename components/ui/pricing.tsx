@@ -70,7 +70,8 @@ Button.displayName = "Button";
 
 // --- INTERACTIVE STARFIELD ---
 function Star({ mousePosition, containerRef }: { mousePosition: { x: number | null; y: number | null }; containerRef: React.MutableRefObject<HTMLDivElement | null>; }) {
-  const [initialPos] = useState({ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%` });
+  // Generate randoms only on client after mount to avoid SSR hydration mismatch
+  const [initialPos] = useState<{ top: string; left: string }>(() => ({ top: `${Math.random() * 100}%`, left: `${Math.random() * 100}%` }));
   const springConfig = { stiffness: 100, damping: 15, mass: 0.1 };
   const springX = useSpring(0, springConfig);
   const springY = useSpring(0, springConfig);
@@ -91,15 +92,30 @@ function Star({ mousePosition, containerRef }: { mousePosition: { x: number | nu
     } else { springX.set(0); springY.set(0); }
   }, [mousePosition, initialPos, containerRef, springX, springY]);
 
+  // Width/height/timing randoms should also be client-only; compute once per star instance
+  const [randDims] = useState(() => ({
+    w: 1 + Math.random() * 2,
+    h: 1 + Math.random() * 2,
+    dur: 2 + Math.random() * 3,
+    delay: Math.random() * 5,
+  }));
+
   return (
-    <motion.div className="absolute bg-white/90 rounded-full"
-      style={{ top: initialPos.top, left: initialPos.left, width: `${1 + Math.random() * 2}px`, height: `${1 + Math.random() * 2}px`, x: springX, y: springY }}
-      initial={{ opacity: 0 }} animate={{ opacity: [0, 1, 0] }}
-      transition={{ duration: 2 + Math.random() * 3, repeat: Infinity, delay: Math.random() * 5 }} />
+    <motion.div
+      className="absolute bg-white/90 rounded-full"
+      style={{ top: initialPos.top, left: initialPos.left, width: `${randDims.w}px`, height: `${randDims.h}px`, x: springX, y: springY }}
+      initial={{ opacity: 0 }}
+      animate={{ opacity: [0, 1, 0] }}
+      transition={{ duration: randDims.dur, repeat: Infinity, delay: randDims.delay }}
+    />
   );
 }
 
 function InteractiveStarfield({ mousePosition, containerRef }: { mousePosition: { x: number | null; y: number | null }; containerRef: React.MutableRefObject<HTMLDivElement | null>; }) {
+  // Render starfield only after mount to avoid SSR/client markup mismatch
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
+  if (!mounted) return null;
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
       {Array.from({ length: 120 }).map((_, i) => (
